@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KÂŞİF - Görev Kontrol (Admin)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { 'kid': ['Fredoka', 'sans-serif'] },
+                    colors: { 'admin-dark': '#0f172a', 'admin-panel': '#1e293b' }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Fredoka', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        /* Özel Tag Efektleri */
+        .tag-glow { text-shadow: 0 0 10px #fcd34d; animation: pulse 2s infinite; }
+        .tag-fire { color: #f87171; text-shadow: 0 0 5px #ef4444; }
+        .tag-rainbow { background-image: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red); -webkit-background-clip: text; color: transparent; }
+    </style>
+</head>
+<body class="bg-admin-dark text-slate-200 h-screen flex overflow-hidden">
+
+    <aside class="w-64 bg-admin-panel flex flex-col border-r border-slate-700">
+        <div class="h-20 flex items-center justify-center border-b border-slate-700">
+            <h1 class="text-2xl font-black text-red-500 tracking-widest">GÖREV KONTROL</h1>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <button onclick="switchTab('users')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-700 transition text-left tab-btn bg-slate-700 text-white" data-tab="users">
+                <i class="fa-solid fa-users-gear text-blue-400"></i> Öğrenci Yönetimi
+            </button>
+            <button onclick="switchTab('games')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-700 transition text-left tab-btn" data-tab="games">
+                <i class="fa-solid fa-gamepad text-green-400"></i> Oyun İçerikleri
+            </button>
+        </nav>
+        <div class="p-4">
+            <button onclick="location.href='portal.html'" class="w-full border border-slate-600 p-3 rounded-xl hover:bg-slate-700 transition">
+                <i class="fa-solid fa-arrow-left"></i> Portala Dön
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden">
+        
+        <header class="h-20 border-b border-slate-700 flex items-center justify-between px-8 bg-admin-panel/50 backdrop-blur">
+            <h2 id="page-title" class="text-xl font-bold">Öğrenci Yönetimi</h2>
+            <div class="flex items-center gap-4">
+                <div class="text-right">
+                    <p class="text-sm font-bold text-slate-400">Admin Oturumu</p>
+                    <p class="text-xs text-green-500">● Sistem Aktif</p>
+                </div>
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Admin" class="w-10 h-10 rounded-full bg-slate-700">
+            </div>
+        </header>
+
+        <div id="tab-users" class="flex-1 overflow-y-auto p-8 content-tab">
+            <div class="grid grid-cols-3 gap-6 mb-8">
+                <div class="bg-blue-900/20 border border-blue-500/30 p-6 rounded-2xl">
+                    <h3 class="text-blue-400 text-sm font-bold uppercase">Toplam Öğrenci</h3>
+                    <p class="text-4xl font-black mt-2" id="stat-users">0</p>
+                </div>
+                <div class="bg-yellow-900/20 border border-yellow-500/30 p-6 rounded-2xl">
+                    <h3 class="text-yellow-400 text-sm font-bold uppercase">Dağıtılan Altın</h3>
+                    <p class="text-4xl font-black mt-2" id="stat-coins">0</p>
+                </div>
+                <div class="bg-purple-900/20 border border-purple-500/30 p-6 rounded-2xl">
+                    <h3 class="text-purple-400 text-sm font-bold uppercase">En Yüksek Level</h3>
+                    <p class="text-4xl font-black mt-2" id="stat-max-lvl">0</p>
+                </div>
+            </div>
+
+            <div class="bg-admin-panel rounded-2xl border border-slate-700 overflow-hidden">
+                <div class="p-4 border-b border-slate-700 flex justify-between items-center">
+                    <h3 class="font-bold">Kayıtlı Kâşifler</h3>
+                    <button onclick="refreshUsers()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-rotate"></i> Yenile</button>
+                </div>
+                <table class="w-full text-left">
+                    <thead class="bg-slate-800 text-slate-400 text-xs uppercase">
+                        <tr>
+                            <th class="p-4">Kâşif</th>
+                            <th class="p-4">Ünvan</th>
+                            <th class="p-4">Level / XP</th>
+                            <th class="p-4">Bakiye</th>
+                            <th class="p-4 text-right">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body" class="divide-y divide-slate-700 text-sm">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-games" class="flex-1 overflow-y-auto p-8 content-tab hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Oyun Kütüphanesi</h3>
+                <button onclick="openGameModal()" class="bg-green-600 hover:bg-green-500 text-white px-6 py-2 rounded-xl font-bold shadow-lg transition">
+                    <i class="fa-solid fa-plus mr-2"></i> Yeni Oyun Ekle
+                </button>
+            </div>
+
+            <div id="games-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                </div>
+        </div>
+
+    </main>
+
+    <div id="user-modal" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-admin-panel w-full max-w-lg rounded-2xl border border-slate-600 shadow-2xl p-6 relative">
+            <button onclick="closeModal('user-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <h3 class="text-xl font-bold mb-1 text-white">Kâşif Düzenle</h3>
+            <p class="text-xs text-slate-400 mb-6" id="editing-user-id">ID: ...</p>
+
+            <form onsubmit="saveUserChanges(event)" class="space-y-4">
+                <input type="hidden" id="edit-uid">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-1">Altın (Coins)</label>
+                        <input type="number" id="edit-coins" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 mb-1">XP Puanı</label>
+                        <input type="number" id="edit-xp" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Özel Ünvan</label>
+                    <input type="text" id="edit-title" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Animasyonlu Tag (Efekt)</label>
+                    <select id="edit-tag" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
+                        <option value="">Yok</option>
+                        <option value="tag-glow">✨ Parlayan Yıldız</option>
+                        <option value="tag-fire">🔥 Ateşli Kâşif</option>
+                        <option value="tag-rainbow">🌈 Gökkuşağı Efsanesi</option>
+                    </select>
+                </div>
+
+                <div class="pt-4 border-t border-slate-700 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('user-modal')" class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-bold">İptal</button>
+                    <button type="submit" class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold shadow-lg">Değişiklikleri Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="game-modal" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-admin-panel w-full max-w-lg rounded-2xl border border-slate-600 shadow-2xl p-6 relative">
+            <button onclick="closeModal('game-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <h3 class="text-xl font-bold mb-6 text-white" id="game-modal-title">Yeni Oyun Ekle</h3>
+
+            <form onsubmit="saveGame(event)" class="space-y-4">
+                <input type="hidden" id="game-id"> <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Oyun Adı</label>
+                    <input type="text" id="game-title" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Kategori</label>
+                    <select id="game-cat" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white">
+                        <option value="Tarih">Tarih</option>
+                        <option value="Coğrafya">Coğrafya</option>
+                        <option value="Bilim">Bilim</option>
+                        <option value="Vatandaşlık">Vatandaşlık</option>
+                        <option value="Mantık">Mantık/Zeka</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Kapak Resmi URL</label>
+                    <input type="text" id="game-img" placeholder="https://..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">Oyun Embed Linki (Wordwall/LearningApps)</label>
+                    <input type="text" id="game-url" placeholder="https://wordwall.net/embed/..." required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white text-xs">
+                </div>
+
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="submit" class="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white font-bold shadow-lg">Oyunu Yayınla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // FIREBASE CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5SFoL8-4idNlbixCw81pjWMn6M6-yv1A",
+            authDomain: "kasif-cd133.firebaseapp.com",
+            projectId: "kasif-cd133",
+            storageBucket: "kasif-cd133.firebasestorage.app",
+            messagingSenderId: "734052460302",
+            appId: "1:734052460302:web:9c8b1747e3dcbdff6c195f",
+            measurementId: "G-VZ04P8EQ69"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app, "kasif");
+
+        // --- GÜVENLİK KONTROLÜ (Basit) ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Gerçek projede burada kullanıcının "isAdmin" field'ı kontrol edilmeli.
+                console.log("Admin oturumu açık:", user.email);
+                loadUsers();
+                loadGames();
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        // --- GLOBAL FONKSİYONLAR ---
+        window.switchTab = (tabId) => {
+            document.querySelectorAll('.content-tab').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('bg-slate-700', 'text-white'));
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('bg-slate-700', 'text-white');
+            
+            document.getElementById('page-title').innerText = tabId === 'users' ? 'Öğrenci Yönetimi' : 'Oyun İçerikleri';
+        };
+
+        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+
+        // ==========================================
+        // 1. ÖĞRENCİ YÖNETİMİ
+        // ==========================================
+        window.refreshUsers = () => loadUsers();
+
+        async function loadUsers() {
+            const tableBody = document.getElementById('users-table-body');
+            tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</td></tr>';
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "users"));
+                let html = '';
+                let totalUsers = 0;
+                let totalCoins = 0;
+                let maxLvl = 0;
+
+                querySnapshot.forEach((doc) => {
+                    const u = doc.data();
+                    const uid = doc.id;
+                    totalUsers++;
+                    totalCoins += (u.coins || 0);
+                    if((u.level || 1) > maxLvl) maxLvl = u.level || 1;
+
+                    // Özel Tag Sınıfı
+                    const tagClass = u.specialTag || "";
+
+                    html += `
+                    <tr class="hover:bg-slate-700/50 transition">
+                        <td class="p-4 flex items-center gap-3">
+                            <img src="${u.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=x'}" class="w-8 h-8 rounded-full bg-slate-600">
+                            <div>
+                                <div class="font-bold text-white">${u.username}</div>
+                                <div class="text-xs text-slate-500">${u.email}</div>
+                            </div>
+                        </td>
+                        <td class="p-4 font-bold text-yellow-500 ${tagClass}">${u.title || 'Acemi'}</td>
+                        <td class="p-4">
+                            <span class="bg-slate-700 px-2 py-1 rounded text-xs font-bold text-white">Lvl ${u.level || 1}</span>
+                            <span class="text-xs text-slate-400 ml-1">${u.xp || 0} XP</span>
+                        </td>
+                        <td class="p-4 font-mono text-green-400">${u.coins || 0} 💰</td>
+                        <td class="p-4 text-right">
+                            <button onclick="openUserEdit('${uid}', '${u.username}', ${u.coins}, ${u.xp}, '${u.title}', '${u.specialTag || ''}')" class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-lg text-xs font-bold">
+                                <i class="fa-solid fa-pen"></i> Düzenle
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+
+                tableBody.innerHTML = html;
+                
+                // İstatistikleri Güncelle
+                document.getElementById('stat-users').innerText = totalUsers;
+                document.getElementById('stat-coins').innerText = totalCoins.toLocaleString();
+                document.getElementById('stat-max-lvl').innerText = maxLvl;
+
+            } catch (error) {
+                console.error(error);
+                tableBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500">Veri yüklenemedi.</td></tr>';
+            }
+        }
+
+        window.openUserEdit = (uid, name, coins, xp, title, tag) => {
+            document.getElementById('edit-uid').value = uid;
+            document.getElementById('editing-user-id').innerText = `Düzenlenen: ${name} (ID: ${uid})`;
+            document.getElementById('edit-coins').value = coins || 0;
+            document.getElementById('edit-xp').value = xp || 0;
+            document.getElementById('edit-title').value = title || '';
+            document.getElementById('edit-tag').value = tag || '';
+            
+            document.getElementById('user-modal').classList.remove('hidden');
+        };
+
+        window.saveUserChanges = async (e) => {
+            e.preventDefault();
+            const uid = document.getElementById('edit-uid').value;
+            const coins = parseInt(document.getElementById('edit-coins').value);
+            const xp = parseInt(document.getElementById('edit-xp').value);
+            const title = document.getElementById('edit-title').value;
+            const tag = document.getElementById('edit-tag').value;
+
+            // Level Hesaplama (Basit mantık: Her 1000 XP = 1 Level)
+            const newLevel = Math.floor(xp / 1000) + 1;
+
+            try {
+                await updateDoc(doc(db, "users", uid), {
+                    coins: coins,
+                    xp: xp,
+                    level: newLevel,
+                    title: title,
+                    specialTag: tag
+                });
+                
+                window.closeModal('user-modal');
+                loadUsers(); // Tabloyu yenile
+                Swal.fire({icon: 'success', title: 'Kaydedildi!', timer: 1500, showConfirmButton: false, background: '#1e293b', color: '#fff'});
+            } catch (error) {
+                console.error(error);
+                Swal.fire({icon: 'error', title: 'Hata!', text: error.message});
+            }
+        };
+
+        // ==========================================
+        // 2. OYUN YÖNETİMİ
+        // ==========================================
+        
+        async function loadGames() {
+            const list = document.getElementById('games-list');
+            // list.innerHTML = '<div class="col-span-4 text-center"><i class="fa-solid fa-spinner fa-spin"></i> Oyunlar yükleniyor...</div>';
+
+            try {
+                // "games" koleksiyonundan verileri çek
+                // NOT: Eğer "games" koleksiyonu yoksa boş gelir. İlk başta boştur.
+                const querySnapshot = await getDocs(collection(db, "games"));
+                let html = '';
+
+                querySnapshot.forEach((doc) => {
+                    const g = doc.data();
+                    const gid = doc.id;
+                    
+                    let catColor = "text-slate-400";
+                    if(g.cat === "Tarih") catColor = "text-red-400";
+                    if(g.cat === "Bilim") catColor = "text-green-400";
+
+                    html += `
+                    <div class="bg-slate-800 rounded-xl overflow-hidden border border-slate-600 group relative">
+                        <img src="${g.img || 'https://placehold.co/400x200?text=Oyun'}" class="w-full h-32 object-cover opacity-70 group-hover:opacity-100 transition">
+                        <div class="p-4">
+                            <span class="text-xs font-bold uppercase ${catColor}">${g.cat}</span>
+                            <h4 class="font-bold text-white text-lg truncate">${g.title}</h4>
+                            <div class="mt-4 flex gap-2">
+                                <button onclick="editGame('${gid}', '${g.title}', '${g.cat}', '${g.img}', '${g.url}')" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white text-xs py-2 rounded font-bold">Düzenle</button>
+                                <button onclick="deleteGame('${gid}')" class="bg-red-600 hover:bg-red-500 text-white px-3 py-2 rounded font-bold"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+
+                list.innerHTML = html || '<div class="col-span-4 text-center text-slate-500">Henüz hiç oyun eklenmemiş.</div>';
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        window.openGameModal = () => {
+            // Formu temizle (Yeni ekleme modu)
+            document.getElementById('game-id').value = '';
+            document.getElementById('game-title').value = '';
+            document.getElementById('game-img').value = '';
+            document.getElementById('game-url').value = '';
+            document.getElementById('game-modal-title').innerText = "Yeni Oyun Ekle";
+            document.getElementById('game-modal').classList.remove('hidden');
+        };
+
+        window.editGame = (id, title, cat, img, url) => {
+            // Formu doldur (Düzenleme modu)
+            document.getElementById('game-id').value = id;
+            document.getElementById('game-title').value = title;
+            document.getElementById('game-cat').value = cat;
+            document.getElementById('game-img').value = img;
+            document.getElementById('game-url').value = url;
+            document.getElementById('game-modal-title').innerText = "Oyunu Düzenle";
+            document.getElementById('game-modal').classList.remove('hidden');
+        };
+
+        window.saveGame = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('game-id').value;
+            const gameData = {
+                title: document.getElementById('game-title').value,
+                cat: document.getElementById('game-cat').value,
+                img: document.getElementById('game-img').value,
+                url: document.getElementById('game-url').value
+            };
+
+            try {
+                if (id) {
+                    // Güncelleme
+                    await updateDoc(doc(db, "games", id), gameData);
+                } else {
+                    // Yeni Ekleme
+                    await addDoc(collection(db, "games"), gameData);
+                }
+                window.closeModal('game-modal');
+                loadGames();
+                Swal.fire({icon: 'success', title: 'Oyun Kaydedildi!', timer: 1500, showConfirmButton: false, background: '#1e293b', color: '#fff'});
+            } catch (error) {
+                console.error(error);
+                alert("Hata oluştu: " + error.message);
+            }
+        };
+
+        window.deleteGame = async (id) => {
+            if(confirm("Bu oyunu silmek istediğine emin misin?")) {
+                try {
+                    await deleteDoc(doc(db, "games", id));
+                    loadGames();
+                } catch(e) { console.error(e); }
+            }
+        };
+
+        // Başlangıç Yüklemeleri
+        loadUsers();
+        loadGames();
+
+    </script>
+</body>
+</html>
