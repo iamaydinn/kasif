@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KÂŞİF - Oyun Portalı</title>
+    <title>KÂŞİF - Uzay İstasyonu</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -21,32 +21,24 @@
         }
     </script>
     <style>
-        /* ÇOCUKSU İMLEÇ */
-        body { 
-            font-family: 'Fredoka', sans-serif; 
-            cursor: url('https://cdn-icons-png.flaticon.com/32/889/889669.png'), auto; /* Sihirli Değnek */
-            overflow: hidden; 
-        }
+        body { font-family: 'Fredoka', sans-serif; cursor: default; /* Normal İmleç */ overflow: hidden; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Tıklama Efekti (Sarı Yıldız) */
-        .click-particle { 
-            position: absolute; pointer-events: none; 
-            animation: particleFade 0.8s forwards; z-index: 999999; 
-            font-size: 24px; color: #FFD700; text-shadow: 0 0 5px orange;
-        }
-        @keyframes particleFade { 
-            0% { opacity: 1; transform: scale(0.5) rotate(0deg); } 
-            100% { opacity: 0; transform: scale(1.5) rotate(180deg); } 
-        }
-
-        /* KRİTİK DÜZELTME: SweetAlert EN ÜSTTE */
-        .swal2-container { z-index: 2147483647 !important; }
-        .modal-overlay { z-index: 10000 !important; background-color: rgba(15, 23, 42, 0.9); backdrop-filter: blur(5px); }
-        
         /* Animasyonlar */
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         .animate-float { animation: float 3s ease-in-out infinite; }
+
+        /* Sohbet Balonları */
+        .bubble-me { background: linear-gradient(135deg, #8B5CF6, #D946EF); color: white; border-radius: 1.5rem 1.5rem 0 1.5rem; box-shadow: 0 2px 5px rgba(139, 92, 246, 0.3); }
+        .bubble-other { background: white; color: #374151; border-radius: 1.5rem 1.5rem 1.5rem 0; border: 1px solid #E5E7EB; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        /* === KRİTİK Z-INDEX DÜZELTMELERİ === */
+        /* SweetAlert (Popup) En Üstte */
+        .swal2-container { z-index: 2147483647 !important; }
+        /* Modallar */
+        .modal-overlay { z-index: 99999 !important; background-color: rgba(15, 23, 42, 0.9); backdrop-filter: blur(5px); }
+        /* Loader */
+        #loader { position: fixed; inset: 0; background: #0F172A; z-index: 200000; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s; }
         
         /* İsim Efektleri */
         .effect-rainbow { background-image: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red); -webkit-background-clip: text; color: transparent; animation: hue 3s linear infinite; font-weight: 900; }
@@ -54,11 +46,9 @@
         .effect-glitch { color: #00ff00; text-shadow: 2px 0 #ff00ff; animation: glitch 0.5s infinite; font-weight: 900; }
         @keyframes hue { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(360deg); } }
         @keyframes burn { from { text-shadow: 0 0 5px #ff8c00; } to { text-shadow: 0 0 20px #ff4500; } }
-        
-        #loader { position: fixed; inset: 0; background: #0F172A; z-index: 20000; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s; }
     </style>
 </head>
-<body class="bg-panel-bg h-screen flex text-slate-800" onclick="window.app.spawnParticle(event)">
+<body class="bg-panel-bg h-screen flex text-slate-800">
 
     <audio id="sfx-pop" src="https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3"></audio>
     <audio id="sfx-win" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
@@ -68,11 +58,14 @@
         <i class="fa-solid fa-rocket text-7xl text-brand-yellow animate-bounce"></i>
         <h2 class="text-4xl font-black text-white mt-6 tracking-widest">KÂŞİF</h2>
         <p class="text-slate-400 text-sm mt-2 font-bold animate-pulse">Sistemler Hazırlanıyor...</p>
-        <button onclick="document.getElementById('loader').style.display='none'" class="mt-10 text-xs text-slate-600 underline hover:text-white cursor-pointer">Yüklenmedi mi? Tıkla.</button>
+        <button onclick="document.getElementById('loader').style.display='none'" class="mt-8 px-6 py-2 bg-slate-800 text-white rounded-full text-xs font-bold hover:bg-slate-700 transition border border-slate-600">
+            Otomatik Açılmazsa Tıkla 🚀
+        </button>
     </div>
 
     <aside class="w-20 lg:w-64 bg-sidebar-bg text-white flex flex-col justify-between shadow-2xl flex-shrink-0 z-50 relative">
         <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 pointer-events-none"></div>
+        
         <div>
             <div class="h-24 flex items-center justify-center lg:justify-start lg:px-6 border-b border-slate-800 cursor-pointer group" onclick="location.reload()">
                 <div class="w-12 h-12 bg-brand-yellow rounded-2xl flex items-center justify-center text-sidebar-bg text-3xl shadow-[0_0_20px_rgba(252,211,77,0.4)] group-hover:rotate-12 transition duration-300">
@@ -80,7 +73,7 @@
                 </div>
                 <div class="hidden lg:block ml-3">
                     <h1 class="text-2xl font-black text-white tracking-wider">KÂŞİF</h1>
-                    <p class="text-[10px] text-slate-400 font-bold tracking-widest">V12 FINAL</p>
+                    <p class="text-[10px] text-slate-400 font-bold tracking-widest">V13 STABLE</p>
                 </div>
             </div>
             
@@ -112,6 +105,7 @@
                 </button>
             </nav>
         </div>
+        
         <div class="p-4">
             <button onclick="window.app.logout()" class="w-full bg-red-500/10 text-red-400 p-3.5 rounded-2xl hover:bg-red-600 hover:text-white transition flex items-center justify-center lg:justify-start group border border-red-500/20">
                 <i class="fa-solid fa-right-from-bracket text-xl w-8 text-center group-hover:rotate-180 transition duration-500"></i>
@@ -123,11 +117,15 @@
     <main class="flex-1 flex flex-col h-full relative min-w-0 bg-panel-bg">
         <header class="h-24 bg-white border-b border-slate-200 flex items-center justify-between px-8 shadow-sm z-40 relative">
             <div>
-                <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">Merhaba, <span id="display-name" class="text-indigo-600">...</span>! 👋</h2>
+                <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
+                    Merhaba, <span id="display-name" class="text-indigo-600">...</span>! 👋
+                </h2>
                 <div class="flex items-center gap-2 mt-1">
                     <span id="display-title" class="px-3 py-1 rounded-lg bg-slate-100 text-xs font-black text-slate-500 border border-slate-200 uppercase tracking-wide">...</span>
+                    <div id="active-badge-slot"></div>
                 </div>
             </div>
+            
             <div class="flex items-center gap-6">
                 <div class="hidden md:flex flex-col w-56 group transition hover:scale-105" title="Seviye Durumu">
                     <div class="flex justify-between text-xs font-black text-slate-600 mb-1">
@@ -138,10 +136,13 @@
                         <div id="xp-bar" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 w-0 transition-all duration-1000 relative"></div>
                     </div>
                 </div>
-                <div class="bg-yellow-50 text-yellow-700 px-5 py-2.5 rounded-2xl font-black flex items-center gap-2 border-2 border-yellow-200 shadow-sm hover:scale-105 transition active:scale-95" onclick="window.app.playSound('sfx-pop'); window.app.openShop()">
-                    <i class="fa-solid fa-coins text-yellow-500 text-xl drop-shadow-sm"></i> <span id="display-coins" class="text-xl">0</span>
+                
+                <div class="bg-yellow-50 text-yellow-700 px-5 py-2.5 rounded-2xl font-black flex items-center gap-2 border-2 border-yellow-200 shadow-sm hover:scale-105 transition cursor-pointer active:scale-95" onclick="window.app.playSound('sfx-pop'); window.app.openShop()">
+                    <i class="fa-solid fa-coins text-yellow-500 text-xl drop-shadow-sm animate-float"></i> 
+                    <span id="display-coins" class="text-xl">0</span>
                 </div>
-                <div class="relative group" onclick="window.app.playSound('sfx-pop'); window.app.openProfile()">
+                
+                <div class="relative group cursor-pointer" onclick="window.app.playSound('sfx-pop'); window.app.openProfile()">
                     <img id="display-avatar" src="" class="w-14 h-14 rounded-full bg-slate-100 border-4 border-white shadow-md transition group-hover:scale-110 object-cover">
                     <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full animate-pulse shadow-lg"></div>
                 </div>
@@ -155,18 +156,26 @@
                 <button onclick="window.app.filterGames('Coğrafya')" class="bg-blue-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition active:scale-95 border-b-4 border-blue-700">Coğrafya</button>
                 <button onclick="window.app.filterGames('Bilim')" class="bg-green-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-green-600 transition active:scale-95 border-b-4 border-green-700">Bilim</button>
             </div>
+            
             <div id="games-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 pb-20">
-                <div class="col-span-full text-center py-20 opacity-50"><i class="fa-solid fa-satellite-dish fa-spin text-4xl mb-4 text-slate-300"></i><p>Oyun veritabanına bağlanılıyor...</p></div>
+                <div class="col-span-full text-center py-20 opacity-50">
+                    <i class="fa-solid fa-satellite-dish fa-spin text-4xl mb-4 text-slate-300"></i>
+                    <p>Oyun veritabanına bağlanılıyor...</p>
+                </div>
             </div>
         </div>
     </main>
 
     <aside class="w-72 bg-white border-l border-slate-200 hidden xl:flex flex-col z-40 shadow-lg">
         <div class="p-5 border-b border-slate-100 bg-slate-50">
-            <h3 class="font-black text-slate-700 flex items-center gap-2"><i class="fa-solid fa-users-viewfinder text-indigo-500 animate-pulse"></i> AKTİF KÂŞİFLER</h3>
-            <p class="text-xs text-slate-400 font-bold mt-1">Sosyalleşme Zamanı!</p>
+            <h3 class="font-black text-slate-700 flex items-center gap-2">
+                <i class="fa-solid fa-users-viewfinder text-indigo-500 animate-pulse"></i> AKTİF KÂŞİFLER
+            </h3>
+            <p class="text-xs text-slate-400 font-bold mt-1">Kimler neler oynuyor?</p>
         </div>
-        <div id="active-users-list" class="flex-1 overflow-y-auto p-4 space-y-3"><div class="text-center text-xs text-gray-400 mt-4">Sinyal taranıyor...</div></div>
+        <div id="active-users-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+            <div class="text-center text-xs text-gray-400 mt-4">Sinyal taranıyor...</div>
+        </div>
     </aside>
 
     <div id="modal-shop" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4">
@@ -176,12 +185,20 @@
                 <h2 class="text-4xl font-black text-indigo-600">MAĞAZA</h2>
                 <div class="inline-block bg-brand-yellow text-yellow-900 px-5 py-2 rounded-full font-black border-2 border-yellow-400 mt-3 text-lg">BAKİYEN: <span id="shop-balance">0</span> 💰</div>
             </div>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto p-4 no-scrollbar">
-                <div class="col-span-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl p-8 text-center text-white shadow-lg relative overflow-hidden group hover:scale-[1.01] transition" onclick="window.app.buyMysteryBox()">
+                <div class="col-span-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl p-8 text-center text-white shadow-lg relative overflow-hidden group hover:scale-[1.01] transition flex flex-col items-center justify-center min-h-[200px]" onclick="window.app.buyMysteryBox()">
                     <h3 class="text-3xl font-black mb-2">🎁 GİZEMLİ KUTU</h3>
-                    <p class="text-sm opacity-90 mb-4 font-bold">50 Altın ver, şansını dene! (1000 Altın çıkabilir!)</p>
+                    <p class="text-sm opacity-90 mb-6 font-bold">50 Altın ver, şansını dene! (1000 Altın çıkabilir!)</p>
                     <button class="bg-white text-purple-600 font-black px-10 py-3 rounded-full shadow-xl hover:bg-gray-100 transition active:scale-95 text-lg">50 💰 AÇ</button>
                 </div>
+
+                <div class="border-4 border-slate-50 rounded-3xl p-6 text-center hover:border-indigo-200 transition bg-white group hover:-translate-y-2">
+                    <div class="text-7xl mb-4 animate-float">🚀</div>
+                    <h3 class="font-bold text-slate-700">Roket</h3>
+                    <button onclick="window.app.buyItem('badge', 'badge_rocket', 100, '🚀')" class="bg-green-500 hover:bg-green-600 text-white w-full py-3 rounded-xl font-bold shadow-lg active:scale-95 transition mt-4">100 💰 AL</button>
+                </div>
+                
                 <div class="border-4 border-slate-50 rounded-3xl p-6 text-center hover:border-purple-200 transition bg-white group hover:-translate-y-2">
                     <div class="text-3xl mb-4 font-black effect-rainbow py-4">Gökkuşağı</div>
                     <button onclick="window.app.buyItem('effect', 'effect-rainbow', 1000, '🌈')" class="bg-purple-500 hover:bg-purple-600 text-white w-full py-3 rounded-xl font-bold shadow-lg active:scale-95 transition">1000 💰 AL</button>
@@ -189,10 +206,6 @@
                 <div class="border-4 border-slate-50 rounded-3xl p-6 text-center hover:border-orange-200 transition bg-white group hover:-translate-y-2">
                     <div class="text-3xl mb-4 font-black effect-fire py-4">Alev Alev</div>
                     <button onclick="window.app.buyItem('effect', 'effect-fire', 800, '🔥')" class="bg-orange-500 hover:bg-orange-600 text-white w-full py-3 rounded-xl font-bold shadow-lg active:scale-95 transition">800 💰 AL</button>
-                </div>
-                <div class="border-4 border-slate-50 rounded-3xl p-6 text-center hover:border-green-200 transition bg-white group hover:-translate-y-2">
-                    <div class="text-3xl mb-4 font-black effect-glitch py-4">Hacker</div>
-                    <button onclick="window.app.buyItem('effect', 'effect-glitch', 600, '👾')" class="bg-slate-800 hover:bg-slate-900 text-white w-full py-3 rounded-xl font-bold shadow-lg active:scale-95 transition">600 💰 AL</button>
                 </div>
             </div>
         </div>
@@ -211,11 +224,12 @@
         <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 relative shadow-2xl animate-float border-4 border-white">
             <button onclick="window.app.closeModal('modal-profile')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 font-bold text-2xl transition">X</button>
             <h2 class="text-2xl font-black text-slate-800 mb-6 text-center">KİMLİK KARTI</h2>
-            <div class="flex justify-center mb-6 relative group" onclick="window.app.playSound('sfx-pop'); window.app.randomAvatar()">
+            <div class="flex justify-center mb-6 relative group cursor-pointer" onclick="window.app.playSound('sfx-pop'); window.app.randomAvatar()">
                 <div class="w-32 h-32 rounded-full bg-indigo-100 border-4 border-indigo-500 overflow-hidden relative shadow-lg">
                     <img id="edit-avatar" src="" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300"><i class="fa-solid fa-shuffle text-white text-3xl"></i></div>
                 </div>
+                <p class="text-xs text-indigo-500 font-bold mt-2 text-center animate-pulse">Tıkla ve Değiştir</p>
             </div>
             <div class="space-y-4">
                 <div><label class="text-xs font-bold text-slate-400 uppercase ml-2">İsim</label><input type="text" id="edit-name" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-3.5 font-bold outline-none"></div>
@@ -287,56 +301,25 @@
 
         // 20 TANE ÖZEL ROZET TANIMI
         const BADGE_LIBRARY = [
-            {id:'b1', icon:'🚀', name:'Uzay Çırağı', desc:'İlk adım.'},
-            {id:'b2', icon:'⭐', name:'Parlayan Yıldız', desc:'Gelecek vaat ediyor.'},
-            {id:'b3', icon:'🧠', name:'Bilgi Küpü', desc:'Çok okuyan.'},
-            {id:'b4', icon:'🎨', name:'Sanatçı', desc:'Yaratıcı ruh.'},
-            {id:'b5', icon:'🌍', name:'Dünya Dostu', desc:'Doğayı seven.'},
-            {id:'b6', icon:'⚡', name:'Hızlı Kâşif', desc:'Çok hızlı.'},
-            {id:'b7', icon:'🦉', name:'Gece Kuşu', desc:'Gece çalışan.'},
-            {id:'b8', icon:'🦁', name:'Cesur Yürek', desc:'Korkusuz.'},
-            {id:'b9', icon:'💎', name:'Hazine Avcısı', desc:'Altın seven.'},
-            {id:'b10', icon:'🔭', name:'Gözlemci', desc:'Detaycı.'},
-            {id:'b11', icon:'🧪', name:'Çılgın Profesör', desc:'Bilim aşığı.'},
-            {id:'b12', icon:'🛡️', name:'Koruyucu', desc:'Dost canlısı.'},
-            {id:'b13', icon:'🔥', name:'Ateş Topu', desc:'Enerjik.'},
-            {id:'b14', icon:'🌊', name:'Okyanus', desc:'Derin bilgi.'},
-            {id:'b15', icon:'🎵', name:'Müzisyen', desc:'Ritim ustası.'},
-            {id:'b16', icon:'👾', name:'Gamer', desc:'Oyun canavarı.'},
-            {id:'b17', icon:'🤖', name:'Robotik', desc:'Teknoloji kurdu.'},
-            {id:'b18', icon:'👑', name:'Lider', desc:'Öncü.'},
-            {id:'b19', icon:'🍕', name:'Gurme', desc:'Yemeği sever.'},
-            {id:'b20', icon:'🌈', name:'Hayalperest', desc:'Geniş hayal gücü.'}
+            {id:'b1', icon:'🚀', name:'Uzay Çırağı', desc:'İlk adım.'}, {id:'b2', icon:'⭐', name:'Parlayan Yıldız', desc:'Gelecek vaat ediyor.'}, {id:'b3', icon:'🧠', name:'Bilgi Küpü', desc:'Çok okuyan.'}, {id:'b4', icon:'🎨', name:'Sanatçı', desc:'Yaratıcı ruh.'}, {id:'b5', icon:'🌍', name:'Dünya Dostu', desc:'Doğayı seven.'}, {id:'b6', icon:'⚡', name:'Hızlı Kâşif', desc:'Çok hızlı.'}, {id:'b7', icon:'🦉', name:'Gece Kuşu', desc:'Gece çalışan.'}, {id:'b8', icon:'🦁', name:'Cesur Yürek', desc:'Korkusuz.'}, {id:'b9', icon:'💎', name:'Hazine Avcısı', desc:'Altın seven.'}, {id:'b10', icon:'🔭', name:'Gözlemci', desc:'Detaycı.'}, {id:'b11', icon:'🧪', name:'Çılgın Profesör', desc:'Bilim aşığı.'}, {id:'b12', icon:'🛡️', name:'Koruyucu', desc:'Dost canlısı.'}, {id:'b13', icon:'🔥', name:'Ateş Topu', desc:'Enerjik.'}, {id:'b14', icon:'🌊', name:'Okyanus', desc:'Derin bilgi.'}, {id:'b15', icon:'🎵', name:'Müzisyen', desc:'Ritim ustası.'}, {id:'b16', icon:'👾', name:'Gamer', desc:'Oyun canavarı.'}, {id:'b17', icon:'🤖', name:'Robotik', desc:'Teknoloji kurdu.'}, {id:'b18', icon:'👑', name:'Lider', desc:'Öncü.'}, {id:'b19', icon:'🍕', name:'Gurme', desc:'Yemeği sever.'}, {id:'b20', icon:'🌈', name:'Hayalperest', desc:'Geniş hayal gücü.'}
         ];
 
         window.app = {
-            playSound: (id) => { const a=document.getElementById(id); if(a){a.currentTime=0; a.volume=0.3; a.play().catch(()=>{});} },
-            spawnParticle: (e) => { const el=document.createElement('div'); el.className='click-particle fa-solid fa-star'; el.style.left=e.pageX+'px'; el.style.top=e.pageY+'px'; document.body.appendChild(el); setTimeout(()=>el.remove(),800); },
+            playSound: (id) => { 
+                const a=document.getElementById(id); 
+                if(a){ a.currentTime=0; a.volume=0.3; a.play().catch(e=>console.log("Ses engellendi:", e)); } 
+            },
+            
             closeModal: (id) => document.getElementById(id).style.display = 'none',
             
-            // ROZETLERİM
             openBadges: () => {
-                const grid = document.getElementById('badge-grid');
-                grid.innerHTML = '';
+                const grid = document.getElementById('badge-grid'); grid.innerHTML = '';
                 const myBadges = userData.badges || [];
-                const displayBadges = myBadges.filter(b => !b.id.startsWith('effect')); // Sadece rozetleri göster
-                
-                if(displayBadges.length === 0) {
-                    grid.innerHTML = '<div class="col-span-full text-center text-slate-400 py-10">Henüz rozetin yok. <br> Mağazadan al veya Öğretmeninden iste!</div>';
-                } else {
-                    displayBadges.forEach(b => {
-                        // Badge kütüphanesinden detay bul (yoksa varsayılan kullan)
-                        const libBadge = BADGE_LIBRARY.find(lb => lb.id === b.id) || { name: b.name || 'Özel Rozet', desc: 'Başarı', icon: b.icon };
-                        grid.innerHTML += `
-                        <div class="bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-center hover:scale-105 transition hover:border-purple-200">
-                            <div class="text-5xl mb-2 animate-float">${libBadge.icon}</div>
-                            <div class="font-bold text-slate-700 text-sm">${libBadge.name}</div>
-                            <div class="text-xs text-slate-400">${libBadge.desc}</div>
-                        </div>`;
-                    });
+                const displayBadges = myBadges.filter(b => !b.id.startsWith('effect'));
+                if(displayBadges.length === 0) { grid.innerHTML = '<div class="col-span-full text-center text-slate-400 py-10">Henüz rozetin yok. <br> Mağazadan al veya Öğretmeninden iste!</div>'; } else {
+                    displayBadges.forEach(b => { const libBadge = BADGE_LIBRARY.find(lb => lb.id === b.id) || { name: b.name || 'Özel Rozet', desc: 'Başarı', icon: b.icon }; grid.innerHTML += `<div class="bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-center hover:scale-105 transition hover:border-purple-200"><div class="text-5xl mb-2 animate-float">${libBadge.icon}</div><div class="font-bold text-slate-700 text-sm">${libBadge.name}</div><div class="text-xs text-slate-400">${libBadge.desc}</div></div>`; });
                 }
-                document.getElementById('modal-badges').style.display = 'flex';
-                window.app.playSound('sfx-pop');
+                document.getElementById('modal-badges').style.display = 'flex'; window.app.playSound('sfx-pop');
             },
 
             openProfile: () => {
@@ -371,10 +354,8 @@
                     if(chance < 0.1) { reward = {coins: 1000}; msg="BÜYÜK İKRAMİYE! 1000 ALTIN!"; }
                     else if(chance < 0.5) { reward = {coins: 100}; msg="100 Altın çıktı!"; }
                     else { reward = {xp: 200}; msg="200 XP Kazandın!"; }
-                    
                     if(reward.coins) { await updateDoc(doc(db,"users",currentUser.uid), {coins:increment(reward.coins)}); userData.coins+=reward.coins; }
                     if(reward.xp) { await updateDoc(doc(db,"users",currentUser.uid), {xp:increment(reward.xp)}); userData.xp+=reward.xp; }
-                    
                     updateUI(); confetti(); window.app.playSound('sfx-win'); Swal.fire({title:msg, icon:'success'});
                 }
             },
@@ -454,26 +435,6 @@
             logout: () => { Swal.fire({title:'Çıkış?', icon:'warning', showCancelButton:true}).then(async(r)=>{ if(r.isConfirmed){ await updateStatus('offline', null); await signOut(auth); window.location.href="login.html"; } }); }
         };
 
-        // ROZET BİLDİRİM DİNLEYİCİSİ (YENİ)
-        function initBadgeListener(uid) {
-            onSnapshot(doc(db, "users", uid), (doc) => {
-                const newData = doc.data();
-                if(newData.badges && userData.badges && newData.badges.length > userData.badges.length) {
-                    const newBadge = newData.badges[newData.badges.length-1];
-                    if(newBadge.type !== 'effect') {
-                        confetti(); window.app.playSound('sfx-win');
-                        Swal.fire({
-                            title: 'YENİ ROZET KAZANDIN! 🏅',
-                            html: `<div class="text-6xl my-4">${newBadge.icon}</div><div class="font-bold text-xl">${newBadge.name}</div>`,
-                            confirmButtonText: 'HARİKA!'
-                        });
-                    }
-                }
-                userData = newData; // Veriyi güncelle
-                updateUI();
-            });
-        }
-
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
@@ -482,7 +443,6 @@
                 if (snap.exists()) userData = snap.data();
                 else { userData = { username: user.email.split('@')[0], email: user.email, xp: 0, level: 1, coins: 100, avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`, title: "Acemi Kâşif" }; await setDoc(docRef, userData); }
                 updateUI(); updateStatus('online', null); fetchGames(); initRealtimeUsers(); initChat();
-                initBadgeListener(user.uid); // Dinleyiciyi başlat
                 document.getElementById('loader').style.display = 'none';
             } else { window.location.href = "login.html"; }
         });
