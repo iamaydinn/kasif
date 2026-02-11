@@ -27,10 +27,18 @@
         .badge-anim { animation: float 3s ease-in-out infinite; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         
-        /* SweetAlert Özelleştirme (Daha Çocuksu) */
-        div:where(.swal2-container) div:where(.swal2-popup) {
-            border-radius: 2rem !important;
-            border: 4px solid #fcd34d !important;
+        /* Sohbet Baloncukları */
+        .chat-bubble-me { background: linear-gradient(135deg, #6366f1, #a855f7); color: white; border-radius: 1.5rem 1.5rem 0 1.5rem; }
+        .chat-bubble-other { background: #e5e7eb; color: #1f2937; border-radius: 1.5rem 1.5rem 1.5rem 0; }
+        
+        /* Bildirim Parlaması */
+        .notification-glow {
+            animation: glow-red 1.5s infinite;
+        }
+        @keyframes glow-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
     </style>
 </head>
@@ -39,7 +47,7 @@
     <div id="loader">
         <i class="fa-solid fa-rocket fa-bounce text-6xl text-yellow-400 mb-6"></i>
         <h2 class="text-3xl font-black tracking-wide">KÂŞİF YÜKLENİYOR...</h2>
-        <p class="text-gray-400 mt-2 text-sm">Arkadaşların aranıyor...</p>
+        <p class="text-gray-400 mt-2 text-sm">Telsiz frekansları ayarlanıyor...</p>
     </div>
 
     <aside class="w-20 lg:w-64 bg-sidebar-bg text-white flex flex-col justify-between z-30 shadow-2xl flex-shrink-0">
@@ -54,6 +62,15 @@
                     <i class="fa-solid fa-gamepad text-xl w-8 text-center"></i>
                     <span class="hidden lg:block font-bold">Oyunlar</span>
                 </a>
+                
+                <a href="#" onclick="openChatModal()" id="chat-nav-btn" class="relative flex items-center p-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-green-400 transition">
+                    <div class="relative">
+                        <i class="fa-solid fa-walkie-talkie text-xl w-8 text-center"></i>
+                        <span id="chat-notification" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-800"></span>
+                    </div>
+                    <span class="hidden lg:block font-bold">Kâşif Telsizi</span>
+                </a>
+
                 <a href="#" onclick="openShopModal()" class="flex items-center p-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-yellow-400 transition">
                     <i class="fa-solid fa-store text-xl w-8 text-center"></i>
                     <span class="hidden lg:block font-bold">Mağaza</span>
@@ -121,25 +138,52 @@
             <h3 class="font-black text-slate-700 flex items-center gap-2">
                 <i class="fa-solid fa-earth-americas text-green-500 animate-pulse"></i> Canlı Kâşifler
             </h3>
-            <p class="text-xs text-gray-400 font-bold mt-1">Sadece gerçek oyuncular</p>
+            <p class="text-xs text-gray-400 font-bold mt-1">Diğer Kâşif Arkadaşların İşte Burada!</p>
         </div>
-        
         <div id="active-users-list" class="flex-1 overflow-y-auto p-4 space-y-3">
-            <div class="text-center text-gray-400 text-xs mt-10 italic">
-                <i class="fa-solid fa-satellite-dish fa-spin mb-2 text-xl"></i><br>
-                Sinyal taranıyor...
+             <div class="text-center text-gray-400 text-xs mt-10 italic">
+                <i class="fa-solid fa-satellite-dish fa-spin mb-2 text-xl"></i><br>Sinyal taranıyor...
             </div>
         </div>
     </aside>
+
+    <div id="chat-modal" class="fixed inset-0 z-50 bg-black/60 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-md h-[600px] rounded-[2rem] shadow-2xl flex flex-col relative overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 flex justify-between items-center text-white">
+                <div class="flex items-center gap-3">
+                    <div class="bg-white/20 p-2 rounded-full"><i class="fa-solid fa-walkie-talkie"></i></div>
+                    <div>
+                        <h3 class="font-black text-lg">Kâşif Telsizi</h3>
+                        <p class="text-xs text-purple-200">Global Frekans • Herkese Açık</p>
+                    </div>
+                </div>
+                <button onclick="closeChatModal()" class="text-white/80 hover:text-white hover:bg-white/10 w-8 h-8 rounded-full transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+                <div class="text-center text-gray-400 text-xs mt-4">
+                    <p>Sohbet geçmişi her 1 dakikada bir temizlenir.</p>
+                    <p class="mt-1">Güvenli ve nazik konuşalım! 🚀</p>
+                </div>
+            </div>
+
+            <div class="p-4 bg-white border-t border-gray-100">
+                <form onsubmit="sendMessage(event)" class="flex gap-2">
+                    <input type="text" id="chat-input" maxlength="100" placeholder="Bir şeyler yaz..." class="flex-1 bg-gray-100 border-0 rounded-full px-4 py-3 font-bold text-slate-700 focus:ring-2 focus:ring-purple-500 focus:bg-white transition outline-none">
+                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <div id="shop-modal" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-4xl rounded-[2rem] p-8 relative shadow-2xl h-[80vh] flex flex-col">
             <button onclick="document.getElementById('shop-modal').classList.add('hidden')" class="absolute top-6 right-6 text-gray-400 hover:text-red-500 font-bold text-2xl transition">X</button>
             <div class="text-center mb-8">
                 <h2 class="text-4xl font-black text-purple-600 mb-2">MAĞAZA</h2>
-                <div class="inline-block bg-yellow-100 text-yellow-800 px-4 py-1 rounded-full font-black border border-yellow-300">
-                    BAKİYEN: <span id="shop-balance">0</span> <i class="fa-solid fa-coins"></i>
-                </div>
+                <div class="inline-block bg-yellow-100 text-yellow-800 px-4 py-1 rounded-full font-black border border-yellow-300">BAKİYEN: <span id="shop-balance">0</span> <i class="fa-solid fa-coins"></i></div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-y-auto p-4">
                 <div class="border-4 border-gray-100 rounded-3xl p-6 text-center hover:border-purple-300 transition group relative overflow-hidden">
@@ -163,7 +207,6 @@
             </div>
         </div>
     </div>
-
     <div id="leaderboard-modal" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-lg rounded-[2rem] p-8 relative shadow-2xl">
             <button onclick="document.getElementById('leaderboard-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 font-bold text-xl">X</button>
@@ -171,15 +214,12 @@
             <div id="leaderboard-list" class="space-y-3 max-h-[60vh] overflow-y-auto pr-2"></div>
         </div>
     </div>
-
     <div id="game-modal" class="fixed inset-0 z-50 bg-black/95 hidden flex flex-col items-center justify-center backdrop-blur-md">
         <div class="w-full max-w-6xl h-[90vh] flex flex-col relative">
             <div class="flex justify-between items-center text-white mb-3 px-4">
                 <h2 id="modal-game-title" class="text-2xl font-bold text-yellow-400">Oyun Yükleniyor...</h2>
                 <div class="flex gap-4">
-                     <div class="text-sm bg-gray-800 px-3 py-1 rounded-full flex items-center gap-2">
-                        <i class="fa-regular fa-clock"></i> <span id="game-timer">00:00</span>
-                    </div>
+                     <div class="text-sm bg-gray-800 px-3 py-1 rounded-full flex items-center gap-2"><i class="fa-regular fa-clock"></i> <span id="game-timer">00:00</span></div>
                     <button onclick="closeGameModal()" class="bg-red-500 px-4 py-1 rounded-full font-bold hover:bg-red-600 transition shadow-lg shadow-red-500/50">Çıkış X</button>
                 </div>
             </div>
@@ -187,13 +227,10 @@
                 <iframe id="game-iframe" src="" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
             </div>
             <div class="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
-                <button onclick="claimReward()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-black py-3 px-8 rounded-full shadow-lg hover:scale-105 transition animate-bounce border-4 border-white/20">
-                    <i class="fa-solid fa-trophy mr-2"></i> PUANIMI AL!
-                </button>
+                <button onclick="claimReward()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-black py-3 px-8 rounded-full shadow-lg hover:scale-105 transition animate-bounce border-4 border-white/20"><i class="fa-solid fa-trophy mr-2"></i> PUANIMI AL!</button>
             </div>
         </div>
     </div>
-
     <div id="profile-modal" class="fixed inset-0 z-50 bg-black/60 hidden flex items-center justify-center backdrop-blur-sm p-4">
         <div class="bg-white w-full max-w-md rounded-[2rem] p-8 relative shadow-2xl border-8 border-white">
             <button onclick="document.getElementById('profile-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-300 hover:text-red-500 font-bold text-xl transition">X</button>
@@ -201,9 +238,7 @@
             <div class="flex justify-center mb-6 relative group cursor-pointer" onclick="randomAvatar()">
                 <div class="w-28 h-28 rounded-full bg-purple-100 border-4 border-purple-500 overflow-hidden relative">
                     <img id="edit-avatar" src="" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
-                        <i class="fa-solid fa-shuffle text-white text-2xl"></i>
-                    </div>
+                    <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300"><i class="fa-solid fa-shuffle text-white text-2xl"></i></div>
                 </div>
                 <p class="absolute -bottom-6 text-xs text-purple-500 font-bold animate-pulse">Tıkla ve Değiştir</p>
             </div>
@@ -224,7 +259,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, collection, query, orderBy, limit, getDocs, onSnapshot, where, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, collection, query, orderBy, limit, getDocs, onSnapshot, where, addDoc, deleteDoc, Timestamp, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // CONFIG
         const firebaseConfig = {
@@ -240,94 +275,127 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app, "kasif");
-
-        enableIndexedDbPersistence(db).catch((err) => console.log("Offline mod hatası:", err.code));
+        
+        enableIndexedDbPersistence(db).catch(err => console.log(err));
 
         let currentUserUid = null;
-        let gameTimerInterval;
         let userDataCache = {};
+        let gameTimerInterval;
 
+        // AUTH
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUserUid = user.uid;
                 await loadUserData(user); 
                 updateStatus('online', null);
-                // Gerçek zamanlı kullanıcı listesini başlat (Botlar yok!)
                 initRealtimeUsers();
+                initChatListener(); // Sohbeti başlat
             } else {
                 window.location.href = "login.html";
             }
         });
 
-        // Sayfa kapatılırken durumu offline yap (Her zaman çalışmaz ama denemeye değer)
-        window.addEventListener('beforeunload', () => {
-            updateStatus('offline', null);
-        });
-
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            Swal.fire({
-                title: 'Ayrılıyor musun?',
-                text: "Maceraya ara mı veriyoruz kâşif?",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Evet, Çıkış Yap',
-                cancelButtonText: 'Hayır, Kal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    updateStatus('offline', null);
-                    signOut(auth).then(() => window.location.href = "login.html");
-                }
-            });
-        });
-
-        // --- GERÇEK ZAMANLI KULLANICI LİSTESİ (BOT YOK!) ---
-        function initRealtimeUsers() {
-            const usersRef = collection(db, "users");
-            // Sadece 'online' olanları getir
-            const q = query(usersRef, where("onlineStatus", "==", "online"));
+        // --- SOHBET SİSTEMİ (PERFORMANSLI) ---
+        // Sadece son 50 mesajı getir, istemcide eski mesajları gösterme.
+        function initChatListener() {
+            const chatRef = collection(db, "messages");
+            const q = query(chatRef, orderBy("timestamp", "asc"), limit(50));
 
             onSnapshot(q, (snapshot) => {
-                const list = document.getElementById('active-users-list');
-                list.innerHTML = '';
+                const chatBox = document.getElementById('chat-messages');
+                chatBox.innerHTML = '<div class="text-center text-gray-400 text-xs mt-4"><p>Sohbet geçmişi her 1 dakikada bir temizlenir.</p><p class="mt-1">Güvenli ve nazik konuşalım! 🚀</p></div>';
                 
-                let count = 0;
-                snapshot.forEach((doc) => {
-                    const u = doc.data();
-                    // Kendini listede gösterme veya farklı stil ver (İsteğe bağlı)
-                    
-                    let statusText = '🟢 Çevrimiçi';
-                    let gameIcon = '';
-                    
-                    if(u.playing) {
-                        statusText = `🎮 ${u.playing} Oynuyor`;
-                        gameIcon = '<i class="fa-solid fa-gamepad text-purple-500 animate-bounce"></i>';
-                    }
+                let hasNewMessage = false;
 
-                    const html = `
-                    <div class="flex items-center gap-3 p-2 rounded-xl border border-gray-100 hover:bg-blue-50 transition animate-fade-in">
-                        <div class="relative">
-                            <img src="${u.avatar}" class="w-10 h-10 rounded-full bg-slate-200">
-                            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
-                        </div>
-                        <div class="overflow-hidden flex-1">
-                            <h4 class="font-bold text-sm text-slate-700 truncate">${u.username}</h4>
-                            <p class="text-[10px] text-purple-600 truncate font-bold">${statusText}</p>
-                        </div>
-                        <div>${gameIcon}</div>
-                    </div>`;
-                    list.innerHTML += html;
-                    count++;
+                snapshot.forEach((doc) => {
+                    const msg = doc.data();
+                    
+                    // 1 Dakika Kuralı (Performans için İstemcide Filtrele)
+                    const msgTime = msg.timestamp ? msg.timestamp.toDate() : new Date();
+                    const now = new Date();
+                    const diffSeconds = (now - msgTime) / 1000;
+
+                    if (diffSeconds < 60) { // Sadece 60 saniyeden yeni mesajları göster
+                        const isMe = msg.senderId === currentUserUid;
+                        const bubbleClass = isMe ? 'chat-bubble-me self-end' : 'chat-bubble-other self-start';
+                        const alignClass = isMe ? 'justify-end' : 'justify-start';
+                        const timeStr = msgTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                        const html = `
+                        <div class="flex w-full ${alignClass} mb-2 animate-fade-in">
+                             ${!isMe ? `<img src="${msg.avatar}" class="w-8 h-8 rounded-full bg-white mr-2 self-end mb-1">` : ''}
+                            <div class="flex flex-col max-w-[80%]">
+                                ${!isMe ? `<span class="text-[10px] text-gray-500 ml-1 mb-0.5">${msg.senderName}</span>` : ''}
+                                <div class="px-4 py-2 text-sm font-medium shadow-sm ${bubbleClass}">
+                                    ${msg.text}
+                                </div>
+                                <span class="text-[9px] text-gray-400 mt-0.5 ${isMe ? 'text-right mr-1' : 'ml-1'}">${timeStr}</span>
+                            </div>
+                        </div>`;
+                        chatBox.innerHTML += html;
+                        hasNewMessage = true;
+                    }
                 });
 
-                if(count === 0) {
-                    list.innerHTML = '<div class="text-center text-gray-400 text-xs mt-4">Şu an başka kimse yok.<br>Uzay çok sessiz... 🌌</div>';
+                // Otomatik aşağı kaydır
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // Bildirim Mantığı: Eğer modal kapalıysa ve son mesaj başkasındansa
+                const chatModal = document.getElementById('chat-modal');
+                if(chatModal.classList.contains('hidden') && hasNewMessage) {
+                    // Son mesaj benim değilse bildirim ver
+                    // (Basitlik için her güncellemede yakıyoruz)
+                     document.getElementById('chat-notification').classList.remove('hidden');
+                     document.getElementById('chat-nav-btn').classList.add('notification-glow', 'text-green-400', 'bg-gray-800');
                 }
             });
         }
 
-        async function updateStatus(status, gameName) {
+        window.sendMessage = async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if(!text) return;
+
+            try {
+                // Mesaj Gönder
+                await addDoc(collection(db, "messages"), {
+                    text: text,
+                    senderId: currentUserUid,
+                    senderName: userDataCache.username,
+                    avatar: userDataCache.avatar,
+                    timestamp: Timestamp.now()
+                });
+                input.value = '';
+
+                // TEMİZLİK GÖREVİ (Her mesaj atıldığında şans eseri eski mesajları sil)
+                // Bu veritabanını temiz tutar. (Sadece %10 ihtimalle çalışsın ki sistemi yormasın)
+                if(Math.random() < 0.1) deleteOldMessages();
+
+            } catch(e) { console.error("Mesaj hatası:", e); }
+        };
+
+        // Veritabanı Temizliği (1 dakikadan eski mesajları sil)
+        async function deleteOldMessages() {
+            const oneMinAgo = new Date(Date.now() - 60 * 1000);
+            const q = query(collection(db, "messages"), where("timestamp", "<", oneMinAgo));
+            const snapshot = await getDocs(q);
+            snapshot.forEach((doc) => deleteDoc(doc.ref));
+        }
+
+        window.openChatModal = () => {
+            document.getElementById('chat-modal').classList.remove('hidden');
+            // Bildirimi temizle
+            document.getElementById('chat-notification').classList.add('hidden');
+            document.getElementById('chat-nav-btn').classList.remove('notification-glow', 'text-green-400', 'bg-gray-800');
+            // En alta kaydır
+            const chatBox = document.getElementById('chat-messages');
+            chatBox.scrollTop = chatBox.scrollHeight;
+        };
+        window.closeChatModal = () => document.getElementById('chat-modal').classList.add('hidden');
+
+        // --- DİĞER FONKSİYONLAR (Öncekiyle aynı) ---
+        window.updateStatus = async (status, gameName) => {
             if (!currentUserUid) return;
             try {
                 await updateDoc(doc(db, "users", currentUserUid), {
@@ -335,30 +403,19 @@
                     playing: gameName || null,
                     lastSeen: new Date().toISOString()
                 });
-            } catch (e) { console.error(e); }
+            } catch (e) {}
         }
 
-        async function loadUserData(user) {
+        window.loadUserData = async (user) => {
             const loader = document.getElementById('loader');
             try {
                 const docRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(docRef);
-
                 if (docSnap.exists()) {
                     userDataCache = docSnap.data();
                     updateUI(userDataCache);
                 } else {
-                    const newProfile = {
-                        username: user.email.split('@')[0], 
-                        email: user.email,
-                        xp: 0,
-                        level: 1,
-                        coins: 100, 
-                        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`,
-                        title: "Acemi Kâşif",
-                        badges: [],
-                        onlineStatus: 'online'
-                    };
+                    const newProfile = { username: user.email.split('@')[0], email: user.email, xp: 0, level: 1, coins: 100, avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`, title: "Acemi Kâşif", badges: [], onlineStatus: 'online' };
                     await setDoc(docRef, newProfile);
                     userDataCache = newProfile;
                     updateUI(newProfile);
@@ -375,144 +432,77 @@
             document.getElementById('xp-display').innerText = data.xp + " XP";
             document.getElementById('coin-display').innerText = data.coins;
             document.getElementById('shop-balance').innerText = data.coins;
-            
             document.getElementById('header-avatar').src = data.avatar;
             document.getElementById('edit-username').value = data.username;
             document.getElementById('edit-avatar').src = data.avatar;
-
             const badgeContainer = document.getElementById('active-badge-container');
             const myBadgesContainer = document.getElementById('my-badges');
-            badgeContainer.innerHTML = '';
-            myBadgesContainer.innerHTML = '';
-
+            badgeContainer.innerHTML = ''; myBadgesContainer.innerHTML = '';
             if(data.badges && data.badges.length > 0) {
                 const lastBadge = data.badges[data.badges.length - 1];
                 badgeContainer.innerHTML = `<span class="text-3xl filter drop-shadow-md animate-bounce cursor-help" title="Son Rozetin">${lastBadge.icon}</span>`;
-                data.badges.forEach(b => {
-                    myBadgesContainer.innerHTML += `<span class="text-2xl bg-gray-100 p-2 rounded-lg" title="${b.id}">${b.icon}</span>`;
-                });
-            } else {
-                myBadgesContainer.innerHTML = `<span class="text-xs text-gray-400">Henüz rozetin yok.</span>`;
-            }
-
+                data.badges.forEach(b => { myBadgesContainer.innerHTML += `<span class="text-2xl bg-gray-100 p-2 rounded-lg" title="${b.id}">${b.icon}</span>`; });
+            } else { myBadgesContainer.innerHTML = `<span class="text-xs text-gray-400">Henüz rozetin yok.</span>`; }
             const percentage = Math.min((data.xp % 1000) / 10, 100);
             document.getElementById('xp-bar').style.width = percentage + "%";
         }
 
-        // --- HAVALI SATIN ALMA ---
-        window.buyItem = async (itemId, cost, icon) => {
-            if(userDataCache.coins < cost) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Paran Yetmiyor! 😢',
-                    text: 'Biraz daha oyun oyna ve altın kazan!',
-                    confirmButtonColor: '#d33'
+        window.initRealtimeUsers = () => {
+            const q = query(collection(db, "users"), where("onlineStatus", "==", "online"));
+            onSnapshot(q, (snapshot) => {
+                const list = document.getElementById('active-users-list');
+                list.innerHTML = '';
+                let count = 0;
+                snapshot.forEach((doc) => {
+                    const u = doc.data();
+                    let statusText = '🟢 Çevrimiçi';
+                    let gameIcon = '';
+                    if(u.playing) { statusText = `🎮 ${u.playing}`; gameIcon = '<i class="fa-solid fa-gamepad text-purple-500 animate-bounce"></i>'; }
+                    const html = `<div class="flex items-center gap-3 p-2 rounded-xl border border-gray-100 hover:bg-blue-50 transition animate-fade-in"><div class="relative"><img src="${u.avatar}" class="w-10 h-10 rounded-full bg-slate-200"><div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div></div><div class="overflow-hidden flex-1"><h4 class="font-bold text-sm text-slate-700 truncate">${u.username}</h4><p class="text-[10px] text-purple-600 truncate font-bold">${statusText}</p></div><div>${gameIcon}</div></div>`;
+                    list.innerHTML += html;
+                    count++;
                 });
-                return;
-            }
-            if(userDataCache.badges && userDataCache.badges.some(b => b.id === itemId)) {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Zaten Var! 😎',
-                    text: 'Bu rozete zaten sahipsin.',
-                    confirmButtonColor: '#3085d6'
-                });
-                return;
-            }
-
-            Swal.fire({
-                title: 'Emin misin?',
-                text: `${cost} Altın karşılığında bu rozeti alacak mısın?`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#10b981',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Evet, Satın Al!'
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    try {
-                        const newBadge = { id: itemId, icon: icon, date: new Date().toISOString() };
-                        await updateDoc(doc(db, "users", currentUserUid), {
-                            coins: increment(-cost),
-                            badges: [...(userDataCache.badges || []), newBadge]
-                        });
-                        userDataCache.coins -= cost;
-                        if(!userDataCache.badges) userDataCache.badges = [];
-                        userDataCache.badges.push(newBadge);
-                        updateUI(userDataCache);
-                        
-                        Swal.fire(
-                            'Harika! 🎉',
-                            'Rozetin profilinde parlıyor!',
-                            'success'
-                        )
-                    } catch(e) { console.error(e); }
-                }
+                if(count === 0) list.innerHTML = '<div class="text-center text-gray-400 text-xs mt-4">Kimse yok. 🌌</div>';
             });
-        };
+        }
 
+        // Satın Alma, Kaydetme vs. (Eski kodlarla aynı)
+        window.buyItem = async (itemId, cost, icon) => {
+             if(userDataCache.coins < cost) { Swal.fire({icon:'error', title:'Paran Yetmiyor! 😢'}); return; }
+             if(userDataCache.badges && userDataCache.badges.some(b => b.id === itemId)) { Swal.fire({icon:'info', title:'Zaten Var!'}); return; }
+             Swal.fire({title:'Emin misin?', text:`${cost} Altın?`, showCancelButton:true, confirmButtonText:'Al!'}).then(async(res)=>{
+                 if(res.isConfirmed){
+                     try {
+                         const newBadge = { id: itemId, icon: icon, date: new Date().toISOString() };
+                         await updateDoc(doc(db, "users", currentUserUid), { coins: increment(-cost), badges: [...(userDataCache.badges||[]), newBadge] });
+                         userDataCache.coins -= cost; if(!userDataCache.badges) userDataCache.badges=[]; userDataCache.badges.push(newBadge); updateUI(userDataCache);
+                         Swal.fire('Aldın! 🎉','','success');
+                     } catch(e){}
+                 }
+             });
+        }
         window.saveProfile = async () => {
             const newName = document.getElementById('edit-username').value;
             const newAvatar = document.getElementById('edit-avatar').src;
             if(!newName) return;
-
-            try {
-                await updateDoc(doc(db, "users", currentUserUid), {
-                    username: newName,
-                    avatar: newAvatar
-                });
-                userDataCache.username = newName;
-                userDataCache.avatar = newAvatar;
-                updateUI(userDataCache);
-                document.getElementById('profile-modal').classList.add('hidden');
-                
-                Swal.fire({
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Profilin Güncellendi!',
-                    showConfirmButton: false,
-                    timer: 1500
-                })
-            } catch(e) { console.error(e); }
-        };
-
+            try { await updateDoc(doc(db, "users", currentUserUid), { username: newName, avatar: newAvatar }); userDataCache.username=newName; userDataCache.avatar=newAvatar; updateUI(userDataCache); document.getElementById('profile-modal').classList.add('hidden'); Swal.fire({icon:'success', title:'Güncellendi!', timer:1500, showConfirmButton:false}); } catch(e){}
+        }
         window.openShopModal = () => document.getElementById('shop-modal').classList.remove('hidden');
         window.openProfileModal = () => document.getElementById('profile-modal').classList.remove('hidden');
-        window.randomAvatar = () => {
-            const seed = Math.random().toString(36).substring(7);
-            document.getElementById('edit-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
-        };
-
+        window.randomAvatar = () => { document.getElementById('edit-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${Math.random().toString(36)}`; }
+        
+        // Oyun & Sıralama
         window.openLeaderboard = async () => {
-            document.getElementById('leaderboard-modal').classList.remove('hidden');
-            const list = document.getElementById('leaderboard-list');
-            list.innerHTML = '<div class="text-center"><i class="fa-solid fa-spinner fa-spin"></i> Yükleniyor...</div>';
-            try {
-                const usersRef = collection(db, "users");
-                const q = query(usersRef, orderBy("xp", "desc"), limit(10));
-                const querySnapshot = await getDocs(q);
-                list.innerHTML = '';
-                let rank = 1;
-                querySnapshot.forEach((doc) => {
-                    const u = doc.data();
-                    let rankColor = "bg-gray-100";
-                    let trophy = "";
-                    if(rank === 1) { rankColor = "bg-yellow-100 border-yellow-300"; trophy="🥇"; }
-                    if(rank === 2) { rankColor = "bg-gray-200 border-gray-400"; trophy="🥈"; }
-                    if(rank === 3) { rankColor = "bg-orange-100 border-orange-300"; trophy="🥉"; }
-                    list.innerHTML += `
-                    <div class="flex items-center gap-4 p-3 rounded-2xl border ${rankColor}">
-                        <div class="font-black text-xl w-8 text-center">${trophy || '#'+rank}</div>
-                        <img src="${u.avatar}" class="w-10 h-10 rounded-full bg-white">
-                        <div class="flex-1"><h4 class="font-bold text-sm truncate">${u.username}</h4></div>
-                        <div class="font-black text-sm">${u.xp} XP</div>
-                    </div>`;
-                    rank++;
-                });
-            } catch(e) { console.error(e); }
-        };
-
-        // OYUNLAR (SABİT VERİ)
+             document.getElementById('leaderboard-modal').classList.remove('hidden');
+             const list = document.getElementById('leaderboard-list'); list.innerHTML='Yükleniyor...';
+             try {
+                 const q = query(collection(db,"users"), orderBy("xp","desc"), limit(10));
+                 const snap = await getDocs(q); list.innerHTML=''; let rank=1;
+                 snap.forEach(doc=>{ const u=doc.data(); let c="bg-gray-100"; if(rank==1)c="bg-yellow-100 border-yellow-300"; list.innerHTML+=`<div class="flex items-center gap-4 p-3 rounded-2xl border ${c}"><div class="font-black">#${rank}</div><img src="${u.avatar}" class="w-8 h-8 rounded-full"><div class="flex-1 font-bold text-sm">${u.username}</div><div class="font-black text-sm">${u.xp} XP</div></div>`; rank++; });
+             } catch(e){}
+        }
+        
+        // Oyun Verileri
         const gamesDatabase = [
             { id: 1, title: "Kurtuluş Savaşı Cepheleri", cat: "Tarih", img: "https://img.freepik.com/free-vector/turkish-flag-background_23-2147959082.jpg", url: "https://learningapps.org/watch?v=pgi85x8n321" },
             { id: 2, title: "Türkiye Haritası Puzzle", cat: "Coğrafya", img: "https://img.freepik.com/free-vector/turkey-map-flag-concept_23-2148606622.jpg", url: "https://wordwall.net/tr/resource/12345/embed" },
@@ -520,77 +510,23 @@
             { id: 4, title: "Osmanlı Padişahları", cat: "Tarih", img: "https://img.freepik.com/free-vector/ottoman-empire-illustration_23-2148003666.jpg", url: "" },
             { id: 5, title: "Haklarımı Biliyorum", cat: "Vatandaşlık", img: "https://img.freepik.com/free-vector/law-justice-concept_23-2148606622.jpg", url: "" }
         ];
-
         window.filterGames = (filter) => {
-            const grid = document.getElementById('games-grid');
-            grid.innerHTML = '';
-            const filtered = filter === 'all' ? gamesDatabase : gamesDatabase.filter(g => g.cat === filter);
-            filtered.forEach(game => {
-                let badgeColor = "bg-gray-500";
-                if(game.cat === "Tarih") badgeColor = "bg-red-500";
-                if(game.cat === "Coğrafya") badgeColor = "bg-blue-500";
-                if(game.cat === "Bilim") badgeColor = "bg-green-500";
-                grid.innerHTML += `
-                <div onclick="playGame('${game.url}', '${game.title}')" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition duration-300 group cursor-pointer border-2 border-transparent hover:border-purple-400 transform hover:-translate-y-2">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="${game.img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-                        <div class="absolute top-3 right-3 ${badgeColor} text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wide shadow-md z-10">${game.cat}</div>
-                        <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
-                             <i class="fa-solid fa-play text-white text-5xl drop-shadow-lg scale-0 group-hover:scale-100 transition duration-300"></i>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <h4 class="font-black text-slate-700 text-lg mb-1 leading-tight line-clamp-1">${game.title}</h4>
-                        <p class="text-xs text-slate-400 font-bold">Puan Kazanmak için Oyna!</p>
-                    </div>
-                </div>`;
-            });
-        };
-
-        window.playGame = (url, title) => {
-            document.getElementById('modal-game-title').innerText = title;
-            const finalUrl = (url && url !== "") ? url : "https://tr.wikipedia.org/wiki/Ana_Sayfa"; 
-            document.getElementById('game-iframe').src = finalUrl;
-            document.getElementById('game-modal').classList.remove('hidden');
-            updateStatus('online', title);
-            
-            let sec = 0;
-            document.getElementById('game-timer').innerText = "00:00";
-            gameTimerInterval = setInterval(() => {
-                sec++;
-                let m = Math.floor(sec / 60).toString().padStart(2, '0');
-                let s = (sec % 60).toString().padStart(2, '0');
-                document.getElementById('game-timer').innerText = `${m}:${s}`;
-            }, 1000);
-        };
-
-        window.closeGameModal = () => {
-            document.getElementById('game-modal').classList.add('hidden');
-            document.getElementById('game-iframe').src = "";
-            clearInterval(gameTimerInterval);
-            updateStatus('online', null);
-        };
-
+             const grid = document.getElementById('games-grid'); grid.innerHTML='';
+             const filtered = filter==='all'?gamesDatabase:gamesDatabase.filter(g=>g.cat===filter);
+             filtered.forEach(g=>{
+                 let color="bg-gray-500"; if(g.cat=="Tarih")color="bg-red-500"; if(g.cat=="Bilim")color="bg-green-500";
+                 grid.innerHTML+=`<div onclick="playGame('${g.url}','${g.title}')" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition cursor-pointer border-2 hover:border-purple-400 transform hover:-translate-y-2"><div class="relative h-48"><img src="${g.img}" class="w-full h-full object-cover"><div class="absolute top-3 right-3 ${color} text-white text-[10px] font-black px-3 py-1 rounded-full uppercase shadow-md">${g.cat}</div></div><div class="p-5"><h4 class="font-black text-slate-700 text-lg line-clamp-1">${g.title}</h4><p class="text-xs text-slate-400 font-bold">Oyna & Kazan!</p></div></div>`;
+             });
+        }
+        window.playGame = (url,t) => {
+            document.getElementById('modal-game-title').innerText=t; document.getElementById('game-iframe').src=url||""; document.getElementById('game-modal').classList.remove('hidden');
+            updateStatus('online', t); let s=0; document.getElementById('game-timer').innerText="00:00";
+            gameTimerInterval = setInterval(()=>{ s++; document.getElementById('game-timer').innerText = `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; },1000);
+        }
+        window.closeGameModal = () => { document.getElementById('game-modal').classList.add('hidden'); document.getElementById('game-iframe').src=""; clearInterval(gameTimerInterval); updateStatus('online',null); }
         window.claimReward = async () => {
-            const xpReward = 50;
-            const coinReward = 20;
-            try {
-                await updateDoc(doc(db, "users", currentUserUid), {
-                    xp: increment(xpReward),
-                    coins: increment(coinReward)
-                });
-                userDataCache.xp += xpReward;
-                userDataCache.coins += coinReward;
-                updateUI(userDataCache);
-                window.closeGameModal();
-                Swal.fire({
-                    title: 'Tebrikler! 🏆',
-                    html: `Müthiş bir iş çıkardın!<br><br><b>+${xpReward} XP</b> ve <b>+${coinReward} Altın</b> kazandın.`,
-                    icon: 'success',
-                    backdrop: `rgba(0,0,123,0.4) url("https://media.tenor.com/f806K2p30noAAAAi/confetti.gif") left top no-repeat`
-                });
-            } catch(e) { console.error(e); }
-        };
+             try { await updateDoc(doc(db,"users",currentUserUid),{xp:increment(50),coins:increment(20)}); userDataCache.xp+=50; userDataCache.coins+=20; updateUI(userDataCache); window.closeGameModal(); Swal.fire({icon:'success', title:'Kazandın!', text:'+50 XP, +20 Altın'}); } catch(e){}
+        }
 
         filterGames('all');
     </script>
