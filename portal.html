@@ -263,7 +263,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // Offline Persistence
+        // Offline Persistence (HATAYI ÇÖZEN KISIM)
         enableIndexedDbPersistence(db).catch((err) => console.log("Offline mod hatası:", err.code));
 
         let currentUserUid = null;
@@ -277,14 +277,14 @@
                 await loadUserData(user); 
                 updateStatus('online', null); // Çevrimiçi yap
             } else {
-                window.location.href = "index.html";
+                window.location.href = "login.html";
             }
         });
 
         document.getElementById('logout-btn').addEventListener('click', () => {
             if(confirm("Maceradan ayrılmak istiyor musun?")) {
                 updateStatus('offline', null); // Çevrimdışı yap
-                signOut(auth).then(() => window.location.href = "index.html");
+                signOut(auth).then(() => window.location.href = "login.html");
             }
         });
 
@@ -302,8 +302,6 @@
         }
 
         // --- AKTİF KULLANICILARI LİSTELEME ---
-        // Not: Gerçek projede bunu onSnapshot ile dinlemek daha iyidir.
-        // Şimdilik demo için kendi kullanıcımızı ve sahte botları göstereceğim.
         async function renderActiveUsers() {
             const list = document.getElementById('active-users-list');
             list.innerHTML = '';
