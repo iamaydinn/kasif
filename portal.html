@@ -21,24 +21,27 @@
     <style>
         body { font-family: 'Fredoka', sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        #loader { position: fixed; inset: 0; background: #111827; z-index: 999; display: flex; align-items: center; justify-content: center; color: white; flex-direction: column;}
+        #loader { position: fixed; inset: 0; background: #111827; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; color: white; transition: opacity 0.5s; }
+        .hidden-loader { opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body class="bg-panel-bg h-screen flex overflow-hidden text-slate-800">
 
     <div id="loader">
-        <i class="fa-solid fa-compass fa-spin text-5xl text-yellow-400 mb-4"></i>
-        <h2 class="text-2xl font-bold">Verilerin Yükleniyor Kâşif...</h2>
+        <i class="fa-solid fa-compass fa-spin text-6xl text-yellow-400 mb-6"></i>
+        <h2 class="text-3xl font-black tracking-wide">KÂŞİF YÜKLENİYOR...</h2>
+        <p class="text-gray-400 mt-2 text-sm">Profilin hazırlanıyor, lütfen bekle.</p>
     </div>
 
-    <aside class="w-20 lg:w-64 bg-sidebar-bg text-white flex flex-col justify-between z-20">
+    <aside class="w-20 lg:w-64 bg-sidebar-bg text-white flex flex-col justify-between z-20 shadow-2xl">
         <div>
-            <div class="h-20 flex items-center justify-center lg:justify-start lg:px-6 border-b border-gray-800">
-                <i class="fa-solid fa-compass text-3xl text-yellow-400"></i>
+            <div class="h-20 flex items-center justify-center lg:justify-start lg:px-6 border-b border-gray-800 cursor-pointer" onclick="location.reload()">
+                <i class="fa-solid fa-compass text-3xl text-yellow-400 animate-pulse"></i>
                 <span class="hidden lg:block ml-3 text-2xl font-black text-yellow-400 tracking-wider">KÂŞİF</span>
             </div>
+            
             <nav class="mt-6 px-2 space-y-2">
-                <a href="#" class="flex items-center p-3 rounded-xl bg-purple-600 text-white shadow-lg">
+                <a href="#" class="flex items-center p-3 rounded-xl bg-purple-600 text-white shadow-lg transition transform hover:scale-105">
                     <i class="fa-solid fa-gamepad text-xl w-8 text-center"></i>
                     <span class="hidden lg:block font-bold">Oyunlar</span>
                 </a>
@@ -48,77 +51,107 @@
                 </a>
             </nav>
         </div>
+        
         <div class="p-4">
-            <button id="logout-btn" class="w-full bg-red-500/10 text-red-400 p-3 rounded-xl hover:bg-red-500 hover:text-white transition flex items-center justify-center lg:justify-start">
-                <i class="fa-solid fa-right-from-bracket text-xl w-8 text-center"></i>
-                <span class="hidden lg:block font-bold">Çıkış</span>
+            <button id="logout-btn" class="w-full bg-red-500/10 text-red-400 p-3 rounded-xl hover:bg-red-500 hover:text-white transition flex items-center justify-center lg:justify-start group">
+                <i class="fa-solid fa-right-from-bracket text-xl w-8 text-center group-hover:rotate-180 transition duration-500"></i>
+                <span class="hidden lg:block font-bold">Çıkış Yap</span>
             </button>
         </div>
     </aside>
 
     <main class="flex-1 flex flex-col h-full relative">
-        <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8">
+        <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm">
             <div>
                 <h2 class="text-xl font-bold text-slate-700" id="welcome-msg">Hoşgeldin!</h2>
-                <p class="text-xs text-slate-400 font-bold" id="user-title">Yükleniyor...</p>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <p class="text-xs text-slate-400 font-bold" id="user-title">Yükleniyor...</p>
+                </div>
             </div>
+            
             <div class="flex items-center gap-6">
                 <div class="hidden md:flex flex-col w-40">
                     <div class="flex justify-between text-xs font-black text-slate-600 mb-1">
-                        <span id="level-display">Lvl 1</span>
+                        <span id="level-display">Level 1</span>
                         <span class="text-purple-500" id="xp-display">0 XP</span>
                     </div>
                     <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div id="xp-bar" class="h-full bg-purple-500 w-0 transition-all duration-500"></div>
+                        <div id="xp-bar" class="h-full bg-purple-500 w-0 transition-all duration-1000 ease-out"></div>
                     </div>
                 </div>
-                <div class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full font-black flex items-center gap-2 border border-yellow-300">
-                    <i class="fa-solid fa-coins"></i> <span id="coin-display">0</span>
+                
+                <div class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-full font-black flex items-center gap-2 border border-yellow-300 shadow-sm">
+                    <i class="fa-solid fa-coins text-yellow-500"></i> <span id="coin-display">0</span>
                 </div>
-                <img id="header-avatar" src="" class="w-10 h-10 rounded-full bg-gray-200 border-2 border-purple-500">
+
+                <img id="header-avatar" src="" class="w-10 h-10 rounded-full bg-slate-100 border-2 border-purple-500 cursor-pointer hover:scale-110 transition" onclick="openProfileModal()">
             </div>
         </header>
 
         <div class="flex-1 overflow-y-auto p-8 bg-panel-bg">
             <div class="flex gap-2 mb-8 overflow-x-auto pb-2 no-scrollbar">
-                <button onclick="filterGames('all')" class="bg-slate-800 text-white px-5 py-2 rounded-full font-bold shadow-lg">Tümü</button>
-                <button onclick="filterGames('Tarih')" class="bg-red-500 text-white px-5 py-2 rounded-full font-bold shadow-lg">Tarih</button>
-                <button onclick="filterGames('Coğrafya')" class="bg-blue-500 text-white px-5 py-2 rounded-full font-bold shadow-lg">Coğrafya</button>
-                <button onclick="filterGames('Bilim')" class="bg-green-500 text-white px-5 py-2 rounded-full font-bold shadow-lg">Bilim</button>
+                <button onclick="filterGames('all')" class="bg-slate-800 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-black transition transform active:scale-95">Tümü</button>
+                <button onclick="filterGames('Tarih')" class="bg-red-500 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-red-600 transition transform active:scale-95">Tarih</button>
+                <button onclick="filterGames('Coğrafya')" class="bg-blue-500 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-blue-600 transition transform active:scale-95">Coğrafya</button>
+                <button onclick="filterGames('Bilim')" class="bg-green-500 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-green-600 transition transform active:scale-95">Bilim</button>
+                <button onclick="filterGames('Vatandaşlık')" class="bg-orange-500 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-orange-600 transition transform active:scale-95">Vatandaşlık</button>
             </div>
 
-            <div id="games-grid" class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+            <div id="games-grid" class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">
+                </div>
         </div>
     </main>
 
-    <div id="game-modal" class="fixed inset-0 z-50 bg-black/90 hidden flex flex-col items-center justify-center backdrop-blur-sm">
+    <div id="game-modal" class="fixed inset-0 z-50 bg-black/95 hidden flex flex-col items-center justify-center backdrop-blur-md">
         <div class="w-full max-w-6xl h-[90vh] flex flex-col relative">
-            <div class="flex justify-between items-center text-white mb-2 px-4">
-                <h2 id="modal-game-title" class="text-2xl font-bold">Oyun</h2>
-                <button onclick="closeGameModal()" class="bg-red-500 px-4 py-2 rounded-full font-bold hover:bg-red-600 transition">Kapat X</button>
+            <div class="flex justify-between items-center text-white mb-3 px-4">
+                <h2 id="modal-game-title" class="text-2xl font-bold text-yellow-400">Oyun Yükleniyor...</h2>
+                <div class="flex gap-4">
+                     <div class="text-sm bg-gray-800 px-3 py-1 rounded-full flex items-center gap-2">
+                        <i class="fa-regular fa-clock"></i> <span id="game-timer">00:00</span>
+                    </div>
+                    <button onclick="closeGameModal()" class="bg-red-500 px-4 py-1 rounded-full font-bold hover:bg-red-600 transition shadow-lg shadow-red-500/50">Çıkış X</button>
+                </div>
             </div>
-            <div class="flex-1 bg-black rounded-2xl overflow-hidden border-4 border-gray-800 shadow-2xl relative">
-                <iframe id="game-iframe" src="" class="w-full h-full" frameborder="0"></iframe>
+            
+            <div class="flex-1 bg-black rounded-2xl overflow-hidden border-4 border-gray-700 shadow-2xl relative">
+                <iframe id="game-iframe" src="" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
             </div>
-            <div class="absolute bottom-4 right-4">
-                <button onclick="claimReward()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg animate-bounce">
-                    <i class="fa-solid fa-gift"></i> Puanımı Al!
+
+            <div class="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
+                <button onclick="claimReward()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-black py-3 px-8 rounded-full shadow-lg hover:scale-105 transition animate-bounce border-4 border-white/20">
+                    <i class="fa-solid fa-trophy mr-2"></i> PUANIMI AL!
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="profile-modal" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center backdrop-blur-sm">
-        <div class="bg-white w-full max-w-md rounded-[2rem] p-8 relative shadow-2xl">
-            <button onclick="document.getElementById('profile-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 font-bold">X</button>
-            <h2 class="text-2xl font-black text-slate-800 mb-6 text-center">Profilini Düzenle</h2>
-            <div class="flex justify-center mb-6">
-                <img id="edit-avatar" src="" class="w-24 h-24 rounded-full bg-slate-100 border-4 border-purple-500 cursor-pointer" onclick="randomAvatar()">
-                <p class="absolute mt-24 text-xs text-gray-400">Tıkla Değiştir</p>
+    <div id="profile-modal" class="fixed inset-0 z-50 bg-black/60 hidden flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-white w-full max-w-md rounded-[2rem] p-8 relative shadow-2xl border-8 border-white">
+            <button onclick="document.getElementById('profile-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-300 hover:text-red-500 font-bold text-xl transition">X</button>
+            
+            <h2 class="text-2xl font-black text-slate-800 mb-6 text-center">PROFİLİNİ DÜZENLE</h2>
+            
+            <div class="flex justify-center mb-6 relative group cursor-pointer" onclick="randomAvatar()">
+                <div class="w-28 h-28 rounded-full bg-purple-100 border-4 border-purple-500 overflow-hidden relative">
+                    <img id="edit-avatar" src="" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                        <i class="fa-solid fa-shuffle text-white text-2xl"></i>
+                    </div>
+                </div>
+                <p class="absolute -bottom-6 text-xs text-purple-500 font-bold animate-pulse">Tıkla ve Değiştir</p>
             </div>
-            <div class="space-y-4">
-                <input type="text" id="edit-username" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3 font-bold">
-                <button onclick="saveProfile()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-xl shadow-lg">KAYDET</button>
+
+            <div class="space-y-4 mt-8">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase ml-2">Kâşif Adı</label>
+                    <input type="text" id="edit-username" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-3 font-bold focus:border-purple-500 focus:bg-white transition outline-none text-slate-700">
+                </div>
+                
+                <button onclick="saveProfile()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition">
+                    DEĞİŞİKLİKLERİ KAYDET ✅
+                </button>
             </div>
         </div>
     </div>
@@ -126,9 +159,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CONFIG
+        // FIREBASE AYARLARI
         const firebaseConfig = {
             apiKey: "AIzaSyD5SFoL8-4idNlbixCw81pjWMn6M6-yv1A",
             authDomain: "kasif-cd133.firebaseapp.com",
@@ -143,100 +176,125 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         let currentUserUid = null;
+        let gameTimerInterval;
 
-        // AUTH KONTROLÜ
+        // AUTH & VERİ YÜKLEME KONTROLÜ
         onAuthStateChanged(auth, async (user) => {
             if (user) {
+                console.log("Kullanıcı giriş yaptı:", user.uid);
                 currentUserUid = user.uid;
-                await loadUserData(user.uid);
-                document.getElementById('loader').classList.add('hidden');
+                await loadUserData(user); // Kullanıcı verisini çek veya oluştur
             } else {
-                window.location.href = "login.html"; // Giriş yapmamışsa at
+                console.log("Giriş yapılmamış, login sayfasına yönlendiriliyor...");
+                window.location.href = "login.html";
             }
         });
 
-        // ÇIKIŞ BUTONU
+        // ÇIKIŞ YAP
         document.getElementById('logout-btn').addEventListener('click', () => {
-            signOut(auth);
+            if(confirm("Maceradan ayrılmak istiyor musun?")) {
+                signOut(auth).then(() => window.location.href = "login.html");
+            }
         });
 
-        // VERİ YÜKLEME
-        async function loadUserData(uid) {
-            const docRef = doc(db, "users", uid);
-            const docSnap = await getDoc(docRef);
+        // --- VERİ ÇEKME & OTOMATİK OLUŞTURMA (DÜZELTME BURADA) ---
+        async function loadUserData(user) {
+            const loader = document.getElementById('loader');
+            try {
+                const docRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(docRef);
 
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                document.getElementById('welcome-msg').innerText = "Hoşgeldin, " + data.username;
-                document.getElementById('user-title').innerText = data.title;
-                document.getElementById('level-display').innerText = "Lvl " + data.level;
-                document.getElementById('xp-display').innerText = data.xp + " XP";
-                document.getElementById('coin-display').innerText = data.coins;
-                document.getElementById('header-avatar').src = data.avatar;
-                
-                // XP Bar Animasyonu (Her level 1000 XP olsun)
-                const percentage = (data.xp % 1000) / 10;
-                document.getElementById('xp-bar').style.width = percentage + "%";
-
-                // Edit Modalını Doldur
-                document.getElementById('edit-username').value = data.username;
-                document.getElementById('edit-avatar').src = data.avatar;
+                if (docSnap.exists()) {
+                    // Veri varsa arayüzü güncelle
+                    console.log("Mevcut veri yüklendi.");
+                    updateUI(docSnap.data());
+                } else {
+                    // VERİ YOKSA OTOMATİK OLUŞTUR (Takılmayı Önler)
+                    console.log("Profil verisi yok, yeni oluşturuluyor...");
+                    const newProfile = {
+                        username: user.email.split('@')[0], // E-postadan isim üret
+                        email: user.email,
+                        xp: 0,
+                        level: 1,
+                        coins: 100, // Başlangıç hediyesi
+                        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`,
+                        title: "Acemi Kâşif"
+                    };
+                    
+                    // Veritabanına yaz
+                    await setDoc(docRef, newProfile);
+                    // Arayüzü güncelle
+                    updateUI(newProfile);
+                }
+            } catch (error) {
+                console.error("Veri hatası:", error);
+                alert("Bir hata oluştu: " + error.message);
+            } finally {
+                // Her durumda yükleme ekranını kaldır
+                loader.classList.add('hidden-loader');
+                setTimeout(() => loader.style.display = 'none', 500);
             }
         }
 
-        // --- GLOBAL FONKSİYONLAR (Window'a bağlama) ---
-        window.openProfileModal = () => document.getElementById('profile-modal').classList.remove('hidden');
-        
-        window.randomAvatar = () => {
-            const seeds = ['Felix', 'Aneka', 'Captain', 'Buddy', 'Molly', 'Zap', 'Ghost'];
-            const random = seeds[Math.floor(Math.random() * seeds.length)] + Math.random();
-            document.getElementById('edit-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${random}`;
-        };
-
-        window.saveProfile = async () => {
-            const newName = document.getElementById('edit-username').value;
-            const newAvatar = document.getElementById('edit-avatar').src;
+        function updateUI(data) {
+            document.getElementById('welcome-msg').innerText = "Hoşgeldin, " + data.username;
+            document.getElementById('user-title').innerText = data.title;
+            document.getElementById('level-display').innerText = "Level " + data.level;
+            document.getElementById('xp-display').innerText = data.xp + " XP";
+            document.getElementById('coin-display').innerText = data.coins;
+            document.getElementById('header-avatar').src = data.avatar;
             
-            await updateDoc(doc(db, "users", currentUserUid), {
-                username: newName,
-                avatar: newAvatar
-            });
-            
-            document.getElementById('profile-modal').classList.add('hidden');
-            loadUserData(currentUserUid); // Arayüzü yenile
-            alert("Profil güncellendi! 🎉");
-        };
+            // Edit Modal Değerleri
+            document.getElementById('edit-username').value = data.username;
+            document.getElementById('edit-avatar').src = data.avatar;
 
-        // OYUN LİSTESİ (SABİT VERİ)
+            // Bar Animasyonu
+            const percentage = Math.min((data.xp % 1000) / 10, 100);
+            document.getElementById('xp-bar').style.width = percentage + "%";
+        }
+
+        // --- OYUN VERİTABANI ---
         const gamesDatabase = [
-            { id: 1, title: "Kurtuluş Savaşı Cepheleri", cat: "Tarih", img: "https://img.freepik.com/free-vector/turkish-flag-background_23-2147959082.jpg", url: "https://learningapps.org/watch?v=pgi85x8n321" }, // Örnek Link
+            { id: 1, title: "Kurtuluş Savaşı Cepheleri", cat: "Tarih", img: "https://img.freepik.com/free-vector/turkish-flag-background_23-2147959082.jpg", url: "https://learningapps.org/watch?v=pgi85x8n321" },
             { id: 2, title: "Türkiye Haritası Puzzle", cat: "Coğrafya", img: "https://img.freepik.com/free-vector/turkey-map-flag-concept_23-2148606622.jpg", url: "https://wordwall.net/tr/resource/12345/embed" },
-            { id: 3, title: "Gezegenleri Sırala", cat: "Bilim", img: "https://img.freepik.com/free-vector/solar-system-background_1284-13654.jpg", url: "" },
-            { id: 4, title: "Osmanlı Padişahları", cat: "Tarih", img: "https://img.freepik.com/free-vector/ottoman-empire-illustration_23-2148003666.jpg", url: "" }
+            { id: 3, title: "Gezegenleri Sırala", cat: "Bilim", img: "https://img.freepik.com/free-vector/solar-system-background_1284-13654.jpg", url: "https://wordwall.net/tr/resource/54321/embed" }, 
+            { id: 4, title: "Osmanlı Padişahları", cat: "Tarih", img: "https://img.freepik.com/free-vector/ottoman-empire-illustration_23-2148003666.jpg", url: "" },
+            { id: 5, title: "Haklarımı Biliyorum", cat: "Vatandaşlık", img: "https://img.freepik.com/free-vector/law-justice-concept_23-2148606622.jpg", url: "" }
         ];
 
         window.filterGames = (filter) => {
             const grid = document.getElementById('games-grid');
             grid.innerHTML = '';
+            
             const filtered = filter === 'all' ? gamesDatabase : gamesDatabase.filter(g => g.cat === filter);
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10 font-bold">Bu kategoride henüz oyun yok kâşif!</div>`;
+                return;
+            }
 
             filtered.forEach(game => {
                 let badgeColor = "bg-gray-500";
                 if(game.cat === "Tarih") badgeColor = "bg-red-500";
                 if(game.cat === "Coğrafya") badgeColor = "bg-blue-500";
                 if(game.cat === "Bilim") badgeColor = "bg-green-500";
+                if(game.cat === "Vatandaşlık") badgeColor = "bg-orange-500";
 
                 grid.innerHTML += `
-                <div onclick="playGame('${game.url}', '${game.title}')" class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition duration-300 group cursor-pointer border border-gray-100 hover:border-purple-300 transform hover:-translate-y-2">
-                    <div class="relative h-40 overflow-hidden">
+                <div onclick="playGame('${game.url}', '${game.title}')" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition duration-300 group cursor-pointer border-2 border-transparent hover:border-purple-400 transform hover:-translate-y-2">
+                    <div class="relative h-48 overflow-hidden">
                         <img src="${game.img}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-                        <div class="absolute top-2 right-2 ${badgeColor} text-white text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wide shadow-md">${game.cat}</div>
-                        <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
-                            <i class="fa-solid fa-play text-white text-4xl drop-shadow-lg"></i>
+                        <div class="absolute top-3 right-3 ${badgeColor} text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wide shadow-md z-10">${game.cat}</div>
+                        
+                        <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                            <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center shadow-lg transform scale-0 group-hover:scale-100 transition duration-500">
+                                <i class="fa-solid fa-play text-purple-600 text-2xl ml-1"></i>
+                            </div>
                         </div>
                     </div>
-                    <div class="p-4">
-                        <h4 class="font-bold text-slate-700 text-sm mb-1 leading-tight">${game.title}</h4>
+                    <div class="p-5">
+                        <h4 class="font-black text-slate-700 text-lg mb-1 leading-tight line-clamp-1">${game.title}</h4>
+                        <p class="text-xs text-slate-400 font-bold">Puan Kazanmak için Oyna!</p>
                     </div>
                 </div>`;
             });
@@ -244,32 +302,85 @@
 
         window.playGame = (url, title) => {
             document.getElementById('modal-game-title').innerText = title;
-            // Demo için eğer link boşsa Wikipedia açalım :)
-            document.getElementById('game-iframe').src = url || "https://tr.wikipedia.org/wiki/Ana_Sayfa";
+            // Demo Link Kontrolü
+            const finalUrl = (url && url !== "") ? url : "https://tr.wikipedia.org/wiki/Ana_Sayfa"; 
+            document.getElementById('game-iframe').src = finalUrl;
             document.getElementById('game-modal').classList.remove('hidden');
+            
+            // Zamanlayıcıyı başlat
+            let sec = 0;
+            document.getElementById('game-timer').innerText = "00:00";
+            gameTimerInterval = setInterval(() => {
+                sec++;
+                let m = Math.floor(sec / 60).toString().padStart(2, '0');
+                let s = (sec % 60).toString().padStart(2, '0');
+                document.getElementById('game-timer').innerText = `${m}:${s}`;
+            }, 1000);
         };
 
         window.closeGameModal = () => {
             document.getElementById('game-modal').classList.add('hidden');
             document.getElementById('game-iframe').src = "";
+            clearInterval(gameTimerInterval);
         };
 
-        // PUAN KAZANMA FONKSİYONU
-        window.claimReward = async () => {
-            const rewardXP = 50;
-            const rewardCoins = 20;
+        // --- PROFİL DÜZENLEME ---
+        window.openProfileModal = () => document.getElementById('profile-modal').classList.remove('hidden');
+        
+        window.randomAvatar = () => {
+            const seed = Math.random().toString(36).substring(7);
+            document.getElementById('edit-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
+        };
 
-            await updateDoc(doc(db, "users", currentUserUid), {
-                xp: increment(rewardXP),
-                coins: increment(rewardCoins)
-            });
+        window.saveProfile = async () => {
+            const newName = document.getElementById('edit-username').value;
+            const newAvatar = document.getElementById('edit-avatar').src;
             
-            loadUserData(currentUserUid); // Arayüzü güncelle
-            alert(`Tebrikler! ${rewardXP} XP ve ${rewardCoins} Altın Kazandın! 🏆`);
-            closeGameModal();
+            if(!newName) return alert("İsim boş olamaz!");
+
+            try {
+                await updateDoc(doc(db, "users", currentUserUid), {
+                    username: newName,
+                    avatar: newAvatar
+                });
+                
+                // Sayfayı yenilemeden UI güncelle
+                document.getElementById('welcome-msg').innerText = "Hoşgeldin, " + newName;
+                document.getElementById('header-avatar').src = newAvatar;
+                document.getElementById('profile-modal').classList.add('hidden');
+                alert("Profilin güncellendi Kâşif! 🚀");
+            } catch(e) {
+                console.error(e);
+                alert("Hata oluştu.");
+            }
         };
 
-        // Başlangıçta oyunları yükle
+        // --- PUAN SİSTEMİ ---
+        window.claimReward = async () => {
+            const xpReward = 50;
+            const coinReward = 20;
+
+            try {
+                await updateDoc(doc(db, "users", currentUserUid), {
+                    xp: increment(xpReward),
+                    coins: increment(coinReward)
+                });
+                
+                // Anlık güncelleme (DB'den çekmeden)
+                let currentXP = parseInt(document.getElementById('xp-display').innerText);
+                let currentCoins = parseInt(document.getElementById('coin-display').innerText);
+                
+                document.getElementById('xp-display').innerText = (currentXP + xpReward) + " XP";
+                document.getElementById('coin-display').innerText = (currentCoins + coinReward);
+                
+                alert(`Tebrikler! ${xpReward} XP ve ${coinReward} Altın kazandın! 🏆`);
+                window.closeGameModal();
+            } catch(e) {
+                console.error(e);
+            }
+        };
+
+        // Başlangıç
         filterGames('all');
     </script>
 </body>
