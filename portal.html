@@ -15,8 +15,8 @@
             theme: {
                 extend: {
                     fontFamily: { 'kid': ['Fredoka', 'sans-serif'] },
-                    colors: { 'panel-bg': '#F0F4F8', 'sidebar-bg': '#1E293B', 'accent': '#8B5CF6' },
-                    animation: { 'float': 'float 3s ease-in-out infinite' }
+                    colors: { 'panel-bg': '#F0F4F8', 'sidebar-bg': '#1E293B' },
+                    zIndex: { 'modal': '10000', 'swal': '11000', 'loader': '12000' }
                 }
             }
         }
@@ -25,19 +25,19 @@
         body { font-family: 'Fredoka', sans-serif; cursor: default; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Modallar için Yüksek Z-Index */
-        .modal-overlay { z-index: 9999 !important; }
+        /* Modallar için Yüksek Z-Index ve Backdrop */
+        .modal-overlay { z-index: 10000 !important; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(5px); }
+        .swal2-container { z-index: 11000 !important; } /* Alertler en üstte */
         
         /* Animasyonlar */
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         .animate-float { animation: float 3s ease-in-out infinite; }
         
-        /* Sohbet Balonları */
-        .bubble-me { background: linear-gradient(135deg, #8B5CF6, #D946EF); color: white; border-radius: 1.5rem 1.5rem 0 1.5rem; }
-        .bubble-other { background: white; color: #374151; border-radius: 1.5rem 1.5rem 1.5rem 0; border: 1px solid #E5E7EB; }
+        /* Sohbet Tasarımı */
+        .chat-bubble-me { background: linear-gradient(135deg, #8B5CF6, #D946EF); color: white; border-radius: 1.5rem 1.5rem 0 1.5rem; box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.3); }
+        .chat-bubble-other { background: white; color: #374151; border-radius: 1.5rem 1.5rem 1.5rem 0; border: 1px solid #E5E7EB; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         
-        /* Yükleme Ekranı */
-        #loader { position: fixed; inset: 0; background: #111827; z-index: 10000; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s; }
+        #loader { position: fixed; inset: 0; background: #111827; z-index: 12000; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s; }
     </style>
 </head>
 <body class="bg-panel-bg h-screen flex overflow-hidden text-slate-800">
@@ -46,12 +46,10 @@
     <audio id="sfx-win" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
 
     <div id="loader">
-        <div class="relative">
-            <i class="fa-solid fa-rocket text-6xl text-yellow-400 animate-bounce"></i>
-            <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-10 h-2 bg-yellow-400/50 rounded-full blur-md animate-pulse"></div>
-        </div>
+        <i class="fa-solid fa-rocket text-6xl text-yellow-400 animate-bounce"></i>
         <h2 class="text-3xl font-black text-white mt-6 tracking-widest">KÂŞİF</h2>
-        <p class="text-slate-400 text-sm mt-2">Sistemler başlatılıyor...</p>
+        <p class="text-slate-400 text-sm mt-2">Bağlantı kuruluyor...</p>
+        <button onclick="document.getElementById('loader').style.display='none'" class="mt-8 text-xs text-gray-600 underline">Takıldıysa tıkla</button>
     </div>
 
     <aside class="w-20 lg:w-64 bg-sidebar-bg text-white flex flex-col justify-between z-30 shadow-2xl flex-shrink-0">
@@ -62,38 +60,28 @@
             </div>
             
             <nav class="mt-6 px-3 space-y-2">
-                <button onclick="window.app.filterGames('all')" class="w-full flex items-center p-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg transition transform active:scale-95 group">
-                    <i class="fa-solid fa-gamepad text-xl w-8 text-center group-hover:rotate-12 transition"></i>
-                    <span class="hidden lg:block font-bold ml-2">Oyunlar</span>
+                <button onclick="window.app.filterGames('all')" class="w-full flex items-center p-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg transition active:scale-95 group">
+                    <i class="fa-solid fa-gamepad text-xl w-8 text-center group-hover:rotate-12"></i><span class="hidden lg:block font-bold ml-2">Oyunlar</span>
                 </button>
-                
                 <button onclick="window.app.openChat()" class="w-full flex items-center p-3 rounded-2xl text-slate-400 hover:bg-slate-800 hover:text-green-400 transition group relative">
-                    <i class="fa-solid fa-walkie-talkie text-xl w-8 text-center group-hover:scale-110 transition"></i>
+                    <i class="fa-solid fa-walkie-talkie text-xl w-8 text-center group-hover:scale-110"></i>
                     <span id="chat-badge" class="hidden absolute top-2 left-7 w-3 h-3 bg-red-500 rounded-full border-2 border-slate-800 animate-pulse"></span>
                     <span class="hidden lg:block font-bold ml-2">Telsiz</span>
                 </button>
-
                 <button onclick="window.app.openShop()" class="w-full flex items-center p-3 rounded-2xl text-slate-400 hover:bg-slate-800 hover:text-yellow-400 transition group">
-                    <i class="fa-solid fa-store text-xl w-8 text-center group-hover:-translate-y-1 transition"></i>
-                    <span class="hidden lg:block font-bold ml-2">Mağaza</span>
+                    <i class="fa-solid fa-store text-xl w-8 text-center group-hover:-translate-y-1"></i><span class="hidden lg:block font-bold ml-2">Mağaza</span>
                 </button>
-                
                 <button onclick="window.app.openLeaderboard()" class="w-full flex items-center p-3 rounded-2xl text-slate-400 hover:bg-slate-800 hover:text-blue-400 transition group">
-                    <i class="fa-solid fa-trophy text-xl w-8 text-center group-hover:text-yellow-300 transition"></i>
-                    <span class="hidden lg:block font-bold ml-2">Sıralama</span>
+                    <i class="fa-solid fa-trophy text-xl w-8 text-center group-hover:text-yellow-300"></i><span class="hidden lg:block font-bold ml-2">Sıralama</span>
                 </button>
-                
                 <button onclick="window.app.openProfile()" class="w-full flex items-center p-3 rounded-2xl text-slate-400 hover:bg-slate-800 hover:text-pink-400 transition group">
-                    <i class="fa-solid fa-user-astronaut text-xl w-8 text-center"></i>
-                    <span class="hidden lg:block font-bold ml-2">Profilim</span>
+                    <i class="fa-solid fa-user-astronaut text-xl w-8 text-center"></i><span class="hidden lg:block font-bold ml-2">Profilim</span>
                 </button>
             </nav>
         </div>
-        
         <div class="p-4">
             <button onclick="window.app.logout()" class="w-full bg-red-500/10 text-red-400 p-3 rounded-2xl hover:bg-red-500 hover:text-white transition flex items-center justify-center lg:justify-start group border border-red-500/20">
-                <i class="fa-solid fa-right-from-bracket text-xl w-8 text-center group-hover:rotate-180 transition duration-500"></i>
-                <span class="hidden lg:block font-bold ml-2">Çıkış Yap</span>
+                <i class="fa-solid fa-right-from-bracket text-xl w-8 text-center group-hover:rotate-180"></i><span class="hidden lg:block font-bold ml-2">Çıkış Yap</span>
             </button>
         </div>
     </aside>
@@ -101,35 +89,28 @@
     <main class="flex-1 flex flex-col h-full relative min-w-0">
         <header class="h-24 bg-white border-b border-slate-200 flex items-center justify-between px-8 shadow-sm z-20">
             <div>
-                <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">
-                    Merhaba, <span id="display-name" class="text-indigo-600">Kâşif</span>! 👋
-                </h2>
+                <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">Merhaba, <span id="display-name" class="text-indigo-600">...</span>! 👋</h2>
                 <div class="flex items-center gap-2 mt-1">
-                    <span id="display-title" class="px-2 py-0.5 rounded bg-slate-100 text-xs font-bold text-slate-500 border border-slate-200">Acemi</span>
+                    <span id="display-title" class="px-2 py-0.5 rounded bg-slate-100 text-xs font-bold text-slate-500 border border-slate-200">...</span>
                     <div id="active-badge-slot"></div>
                 </div>
             </div>
             
             <div class="flex items-center gap-6">
-                <div class="hidden md:flex flex-col w-48 group cursor-help" title="Sonraki seviyeye ne kadar kaldı?">
+                <div class="hidden md:flex flex-col w-48 group cursor-help">
                     <div class="flex justify-between text-xs font-black text-slate-600 mb-1">
                         <span id="display-level" class="text-indigo-600">Lvl 1</span>
                         <span id="display-xp" class="text-slate-400">0 XP</span>
                     </div>
                     <div class="h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
-                        <div id="xp-bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 w-0 transition-all duration-1000 relative">
-                            <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
-                        </div>
+                        <div id="xp-bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 w-0 transition-all duration-1000 relative"></div>
                     </div>
                 </div>
-                
-                <div class="bg-yellow-50 text-yellow-700 px-5 py-2 rounded-2xl font-black flex items-center gap-2 border-2 border-yellow-200 shadow-sm hover:scale-105 transition cursor-pointer" onclick="window.app.openShop()">
-                    <i class="fa-solid fa-coins text-yellow-500 text-xl drop-shadow-sm"></i> 
-                    <span id="display-coins" class="text-lg">0</span>
+                <div class="bg-yellow-50 text-yellow-700 px-5 py-2 rounded-2xl font-black flex items-center gap-2 border-2 border-yellow-200 shadow-sm cursor-pointer" onclick="window.app.openShop()">
+                    <i class="fa-solid fa-coins text-yellow-500 text-xl"></i> <span id="display-coins" class="text-lg">0</span>
                 </div>
-                
                 <div class="relative group cursor-pointer" onclick="window.app.openProfile()">
-                    <img id="display-avatar" src="" class="w-12 h-12 rounded-full bg-slate-100 border-4 border-white shadow-md group-hover:scale-110 transition duration-300">
+                    <img id="display-avatar" src="" class="w-12 h-12 rounded-full bg-slate-100 border-4 border-white shadow-md transition group-hover:scale-110">
                     <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full animate-pulse"></div>
                 </div>
             </div>
@@ -137,17 +118,13 @@
 
         <div class="flex-1 overflow-y-auto p-8 relative">
             <div class="flex gap-3 mb-8 overflow-x-auto pb-2 no-scrollbar">
-                <button onclick="window.app.filterGames('all')" class="bg-slate-800 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-black transition active:scale-95 border-b-4 border-slate-900">Tümü</button>
-                <button onclick="window.app.filterGames('Tarih')" class="bg-red-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-red-600 transition active:scale-95 border-b-4 border-red-700">Tarih</button>
-                <button onclick="window.app.filterGames('Coğrafya')" class="bg-blue-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition active:scale-95 border-b-4 border-blue-700">Coğrafya</button>
-                <button onclick="window.app.filterGames('Bilim')" class="bg-green-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-green-600 transition active:scale-95 border-b-4 border-green-700">Bilim</button>
+                <button onclick="window.app.filterGames('all')" class="bg-slate-800 text-white px-6 py-2 rounded-xl font-bold shadow hover:bg-black transition active:scale-95">Tümü</button>
+                <button onclick="window.app.filterGames('Tarih')" class="bg-red-500 text-white px-6 py-2 rounded-xl font-bold shadow hover:bg-red-600 transition active:scale-95">Tarih</button>
+                <button onclick="window.app.filterGames('Coğrafya')" class="bg-blue-500 text-white px-6 py-2 rounded-xl font-bold shadow hover:bg-blue-600 transition active:scale-95">Coğrafya</button>
+                <button onclick="window.app.filterGames('Bilim')" class="bg-green-500 text-white px-6 py-2 rounded-xl font-bold shadow hover:bg-green-600 transition active:scale-95">Bilim</button>
             </div>
-            
             <div id="games-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 pb-20">
-                <div class="col-span-full text-center py-20 opacity-50">
-                    <i class="fa-solid fa-satellite-dish fa-spin text-4xl mb-4 text-slate-300"></i>
-                    <p>Oyun veritabanına bağlanılıyor...</p>
-                </div>
+                <div class="col-span-full text-center py-20 opacity-50"><i class="fa-solid fa-spinner fa-spin text-3xl"></i></div>
             </div>
         </div>
     </main>
@@ -155,104 +132,59 @@
     <aside class="w-72 bg-white border-l border-slate-200 hidden xl:flex flex-col z-20">
         <div class="p-5 border-b border-slate-100 bg-slate-50">
             <h3 class="font-black text-slate-700 flex items-center gap-2">
-                <i class="fa-solid fa-users-viewfinder text-indigo-500"></i> AKTİF KÂŞİFLER
+                <i class="fa-solid fa-users text-indigo-500"></i> AKTİF KÂŞİFLER
             </h3>
-            <p class="text-xs text-slate-400 font-bold mt-1">Şu an sistemde kimler var?</p>
+            <p class="text-xs text-slate-400 font-bold mt-1">Kimler neler oynuyor?</p>
         </div>
-        <div id="active-users-list" class="flex-1 overflow-y-auto p-4 space-y-3"></div>
+        <div id="active-users-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+            <div class="text-center text-xs text-gray-400 mt-4">Sinyal taranıyor...</div>
+        </div>
     </aside>
 
-    <div id="modal-profile" class="fixed inset-0 bg-black/60 hidden items-center justify-center modal-overlay backdrop-blur-sm p-4">
+    <div id="modal-profile" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4">
         <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 relative shadow-2xl animate-float">
-            <button onclick="window.app.closeModal('modal-profile')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 font-bold text-2xl transition">X</button>
+            <button onclick="window.app.closeModal('modal-profile')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 font-bold text-2xl">X</button>
             <h2 class="text-2xl font-black text-slate-800 mb-6 text-center">KİMLİK KARTI</h2>
-            
             <div class="flex justify-center mb-6 relative group cursor-pointer" onclick="window.app.randomAvatar()">
                 <div class="w-32 h-32 rounded-full bg-indigo-100 border-4 border-indigo-500 overflow-hidden relative shadow-lg">
                     <img id="edit-avatar" src="" class="w-full h-full object-cover">
                     <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-shuffle text-white text-3xl"></i></div>
                 </div>
-                <p class="text-xs text-indigo-500 font-bold mt-2 text-center animate-pulse">Tıkla Değiştir</p>
             </div>
-
             <div class="space-y-4">
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase ml-2">İsim</label>
-                    <input type="text" id="edit-name" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-3 font-bold focus:border-indigo-500 outline-none">
-                </div>
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase ml-2">Ünvan Seç</label>
-                    <select id="edit-title" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-3 font-bold focus:border-indigo-500 outline-none text-slate-700"></select>
-                </div>
-                <button onclick="window.app.saveProfile()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition mt-2">KAYDET ✅</button>
+                <div><label class="text-xs font-bold text-slate-400 uppercase ml-2">İsim</label><input type="text" id="edit-name" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-3 font-bold outline-none"></div>
+                <div><label class="text-xs font-bold text-slate-400 uppercase ml-2">Ünvan</label><select id="edit-title" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-3 font-bold outline-none text-slate-700"></select></div>
+                <button onclick="window.app.saveProfile()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition">KAYDET ✅</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-shop" class="fixed inset-0 bg-black/80 hidden items-center justify-center modal-overlay backdrop-blur-sm p-4">
+    <div id="modal-shop" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4">
         <div class="bg-white w-full max-w-4xl rounded-[2.5rem] p-8 relative shadow-2xl h-[80vh] flex flex-col">
-            <button onclick="window.app.closeModal('modal-shop')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 font-bold text-2xl transition">X</button>
-            <div class="text-center mb-8">
-                <h2 class="text-4xl font-black text-indigo-600">MAĞAZA</h2>
-                <div class="inline-block bg-yellow-100 text-yellow-800 px-4 py-1 rounded-full font-black border border-yellow-300 mt-2">
-                    BAKİYEN: <span id="shop-balance">0</span> 💰
-                </div>
-            </div>
+            <button onclick="window.app.closeModal('modal-shop')" class="absolute top-6 right-6 text-gray-400 hover:text-red-500 font-bold text-2xl">X</button>
+            <div class="text-center mb-8"><h2 class="text-4xl font-black text-indigo-600">MAĞAZA</h2><div class="inline-block bg-yellow-100 text-yellow-800 px-4 py-1 rounded-full font-black mt-2">BAKİYEN: <span id="shop-balance">0</span> 💰</div></div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-y-auto p-2">
-                <div class="border-4 border-slate-100 rounded-3xl p-6 text-center hover:border-indigo-300 transition group bg-white">
-                    <div class="text-6xl mb-4 animate-float">🚀</div>
-                    <h3 class="font-bold text-slate-700">Roket Rozeti</h3>
-                    <p class="text-xs text-slate-400 mb-4">Profilinde havalı durur.</p>
-                    <button onclick="window.app.buyItem('badge_rocket', 100, '🚀')" class="bg-green-500 hover:bg-green-600 text-white w-full py-3 rounded-xl font-bold shadow-lg active:scale-95 transition">100 💰 AL</button>
-                </div>
-                <div class="border-4 border-slate-100 rounded-3xl p-6 text-center hover:border-indigo-300 transition group bg-white">
-                    <div class="text-6xl mb-4 animate-float" style="animation-delay: 0.5s;">👑</div>
-                    <h3 class="font-bold text-slate-700">Kral Tacı</h3>
-                    <p class="text-xs text-slate-400 mb-4">Gerçek liderler için.</p>
-                    <button onclick="window.app.buyItem('badge_crown', 500, '👑')" class="bg-green-500 hover:bg-green-600 text-white w-full py-3 rounded-xl font-bold shadow-lg active:scale-95 transition">500 💰 AL</button>
-                </div>
-                <div class="border-4 border-slate-100 rounded-3xl p-6 text-center hover:border-indigo-300 transition group bg-white">
-                    <div class="text-6xl mb-4 animate-float" style="animation-delay: 1s;">🦖</div>
-                    <h3 class="font-bold text-slate-700">Dinozor Dostu</h3>
-                    <p class="text-xs text-slate-400 mb-4">Tarih öncesinden.</p>
-                    <button onclick="window.app.buyItem('badge_dino', 200, '🦖')" class="bg-green-500 hover:bg-green-600 text-white w-full py-3 rounded-xl font-bold shadow-lg active:scale-95 transition">200 💰 AL</button>
-                </div>
+                <div class="border-4 border-slate-100 rounded-3xl p-6 text-center hover:border-indigo-300 transition bg-white"><div class="text-6xl mb-4 animate-float">🚀</div><h3 class="font-bold text-slate-700">Roket Rozeti</h3><button onclick="window.app.buyItem('badge_rocket', 100, '🚀')" class="bg-green-500 text-white w-full py-3 rounded-xl font-bold shadow mt-4 active:scale-95">100 💰 AL</button></div>
+                <div class="border-4 border-slate-100 rounded-3xl p-6 text-center hover:border-indigo-300 transition bg-white"><div class="text-6xl mb-4 animate-float" style="animation-delay:0.5s">👑</div><h3 class="font-bold text-slate-700">Kral Tacı</h3><button onclick="window.app.buyItem('badge_crown', 500, '👑')" class="bg-green-500 text-white w-full py-3 rounded-xl font-bold shadow mt-4 active:scale-95">500 💰 AL</button></div>
+                <div class="border-4 border-slate-100 rounded-3xl p-6 text-center hover:border-indigo-300 transition bg-white"><div class="text-6xl mb-4 animate-float" style="animation-delay:1s">🦖</div><h3 class="font-bold text-slate-700">Dinozor</h3><button onclick="window.app.buyItem('badge_dino', 200, '🦖')" class="bg-green-500 text-white w-full py-3 rounded-xl font-bold shadow mt-4 active:scale-95">200 💰 AL</button></div>
             </div>
         </div>
     </div>
 
-    <div id="modal-leaderboard" class="fixed inset-0 bg-black/80 hidden items-center justify-center modal-overlay backdrop-blur-sm p-4">
-        <div class="bg-white w-full max-w-2xl rounded-[2.5rem] p-8 relative shadow-2xl">
-            <button onclick="window.app.closeModal('modal-leaderboard')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 font-bold text-2xl transition">X</button>
-            <h2 class="text-3xl font-black text-center text-slate-800 mb-6">LİDER TABLOSU 🏆</h2>
-            
-            <div id="podium" class="flex justify-center items-end gap-4 mb-6 h-32 border-b border-slate-100 pb-4"></div>
-            <div id="lb-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-2"></div>
-            
-            <div class="flex justify-between items-center mt-4 pt-4 border-t border-slate-100">
-                <button onclick="window.app.changeLbPage(-1)" class="text-indigo-600 font-bold hover:bg-indigo-50 px-3 py-1 rounded">Önceki</button>
-                <span id="lb-page" class="text-xs font-bold text-slate-400">Sayfa 1</span>
-                <button onclick="window.app.changeLbPage(1)" class="text-indigo-600 font-bold hover:bg-indigo-50 px-3 py-1 rounded">Sonraki</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-game" class="fixed inset-0 bg-black/95 hidden flex-col items-center justify-center modal-overlay p-4">
+    <div id="modal-game" class="fixed inset-0 hidden flex-col items-center justify-center modal-overlay p-4 bg-black/95">
         <div class="w-full max-w-6xl h-[85vh] flex flex-col">
             <div class="flex justify-between items-center text-white mb-2">
                 <h2 id="game-title-text" class="text-xl font-bold text-yellow-400">Oyun</h2>
-                <button onclick="window.app.closeGame()" class="bg-red-500 px-4 py-1 rounded-full font-bold hover:bg-red-600">Kapat X</button>
+                <div class="flex gap-4"><span class="bg-slate-800 px-3 rounded-full flex items-center"><i class="fa-regular fa-clock mr-2"></i> <span id="game-timer">00:00</span></span><button onclick="window.app.closeGame()" class="bg-red-500 px-4 rounded-full font-bold hover:bg-red-600">Kapat X</button></div>
             </div>
             <div class="flex-1 bg-black rounded-2xl overflow-hidden border-2 border-slate-700 relative">
                 <iframe id="game-frame" src="" class="w-full h-full border-0"></iframe>
             </div>
-            <div class="text-center mt-4">
-                <button onclick="window.app.claimReward()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-black py-3 px-10 rounded-full shadow-lg hover:scale-105 transition animate-bounce border-4 border-white/20">PUANI KAP! 🏆</button>
-            </div>
+            <div class="text-center mt-4"><button onclick="window.app.claimReward()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-black py-3 px-10 rounded-full shadow-lg hover:scale-105 transition animate-bounce border-4 border-white/20">PUANI KAP! 🏆</button></div>
         </div>
     </div>
 
-    <div id="modal-chat" class="fixed inset-0 bg-black/60 hidden items-center justify-center modal-overlay backdrop-blur-sm p-4">
+    <div id="modal-chat" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4">
         <div class="bg-white w-full max-w-md h-[600px] rounded-[2rem] shadow-2xl flex flex-col overflow-hidden border-4 border-white">
             <div class="bg-slate-800 p-4 flex justify-between items-center text-white">
                 <div class="flex items-center gap-3"><i class="fa-solid fa-walkie-talkie text-green-400"></i> <span class="font-bold">Kâşif Telsizi</span></div>
@@ -260,9 +192,17 @@
             </div>
             <div id="chat-box" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-100"></div>
             <form onsubmit="window.app.sendMsg(event)" class="p-3 bg-white border-t flex gap-2">
-                <input id="chat-input" type="text" placeholder="Mesajın..." class="flex-1 bg-slate-100 rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500">
+                <input id="chat-input" type="text" maxlength="80" placeholder="Mesajın..." class="flex-1 bg-slate-100 rounded-full px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500">
                 <button type="submit" class="bg-indigo-600 text-white w-10 h-10 rounded-full hover:bg-indigo-700 transition"><i class="fa-solid fa-paper-plane"></i></button>
             </form>
+        </div>
+    </div>
+
+    <div id="modal-leaderboard" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4">
+        <div class="bg-white w-full max-w-lg rounded-[2rem] p-8 relative shadow-2xl">
+            <button onclick="window.app.closeModal('modal-leaderboard')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 font-bold text-2xl">X</button>
+            <h2 class="text-3xl font-black text-center text-slate-800 mb-6">LİDER TABLOSU 🏆</h2>
+            <div id="lb-list" class="space-y-2 max-h-[400px] overflow-y-auto pr-2"></div>
         </div>
     </div>
 
@@ -271,7 +211,7 @@
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, increment, collection, query, orderBy, limit, getDocs, onSnapshot, where, addDoc, deleteDoc, Timestamp, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // --- 1. FIREBASE AYARLARI ---
+        // FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyD5SFoL8-4idNlbixCw81pjWMn6M6-yv1A",
             authDomain: "kasif-cd133.firebaseapp.com",
@@ -284,147 +224,107 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app, "kasif"); // ÖNEMLİ: Veritabanı adı 'kasif'
-        
-        // Çevrimdışı destek
-        enableIndexedDbPersistence(db).catch(err => console.log("Offline mode err:", err.code));
+        const db = getFirestore(app, "kasif");
+        enableIndexedDbPersistence(db).catch(e => console.log("Offline:", e));
 
-        // --- 2. DEĞİŞKENLER ---
         let currentUser = null;
         let userData = {};
         let gamesData = [];
-        let leaderboardData = [];
-        let lbPage = 1;
+        let timer;
         const soundPop = document.getElementById('sfx-pop');
         const soundWin = document.getElementById('sfx-win');
 
-        // --- 3. WINDOW FONKSİYONLARI (GLOBAL ERİŞİM İÇİN) ---
+        // WINDOW GLOBAL FONKSİYONLARI (Kapsam sorununu çözer)
         window.app = {
-            // Modal İşlemleri
+            closeModal: (id) => document.getElementById(id).style.display = 'none',
+            
             openProfile: () => {
-                // Ünvanları doldur
                 const sel = document.getElementById('edit-title');
                 sel.innerHTML = '<option value="Acemi Kâşif">Acemi Kâşif</option>';
-                if(userData.level >= 5) sel.innerHTML += '<option value="Gezgin">Gezgin (Lvl 5)</option>';
-                if(userData.level >= 10) sel.innerHTML += '<option value="Uzman">Uzman (Lvl 10)</option>';
-                if(userData.level >= 20) sel.innerHTML += '<option value="Efsane">Efsane (Lvl 20)</option>';
+                if(userData.level >= 5) sel.innerHTML += '<option value="Meraklı Gezgin">Meraklı Gezgin (Lvl 5)</option>';
+                if(userData.level >= 10) sel.innerHTML += '<option value="Bilgi Uzmanı">Bilgi Uzmanı (Lvl 10)</option>';
+                if(userData.level >= 20) sel.innerHTML += '<option value="Efsanevi Kaptan">Efsanevi Kaptan (Lvl 20)</option>';
                 sel.value = userData.title;
-                
                 document.getElementById('edit-name').value = userData.username;
                 document.getElementById('modal-profile').style.display = 'flex';
                 soundPop.play();
             },
-            
+
             saveProfile: async () => {
                 const name = document.getElementById('edit-name').value;
-                const avatar = document.getElementById('edit-avatar').src;
                 const title = document.getElementById('edit-title').value;
+                const avatar = document.getElementById('edit-avatar').src;
                 if(!name) return;
-                
+                document.getElementById('modal-profile').style.display = 'none'; // Önce modalı kapat
                 try {
-                    await updateDoc(doc(db, "users", currentUser.uid), { username: name, avatar: avatar, title: title });
-                    userData.username = name; userData.avatar = avatar; userData.title = title;
+                    await updateDoc(doc(db, "users", currentUser.uid), { username: name, title: title, avatar: avatar });
+                    userData.username = name; userData.title = title; userData.avatar = avatar;
                     updateUI();
-                    document.getElementById('modal-profile').style.display = 'none';
-                    
-                    const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
-                    Toast.fire({ icon: 'success', title: 'Profil Güncellendi' });
+                    Swal.fire({ icon: 'success', title: 'Güncellendi!', toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
                 } catch(e) { console.error(e); }
             },
 
-            randomAvatar: () => {
-                const seed = Math.random().toString(36).substring(7);
-                document.getElementById('edit-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}`;
-            },
+            randomAvatar: () => document.getElementById('edit-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${Math.random()}`,
 
-            openShop: () => {
-                document.getElementById('modal-shop').style.display = 'flex';
-                soundPop.play();
-            },
+            openShop: () => { document.getElementById('modal-shop').style.display = 'flex'; soundPop.play(); },
 
             buyItem: async (id, price, icon) => {
                 if(userData.coins < price) { Swal.fire({icon:'error', title:'Yetersiz Bakiye'}); return; }
-                if(userData.badges && userData.badges.some(b=>b.id===id)) { Swal.fire({icon:'info', title:'Zaten Sahipsin'}); return; }
-                
-                Swal.fire({
-                    title: 'Satın Al?', text: `${price} Altın ödeyeceksin.`, icon: 'question', showCancelButton: true, confirmButtonText: 'Evet, Al'
-                }).then(async(r)=>{
-                    if(r.isConfirmed){
-                        const newBadge = { id, icon, date: new Date().toISOString() };
-                        await updateDoc(doc(db, "users", currentUser.uid), {
-                            coins: increment(-price), badges: [...(userData.badges||[]), newBadge]
-                        });
-                        userData.coins -= price; 
-                        if(!userData.badges) userData.badges=[]; userData.badges.push(newBadge);
-                        updateUI();
-                        soundWin.play();
-                        Swal.fire('Başarılı!', 'Rozet eklendi.', 'success');
-                    }
-                });
+                if(userData.badges && userData.badges.some(b=>b.id===id)) { Swal.fire({icon:'info', title:'Zaten Var'}); return; }
+                const r = await Swal.fire({title:'Satın Al?', text:`${price} Altın`, showCancelButton:true, confirmButtonText:'Al'});
+                if(r.isConfirmed) {
+                    const badge = { id, icon, date: new Date().toISOString() };
+                    await updateDoc(doc(db, "users", currentUser.uid), { coins: increment(-price), badges: [...(userData.badges||[]), badge] });
+                    userData.coins -= price; if(!userData.badges) userData.badges=[]; userData.badges.push(badge);
+                    updateUI();
+                    soundWin.play();
+                    Swal.fire({icon:'success', title:'Hayırlı Olsun!'});
+                }
             },
 
             openLeaderboard: async () => {
                 document.getElementById('modal-leaderboard').style.display = 'flex';
-                const snap = await getDocs(query(collection(db,"users"), orderBy("xp","desc"), limit(50)));
-                leaderboardData = [];
-                snap.forEach(d => leaderboardData.push(d.data()));
-                lbPage = 1;
-                renderLeaderboard();
+                const list = document.getElementById('lb-list');
+                list.innerHTML = '<div class="text-center p-4">Yükleniyor...</div>';
+                const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(20));
+                const snap = await getDocs(q);
+                list.innerHTML = '';
+                let rank = 1;
+                snap.forEach(d => {
+                    const u = d.data();
+                    let bg = "bg-white"; let icon = `#${rank}`;
+                    if(rank===1) { bg="bg-yellow-50 border-yellow-200"; icon="👑"; }
+                    if(rank===2) { bg="bg-gray-50 border-gray-200"; icon="🥈"; }
+                    if(rank===3) { bg="bg-orange-50 border-orange-200"; icon="🥉"; }
+                    list.innerHTML += `
+                    <div class="flex items-center gap-4 p-3 rounded-2xl border ${bg} transition hover:scale-[1.02]">
+                        <div class="font-black text-xl w-8 text-center">${icon}</div>
+                        <img src="${u.avatar}" class="w-10 h-10 rounded-full border border-slate-200">
+                        <div class="flex-1 overflow-hidden">
+                            <div class="font-bold text-sm truncate">${u.username}</div>
+                            <div class="text-[10px] text-slate-500">${u.title}</div>
+                        </div>
+                        <div class="font-black text-indigo-600 text-sm">${u.xp} XP</div>
+                    </div>`;
+                    rank++;
+                });
                 soundPop.play();
             },
 
-            changeLbPage: (dir) => {
-                lbPage += dir;
-                if(lbPage < 1) lbPage = 1;
-                renderLeaderboard();
-            },
-
-            openChat: () => {
-                document.getElementById('modal-chat').style.display = 'flex';
-                document.getElementById('chat-badge').classList.add('hidden');
-                setTimeout(() => {
-                    const box = document.getElementById('chat-box');
-                    box.scrollTop = box.scrollHeight;
-                }, 100);
-            },
-
-            sendMsg: async (e) => {
-                e.preventDefault();
-                const inp = document.getElementById('chat-input');
-                const txt = inp.value.trim();
-                if(!txt) return;
-                await addDoc(collection(db,"messages"), {
-                    text: txt, senderId: currentUser.uid, senderName: userData.username, avatar: userData.avatar, timestamp: Timestamp.now()
-                });
-                inp.value = '';
-            },
-
-            closeModal: (id) => document.getElementById(id).style.display = 'none',
-
             filterGames: (cat) => {
-                const grid = document.getElementById('games-grid');
-                grid.innerHTML = '';
-                const filtered = cat==='all' ? gamesData : gamesData.filter(g=>g.cat===cat);
-                
-                if(filtered.length === 0) { grid.innerHTML = '<div class="col-span-full text-center opacity-50 py-10">Oyun bulunamadı.</div>'; return; }
-
+                const grid = document.getElementById('games-grid'); grid.innerHTML = '';
+                const filtered = cat==='all' ? gamesData : gamesData.filter(g => g.cat === cat);
+                if(filtered.length === 0) { grid.innerHTML = '<div class="col-span-full text-center text-slate-400 py-10">Oyun bulunamadı.</div>'; return; }
                 filtered.forEach(g => {
-                    let color = "bg-slate-500";
-                    if(g.cat==="Tarih") color="bg-red-500";
-                    if(g.cat==="Coğrafya") color="bg-blue-500";
-                    if(g.cat==="Bilim") color="bg-green-500";
-
+                    let c = "bg-slate-500"; if(g.cat==="Tarih")c="bg-red-500"; if(g.cat==="Coğrafya")c="bg-blue-500"; if(g.cat==="Bilim")c="bg-green-500";
                     grid.innerHTML += `
-                    <div onclick="window.app.playGame('${g.url}','${g.title}')" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition cursor-pointer group transform hover:-translate-y-2 duration-300 relative border-2 border-transparent hover:border-indigo-200">
-                        <div class="h-40 overflow-hidden relative">
-                            <img src="${g.img || 'https://placehold.co/400x250'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-                            <div class="absolute top-2 right-2 ${color} text-white text-[10px] px-2 py-1 rounded font-bold uppercase shadow">${g.cat}</div>
-                            <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-play text-white text-4xl drop-shadow-lg"></i></div>
+                    <div onclick="window.app.playGame('${g.url}','${g.title}')" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition cursor-pointer border-2 border-transparent hover:border-indigo-200 transform hover:-translate-y-1">
+                        <div class="h-40 relative">
+                            <img src="${g.img || 'https://placehold.co/400x250'}" class="w-full h-full object-cover">
+                            <div class="absolute top-2 right-2 ${c} text-white text-[10px] px-2 py-1 rounded font-bold uppercase shadow">${g.cat}</div>
+                            <div class="absolute inset-0 bg-black/20 hover:bg-black/10 flex items-center justify-center transition"><i class="fa-solid fa-play text-white text-4xl drop-shadow-md"></i></div>
                         </div>
-                        <div class="p-4">
-                            <h4 class="font-bold text-slate-700 truncate">${g.title}</h4>
-                            <p class="text-xs text-slate-400 mt-1 flex items-center gap-1"><i class="fa-solid fa-coins text-yellow-500"></i> Puan Kazan</p>
-                        </div>
+                        <div class="p-4"><h4 class="font-bold text-slate-700 truncate">${g.title}</h4></div>
                     </div>`;
                 });
             },
@@ -432,228 +332,159 @@
             playGame: (url, title) => {
                 document.getElementById('modal-game').style.display = 'flex';
                 document.getElementById('game-title-text').innerText = title;
-                document.getElementById('game-frame').src = url;
-                updateStatus('online', title); // STEAM STYLE STATUS
+                document.getElementById('game-frame').src = url || "https://tr.wikipedia.org/wiki/Ana_Sayfa";
+                updateStatus('online', title);
+                let s = 0; document.getElementById('game-timer').innerText="00:00";
+                timer = setInterval(()=>{ s++; document.getElementById('game-timer').innerText = `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; }, 1000);
             },
 
             closeGame: () => {
                 document.getElementById('modal-game').style.display = 'none';
                 document.getElementById('game-frame').src = "";
+                clearInterval(timer);
                 updateStatus('online', null);
             },
 
             claimReward: async () => {
-                // Basit Ödül Mantığı
-                const xpGain = 50;
-                const coinGain = 20;
-                await updateDoc(doc(db, "users", currentUser.uid), { xp: increment(xpGain), coins: increment(coinGain) });
-                userData.xp += xpGain; userData.coins += coinGain;
-                
-                // Level Up Kontrolü
-                const newLevel = Math.floor(userData.xp / 1000) + 1;
-                if(newLevel > userData.level) {
-                    await updateDoc(doc(db, "users", currentUser.uid), { level: newLevel });
-                    userData.level = newLevel;
-                    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-                    soundWin.play();
-                    Swal.fire({ title: 'SEVİYE ATLADIN! 🎉', text: `Tebrikler! Artık Seviye ${newLevel} oldun!`, icon: 'success' });
+                await updateDoc(doc(db, "users", currentUser.uid), { xp: increment(50), coins: increment(20) });
+                userData.xp += 50; userData.coins += 20;
+                // Level Up Check
+                const newLvl = Math.floor(userData.xp/1000)+1;
+                if(newLvl > userData.level) {
+                    await updateDoc(doc(db,"users",currentUser.uid), {level: newLvl});
+                    userData.level = newLvl;
+                    confetti({particleCount:150, spread:70});
+                    Swal.fire({title:'TEBRİKLER!', text:`Seviye ${newLvl} Oldun!`, icon:'success'});
                 } else {
-                    soundWin.play();
-                    const Toast = Swal.mixin({ toast: true, position: 'top', showConfirmButton: false, timer: 2000 });
-                    Toast.fire({ icon: 'success', title: `+${xpGain} XP, +${coinGain} Altın` });
+                    const Toast = Swal.mixin({toast:true,position:'top',showConfirmButton:false,timer:2000});
+                    Toast.fire({icon:'success', title:'+50 XP, +20 Altın'});
                 }
-                
                 updateUI();
                 window.app.closeGame();
             },
 
+            // SOHBET
+            openChat: () => {
+                document.getElementById('modal-chat').style.display = 'flex';
+                document.getElementById('chat-badge').classList.add('hidden');
+                setTimeout(()=>document.getElementById('chat-box').scrollTop = 99999, 100);
+            },
+            
+            sendMsg: async (e) => {
+                e.preventDefault(); const i = document.getElementById('chat-input'); const t = i.value.trim(); if(!t) return;
+                await addDoc(collection(db, "messages"), { 
+                    text: t, senderId: currentUser.uid, senderName: userData.username, avatar: userData.avatar, timestamp: Timestamp.now() 
+                });
+                i.value = '';
+                // Temizlik (%10 ihtimal)
+                if(Math.random()<0.1) {
+                    const old = new Date(Date.now()-60000); // 1 dk
+                    const q = query(collection(db,"messages"), where("timestamp","<",old));
+                    const s = await getDocs(q); s.forEach(d=>deleteDoc(d.ref));
+                }
+            },
+
             logout: () => {
-                Swal.fire({
-                    title: 'Çıkış Yapılsın mı?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Evet', cancelButtonText: 'Hayır'
-                }).then(async(r) => {
-                    if(r.isConfirmed){
-                        await updateStatus('offline', null);
-                        await signOut(auth);
-                        window.location.href = "login.html";
-                    }
+                Swal.fire({title:'Çıkış?', icon:'warning', showCancelButton:true}).then(async(r)=>{
+                    if(r.isConfirmed){ await updateStatus('offline', null); await signOut(auth); window.location.href="login.html"; }
                 });
             }
         };
 
-        // --- 4. AUTH & INIT ---
+        // --- AUTH & LOAD ---
         onAuthStateChanged(auth, async (user) => {
-            const loader = document.getElementById('loader');
             if (user) {
                 currentUser = user;
-                // Veriyi Çek veya Oluştur
                 const docRef = doc(db, "users", user.uid);
                 const snap = await getDoc(docRef);
-                
-                if (snap.exists()) {
-                    userData = snap.data();
-                } else {
-                    userData = { username: user.email.split('@')[0], email: user.email, xp: 0, level: 1, coins: 100, avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`, title: "Acemi Kâşif", onlineStatus: 'online' };
+                if (snap.exists()) userData = snap.data();
+                else {
+                    userData = { username: user.email.split('@')[0], email: user.email, xp: 0, level: 1, coins: 100, avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`, title: "Acemi Kâşif" };
                     await setDoc(docRef, userData);
                 }
-                
                 updateUI();
                 updateStatus('online', null);
-                loadGames();
+                fetchGames();
+                initRealtimeUsers();
                 initChat();
-                initActiveUsers();
-                
-                // Loader Kapat
-                loader.style.opacity = '0';
-                setTimeout(() => loader.style.display = 'none', 500);
+                document.getElementById('loader').style.display = 'none';
             } else {
                 window.location.href = "login.html";
             }
         });
 
-        // --- 5. YARDIMCI FONKSİYONLAR ---
+        // --- YARDIMCI ---
         function updateUI() {
             document.getElementById('display-name').innerText = userData.username;
             document.getElementById('display-title').innerText = userData.title;
             document.getElementById('display-level').innerText = "Lvl " + userData.level;
-            document.getElementById('display-xp').innerText = `${userData.xp % 1000} / 1000 XP`;
+            document.getElementById('display-xp').innerText = `${userData.xp%1000} / 1000 XP`;
             document.getElementById('display-coins').innerText = userData.coins;
             document.getElementById('shop-balance').innerText = userData.coins;
             document.getElementById('display-avatar').src = userData.avatar;
             document.getElementById('edit-avatar').src = userData.avatar;
             document.getElementById('edit-name').value = userData.username;
+            document.getElementById('xp-bar').style.width = Math.min((userData.xp%1000)/10, 100) + "%";
             
-            // XP Bar Animasyonu
-            const pct = Math.min((userData.xp % 1000) / 10, 100);
-            document.getElementById('xp-bar').style.width = pct + "%";
-            
-            // Rozet
-            const slot = document.getElementById('active-badge-slot');
-            if(userData.badges && userData.badges.length > 0) {
-                slot.innerHTML = `<span class="text-2xl filter drop-shadow animate-float">${userData.badges[userData.badges.length-1].icon}</span>`;
-            } else { slot.innerHTML = ''; }
+            const badgeSlot = document.getElementById('active-badge-slot');
+            if(userData.badges && userData.badges.length>0) badgeSlot.innerHTML = `<span class="text-2xl animate-bounce">${userData.badges[userData.badges.length-1].icon}</span>`;
+            else badgeSlot.innerHTML = '';
         }
 
-        async function updateStatus(status, game) {
-            try { await updateDoc(doc(db, "users", currentUser.uid), { onlineStatus: status, playing: game, lastSeen: new Date().toISOString() }); } catch(e){}
-        }
+        async function updateStatus(s, g) { try{ await updateDoc(doc(db,"users",currentUser.uid), {onlineStatus:s, playing:g, lastSeen:new Date().toISOString()}); }catch(e){} }
 
-        async function loadGames() {
+        async function fetchGames() {
             try {
                 const snap = await getDocs(collection(db, "games"));
                 gamesData = [];
                 snap.forEach(d => gamesData.push({ ...d.data(), id: d.id }));
-                if(gamesData.length === 0) gamesData = [{ title: "Örnek Oyun", cat: "Coğrafya", url: "", img: "" }];
+                if(gamesData.length===0) gamesData=[{id:1, title:"Örnek Harita", cat:"Coğrafya", url:"", img:""}];
                 window.app.filterGames('all');
-            } catch(e) { console.log(e); }
+            } catch(e){console.log(e);}
         }
 
-        function initActiveUsers() {
-            onSnapshot(query(collection(db, "users"), where("onlineStatus", "==", "online")), (snap) => {
-                const list = document.getElementById('active-users-list');
-                list.innerHTML = '';
+        function initRealtimeUsers() {
+            const q = query(collection(db,"users"), where("onlineStatus","==","online"));
+            onSnapshot(q, (snap) => {
+                const list = document.getElementById('active-users-list'); list.innerHTML='';
                 snap.forEach(d => {
                     const u = d.data();
-                    if(u.email === userData.email) return; // Kendini gösterme
-                    
-                    let statusHtml = '<span class="text-xs text-green-500 font-bold">● Çevrimiçi</span>';
-                    let borderClass = "border-slate-100 hover:bg-slate-50";
-                    
-                    if(u.playing) {
-                        statusHtml = `<span class="text-xs text-indigo-500 font-bold truncate">🎮 ${u.playing}</span>`;
-                        borderClass = "border-indigo-100 bg-indigo-50/50";
-                    }
-
-                    list.innerHTML += `
-                    <div class="flex items-center gap-3 p-3 rounded-2xl border ${borderClass} transition cursor-default">
-                        <div class="relative">
-                            <img src="${u.avatar}" class="w-10 h-10 rounded-full bg-slate-200">
-                            <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
-                        </div>
-                        <div class="flex-1 overflow-hidden">
-                            <h4 class="font-bold text-sm text-slate-700 truncate">${u.username}</h4>
-                            ${statusHtml}
-                        </div>
-                    </div>`;
+                    if(u.email === userData.email) return;
+                    let status = '<span class="text-xs text-green-500 font-bold">● Çevrimiçi</span>';
+                    if(u.playing) status = `<span class="text-xs text-indigo-500 font-bold">🎮 ${u.playing}</span>`;
+                    list.innerHTML += `<div class="flex items-center gap-3 p-3 rounded-2xl border border-slate-100 hover:bg-slate-50 transition"><div class="relative"><img src="${u.avatar}" class="w-10 h-10 rounded-full bg-slate-200"><div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div></div><div class="flex-1 overflow-hidden"><h4 class="font-bold text-sm text-slate-700 truncate">${u.username}</h4>${status}</div></div>`;
                 });
             });
         }
 
         function initChat() {
-            onSnapshot(query(collection(db, "messages"), orderBy("timestamp", "asc"), limit(50)), (snap) => {
+            const q = query(collection(db, "messages"), orderBy("timestamp", "asc"), limit(30));
+            onSnapshot(q, (snap) => {
                 const box = document.getElementById('chat-box');
-                box.innerHTML = '<div class="text-center text-xs text-slate-400 py-4">Sohbet geçmişi sınırlıdır.</div>';
                 let hasNew = false;
-                snap.forEach(d => {
-                    const msg = d.data();
-                    const isMe = msg.senderId === currentUser.uid;
-                    const safeText = msg.text.replace(/kötü|aptal/gi, "***"); // Basit filtre
-                    
-                    const html = `
-                    <div class="flex w-full ${isMe ? 'justify-end' : 'justify-start'} mb-3 group animate-fade-in">
-                        ${!isMe ? `<img src="${msg.avatar}" class="w-8 h-8 rounded-full mr-2 self-end mb-1 border border-slate-200">` : ''}
-                        <div class="max-w-[75%]">
-                            ${!isMe ? `<div class="text-[10px] text-slate-400 ml-2 mb-1">${msg.senderName}</div>` : ''}
-                            <div class="px-4 py-2 text-sm font-medium ${isMe ? 'bubble-me' : 'bubble-other'} shadow-sm">
-                                ${safeText}
+                snap.docChanges().forEach(change => {
+                    if (change.type === "added") {
+                        const msg = change.doc.data();
+                        const isMe = msg.senderId === currentUser.uid;
+                        const now = new Date(); const mTime = msg.timestamp ? msg.timestamp.toDate() : new Date();
+                        if((now - mTime)/1000 > 60) return; // 1 dk eski mesajları gösterme
+                        
+                        const safeText = msg.text.replace(/kötü|aptal/gi, "***");
+                        const html = `
+                        <div class="flex w-full ${isMe ? 'justify-end' : 'justify-start'} mb-3 animate-float group">
+                            ${!isMe ? `<img src="${msg.avatar}" class="w-8 h-8 rounded-full mr-2 self-end border border-slate-200">` : ''}
+                            <div class="max-w-[75%]">
+                                ${!isMe ? `<div class="text-[10px] text-slate-400 ml-2 mb-1">${msg.senderName}</div>` : ''}
+                                <div class="px-4 py-2 text-sm font-medium ${isMe ? 'chat-bubble-me' : 'chat-bubble-other'} shadow-sm">${safeText}</div>
                             </div>
-                        </div>
-                    </div>`;
-                    box.innerHTML += html;
-                    hasNew = true;
+                        </div>`;
+                        box.insertAdjacentHTML('beforeend', html);
+                        hasNew = true;
+                    }
                 });
-                box.scrollTop = box.scrollHeight;
-                if(document.getElementById('modal-chat').style.display === 'none' && hasNew) {
-                    document.getElementById('chat-badge').classList.remove('hidden');
-                }
+                if(hasNew) box.scrollTop = box.scrollHeight;
+                if(document.getElementById('modal-chat').style.display==='none' && hasNew) document.getElementById('chat-badge').classList.remove('hidden');
             });
-        }
-
-        function renderLeaderboard() {
-            const list = document.getElementById('lb-list');
-            const podium = document.getElementById('podium');
-            list.innerHTML = ''; podium.innerHTML = '';
-            document.getElementById('lb-page').innerText = `Sayfa ${lbPage}`;
-
-            // Podyum (Sadece sayfa 1)
-            if(lbPage === 1 && leaderboardData.length > 0) {
-                const top3 = leaderboardData.slice(0, 3);
-                if(top3[1]) createPodium(top3[1], 2, 'h-20 bg-slate-200 border-slate-300', '🥈');
-                if(top3[0]) createPodium(top3[0], 1, 'h-28 bg-yellow-100 border-yellow-300', '👑');
-                if(top3[2]) createPodium(top3[2], 3, 'h-16 bg-orange-100 border-orange-300', '🥉');
-            }
-
-            // Liste
-            const start = (lbPage - 1) * 5 + (lbPage === 1 ? 3 : 0);
-            const end = start + 5;
-            const pageUsers = leaderboardData.slice(start, end);
-
-            pageUsers.forEach((u, i) => {
-                const rank = start + i + 1;
-                list.innerHTML += `
-                <div class="flex items-center gap-4 p-3 rounded-2xl border border-slate-100 hover:bg-slate-50 transition">
-                    <div class="font-black text-slate-400 w-8 text-center">#${rank}</div>
-                    <img src="${u.avatar}" class="w-10 h-10 rounded-full bg-slate-100">
-                    <div class="flex-1">
-                        <h4 class="font-bold text-sm text-slate-700">${u.username}</h4>
-                        <span class="text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500 border">${u.title}</span>
-                    </div>
-                    <div class="font-black text-indigo-600 text-sm">${u.xp} XP</div>
-                </div>`;
-            });
-        }
-
-        function createPodium(u, rank, style, icon) {
-            document.getElementById('podium').innerHTML += `
-            <div class="flex flex-col items-center animate-bounce" style="animation-duration: ${rank+2}s">
-                <div class="text-2xl mb-1">${icon}</div>
-                <img src="${u.avatar}" class="w-14 h-14 rounded-full border-4 border-white shadow-lg z-10">
-                <div class="w-20 rounded-t-xl border-t-4 border-l-2 border-r-2 ${style} flex items-end justify-center pb-2 -mt-6 pt-8 shadow-sm">
-                    <div class="text-center leading-tight">
-                        <div class="font-bold text-xs truncate w-16">${u.username}</div>
-                        <div class="text-[10px] opacity-70">${u.xp} XP</div>
-                    </div>
-                </div>
-            </div>`;
         }
     </script>
 </body>
