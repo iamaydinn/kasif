@@ -528,6 +528,97 @@
         }
 
         filterGames('all');
+
+        // ==========================================
+        // OYUNLARI VERİTABANINDAN ÇEKME MODÜLÜ
+        // ==========================================
+        
+        let gamesDatabase = []; // Oyunlar burada tutulacak
+
+        // 1. Veritabanından Oyunları İndir
+        async function fetchGamesFromDB() {
+            const grid = document.getElementById('games-grid');
+            // Yükleniyor ikonu göster
+            grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-10"><i class="fa-solid fa-spinner fa-spin text-3xl mb-2"></i><br>Oyunlar yükleniyor...</div>';
+
+            try {
+                // "games" koleksiyonuna bağlan
+                const querySnapshot = await getDocs(collection(db, "games"));
+                gamesDatabase = [];
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    gamesDatabase.push({
+                        id: doc.id,
+                        title: data.title,
+                        cat: data.cat,     // Kategori (Tarih, Bilim vb.)
+                        img: data.img,     // Kapak Resmi
+                        url: data.url      // Oyun Linki
+                    });
+                });
+
+                // Oyunları ekrana bas
+                filterGames('all');
+
+            } catch (e) {
+                console.error("Oyunlar yüklenirken hata:", e);
+                grid.innerHTML = '<div class="col-span-full text-center text-red-400">Oyunlar yüklenemedi. İnternet bağlantını kontrol et.</div>';
+            }
+        }
+
+        // 2. Oyunları Ekrana Dizme ve Filtreleme
+        window.filterGames = (filter) => {
+            const grid = document.getElementById('games-grid');
+            grid.innerHTML = '';
+            
+            // Eğer "all" seçiliyse hepsini, değilse kategoriye göre filtrele
+            const filtered = filter === 'all' ? gamesDatabase : gamesDatabase.filter(g => g.cat === filter);
+
+            if(filtered.length === 0) {
+                // Eğer hiç oyun yoksa mesaj göster
+                grid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10 font-bold opacity-50">
+                    <i class="fa-solid fa-box-open text-4xl mb-2"></i><br>
+                    Bu kategoride henüz oyun yok kâşif!
+                </div>`;
+                return;
+            }
+
+            filtered.forEach(game => {
+                // Kategoriye göre etiket rengi belirle
+                let badgeColor = "bg-gray-500";
+                if(game.cat === "Tarih") badgeColor = "bg-red-500";
+                if(game.cat === "Coğrafya") badgeColor = "bg-blue-500";
+                if(game.cat === "Bilim") badgeColor = "bg-green-500";
+                if(game.cat === "Vatandaşlık") badgeColor = "bg-orange-500";
+                if(game.cat === "Mantık") badgeColor = "bg-purple-500";
+
+                // Kart HTML'i
+                const html = `
+                <div onclick="playGame('${game.url}', '${game.title}')" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition duration-300 group cursor-pointer border-2 border-transparent hover:border-purple-400 transform hover:-translate-y-2 animate-fade-in">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="${game.img || 'https://placehold.co/400x300?text=Oyun'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                        <div class="absolute top-3 right-3 ${badgeColor} text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wide shadow-md z-10">
+                            ${game.cat}
+                        </div>
+                        
+                        <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                             <i class="fa-solid fa-play text-white text-5xl drop-shadow-lg scale-0 group-hover:scale-100 transition duration-300"></i>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="font-black text-slate-700 text-lg mb-1 leading-tight line-clamp-1">${game.title}</h4>
+                        <p class="text-xs text-slate-400 font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-coins text-yellow-500"></i> Puan Kazanmak için Oyna!
+                        </p>
+                    </div>
+                </div>`;
+                
+                grid.innerHTML += html;
+            });
+        };
+
+        // Sayfa açıldığında oyunları çekmeyi başlat
+        fetchGamesFromDB();
     </script>
 </body>
 </html>
