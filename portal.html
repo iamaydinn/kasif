@@ -27,11 +27,8 @@
         .badge-anim { animation: float 3s ease-in-out infinite; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         
-        /* Sohbet Baloncukları */
         .chat-bubble-me { background: linear-gradient(135deg, #8b5cf6, #d946ef); color: white; border-radius: 1.5rem 1.5rem 0 1.5rem; box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.3); }
         .chat-bubble-other { background: white; color: #374151; border-radius: 1.5rem 1.5rem 1.5rem 0; border: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        
-        /* Bildirim Parlaması */
         .notification-glow { animation: glow-red 1.5s infinite; }
         @keyframes glow-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
@@ -41,7 +38,8 @@
     <div id="loader">
         <i class="fa-solid fa-rocket fa-bounce text-6xl text-yellow-400 mb-6"></i>
         <h2 class="text-3xl font-black tracking-wide">KÂŞİF YÜKLENİYOR...</h2>
-        <p class="text-gray-400 mt-2 text-sm">Telsiz frekansları ayarlanıyor...</p>
+        <p class="text-gray-400 mt-2 text-sm">Telsiz frekansları ve oyunlar hazırlanıyor...</p>
+        <button onclick="forceCloseLoader()" class="mt-8 text-xs text-gray-600 underline hover:text-white">Çok mu uzun sürdü? Tıkla.</button>
     </div>
 
     <aside class="w-20 lg:w-64 bg-sidebar-bg text-white flex flex-col justify-between z-30 shadow-2xl flex-shrink-0">
@@ -52,11 +50,10 @@
             </div>
             
             <nav class="mt-6 px-2 space-y-2">
-                <a href="#" class="flex items-center p-3 rounded-xl bg-purple-600 text-white shadow-lg transition transform hover:scale-105">
+                <a href="#" onclick="filterGames('all')" class="flex items-center p-3 rounded-xl bg-purple-600 text-white shadow-lg transition transform hover:scale-105">
                     <i class="fa-solid fa-gamepad text-xl w-8 text-center"></i>
                     <span class="hidden lg:block font-bold">Oyunlar</span>
                 </a>
-                
                 <a href="#" onclick="openChatModal()" id="chat-nav-btn" class="relative flex items-center p-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-green-400 transition">
                     <div class="relative">
                         <i class="fa-solid fa-walkie-talkie text-xl w-8 text-center"></i>
@@ -64,7 +61,6 @@
                     </div>
                     <span class="hidden lg:block font-bold">Kâşif Telsizi</span>
                 </a>
-
                 <a href="#" onclick="openShopModal()" class="flex items-center p-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-yellow-400 transition">
                     <i class="fa-solid fa-store text-xl w-8 text-center"></i>
                     <span class="hidden lg:block font-bold">Mağaza</span>
@@ -79,7 +75,6 @@
                 </a>
             </nav>
         </div>
-        
         <div class="p-4">
             <button id="logout-btn" class="w-full bg-red-500/10 text-red-400 p-3 rounded-xl hover:bg-red-500 hover:text-white transition flex items-center justify-center lg:justify-start group">
                 <i class="fa-solid fa-right-from-bracket text-xl w-8 text-center group-hover:rotate-180 transition duration-500"></i>
@@ -97,7 +92,6 @@
                     <p class="text-xs text-slate-400 font-bold" id="user-title">Yükleniyor...</p>
                 </div>
             </div>
-            
             <div class="flex items-center gap-4 md:gap-6">
                 <div id="active-badge-container" class="hidden md:block"></div>
                 <div class="hidden md:flex flex-col w-32">
@@ -122,8 +116,12 @@
                 <button onclick="filterGames('Tarih')" class="bg-red-500 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-red-600 transition transform active:scale-95 whitespace-nowrap">Tarih</button>
                 <button onclick="filterGames('Coğrafya')" class="bg-blue-500 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-blue-600 transition transform active:scale-95 whitespace-nowrap">Coğrafya</button>
                 <button onclick="filterGames('Bilim')" class="bg-green-500 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-green-600 transition transform active:scale-95 whitespace-nowrap">Bilim</button>
+                <button onclick="filterGames('Vatandaşlık')" class="bg-orange-500 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-orange-600 transition transform active:scale-95 whitespace-nowrap">Vatandaşlık</button>
+                <button onclick="filterGames('Mantık')" class="bg-purple-500 text-white px-6 py-2 rounded-full font-bold shadow-lg hover:bg-purple-600 transition transform active:scale-95 whitespace-nowrap">Zeka</button>
             </div>
-            <div id="games-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 pb-20"></div>
+            <div id="games-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 pb-20">
+                <div class="col-span-full text-center py-10 opacity-50"><i class="fa-solid fa-spinner fa-spin text-3xl"></i></div>
+            </div>
         </div>
     </main>
 
@@ -135,9 +133,7 @@
             <p class="text-xs text-gray-400 font-bold mt-1">Sadece gerçek oyuncular</p>
         </div>
         <div id="active-users-list" class="flex-1 overflow-y-auto p-4 space-y-3">
-             <div class="text-center text-gray-400 text-xs mt-10 italic">
-                <i class="fa-solid fa-satellite-dish fa-spin mb-2 text-xl"></i><br>Sinyal taranıyor...
-            </div>
+             <div class="text-center text-gray-400 text-xs mt-10 italic"><i class="fa-solid fa-satellite-dish fa-spin mb-2 text-xl"></i><br>Sinyal taranıyor...</div>
         </div>
     </aside>
 
@@ -146,26 +142,17 @@
             <div class="bg-slate-800 p-4 flex justify-between items-center text-white">
                 <div class="flex items-center gap-3">
                     <div class="bg-green-500 p-2 rounded-full shadow-lg animate-pulse"><i class="fa-solid fa-walkie-talkie text-white"></i></div>
-                    <div>
-                        <h3 class="font-black text-lg text-white">Kâşif Telsizi</h3>
-                        <p class="text-[10px] text-green-400 font-bold tracking-wider">CANLI FREKANS • AÇIK</p>
-                    </div>
+                    <div><h3 class="font-black text-lg text-white">Kâşif Telsizi</h3><p class="text-[10px] text-green-400 font-bold tracking-wider">CANLI FREKANS • AÇIK</p></div>
                 </div>
                 <button onclick="closeChatModal()" class="text-slate-400 hover:text-white hover:bg-white/10 w-8 h-8 rounded-full transition"><i class="fa-solid fa-power-off text-lg"></i></button>
             </div>
-
             <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-100/50">
-                <div class="text-center text-gray-400 text-xs mt-4 opacity-50">
-                    <p>Sohbet geçmişi her 1 dakikada bir silinir.</p>
-                </div>
+                <div class="text-center text-gray-400 text-xs mt-4 opacity-50"><p>Sohbet geçmişi 1 dakikada bir silinir.</p></div>
             </div>
-
             <div class="p-3 bg-white border-t border-gray-100">
                 <form onsubmit="sendMessage(event)" class="flex gap-2 items-center">
                     <input type="text" id="chat-input" maxlength="80" placeholder="Mesajın..." class="flex-1 bg-slate-100 border-2 border-transparent focus:border-purple-500 rounded-full px-5 py-3 font-bold text-slate-700 text-sm transition outline-none">
-                    <button type="submit" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition">
-                        <i class="fa-solid fa-paper-plane text-sm"></i>
-                    </button>
+                    <button type="submit" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition"><i class="fa-solid fa-paper-plane text-sm"></i></button>
                 </form>
             </div>
         </div>
@@ -174,29 +161,11 @@
     <div id="shop-modal" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4 backdrop-blur-sm">
         <div class="bg-white w-full max-w-4xl rounded-[2rem] p-8 relative shadow-2xl h-[80vh] flex flex-col">
             <button onclick="document.getElementById('shop-modal').classList.add('hidden')" class="absolute top-6 right-6 text-gray-400 hover:text-red-500 font-bold text-2xl transition">X</button>
-            <div class="text-center mb-8">
-                <h2 class="text-4xl font-black text-purple-600 mb-2">MAĞAZA</h2>
-                <div class="inline-block bg-yellow-100 text-yellow-800 px-4 py-1 rounded-full font-black border border-yellow-300">BAKİYEN: <span id="shop-balance">0</span> <i class="fa-solid fa-coins"></i></div>
-            </div>
+            <div class="text-center mb-8"><h2 class="text-4xl font-black text-purple-600 mb-2">MAĞAZA</h2><div class="inline-block bg-yellow-100 text-yellow-800 px-4 py-1 rounded-full font-black border border-yellow-300">BAKİYEN: <span id="shop-balance">0</span> <i class="fa-solid fa-coins"></i></div></div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 overflow-y-auto p-4">
-                <div class="border-4 border-gray-100 rounded-3xl p-6 text-center hover:border-purple-300 transition group relative overflow-hidden">
-                    <div class="text-5xl mb-4 badge-anim">🚀</div>
-                    <h3 class="font-bold text-slate-700">Roket Rozeti</h3>
-                    <p class="text-xs text-gray-400 mb-4">Profilinde uçar!</p>
-                    <button onclick="buyItem('badge_rocket', 100, '🚀')" class="bg-green-500 text-white w-full py-2 rounded-xl font-bold hover:bg-green-600 shadow-bouncy">100 💰 AL</button>
-                </div>
-                 <div class="border-4 border-gray-100 rounded-3xl p-6 text-center hover:border-purple-300 transition group">
-                    <div class="text-5xl mb-4 badge-anim">👑</div>
-                    <h3 class="font-bold text-slate-700">Kral Tacı</h3>
-                    <p class="text-xs text-gray-400 mb-4">Liderlere özel.</p>
-                    <button onclick="buyItem('badge_crown', 500, '👑')" class="bg-green-500 text-white w-full py-2 rounded-xl font-bold hover:bg-green-600 shadow-bouncy">500 💰 AL</button>
-                </div>
-                <div class="border-4 border-gray-100 rounded-3xl p-6 text-center hover:border-purple-300 transition group">
-                    <div class="text-5xl mb-4 badge-anim">🦖</div>
-                    <h3 class="font-bold text-slate-700">Dinozor Dostu</h3>
-                    <p class="text-xs text-gray-400 mb-4">Tarih severler için.</p>
-                    <button onclick="buyItem('badge_dino', 200, '🦖')" class="bg-green-500 text-white w-full py-2 rounded-xl font-bold hover:bg-green-600 shadow-bouncy">200 💰 AL</button>
-                </div>
+                <div class="border-4 border-gray-100 rounded-3xl p-6 text-center hover:border-purple-300 transition group relative overflow-hidden"><div class="text-5xl mb-4 badge-anim">🚀</div><h3 class="font-bold text-slate-700">Roket Rozeti</h3><p class="text-xs text-gray-400 mb-4">Profilinde uçar!</p><button onclick="buyItem('badge_rocket', 100, '🚀')" class="bg-green-500 text-white w-full py-2 rounded-xl font-bold hover:bg-green-600 shadow-bouncy">100 💰 AL</button></div>
+                <div class="border-4 border-gray-100 rounded-3xl p-6 text-center hover:border-purple-300 transition group"><div class="text-5xl mb-4 badge-anim">👑</div><h3 class="font-bold text-slate-700">Kral Tacı</h3><p class="text-xs text-gray-400 mb-4">Liderlere özel.</p><button onclick="buyItem('badge_crown', 500, '👑')" class="bg-green-500 text-white w-full py-2 rounded-xl font-bold hover:bg-green-600 shadow-bouncy">500 💰 AL</button></div>
+                <div class="border-4 border-gray-100 rounded-3xl p-6 text-center hover:border-purple-300 transition group"><div class="text-5xl mb-4 badge-anim">🦖</div><h3 class="font-bold text-slate-700">Dinozor Dostu</h3><p class="text-xs text-gray-400 mb-4">Tarih severler.</p><button onclick="buyItem('badge_dino', 200, '🦖')" class="bg-green-500 text-white w-full py-2 rounded-xl font-bold hover:bg-green-600 shadow-bouncy">200 💰 AL</button></div>
             </div>
         </div>
     </div>
@@ -211,17 +180,12 @@
         <div class="w-full max-w-6xl h-[90vh] flex flex-col relative">
             <div class="flex justify-between items-center text-white mb-3 px-4">
                 <h2 id="modal-game-title" class="text-2xl font-bold text-yellow-400">Oyun Yükleniyor...</h2>
-                <div class="flex gap-4">
-                     <div class="text-sm bg-gray-800 px-3 py-1 rounded-full flex items-center gap-2"><i class="fa-regular fa-clock"></i> <span id="game-timer">00:00</span></div>
-                    <button onclick="closeGameModal()" class="bg-red-500 px-4 py-1 rounded-full font-bold hover:bg-red-600 transition shadow-lg shadow-red-500/50">Çıkış X</button>
-                </div>
+                <div class="flex gap-4"><div class="text-sm bg-gray-800 px-3 py-1 rounded-full flex items-center gap-2"><i class="fa-regular fa-clock"></i> <span id="game-timer">00:00</span></div><button onclick="closeGameModal()" class="bg-red-500 px-4 py-1 rounded-full font-bold hover:bg-red-600 transition shadow-lg shadow-red-500/50">Çıkış X</button></div>
             </div>
             <div class="flex-1 bg-black rounded-2xl overflow-hidden border-4 border-gray-700 shadow-2xl relative">
                 <iframe id="game-iframe" src="" class="w-full h-full" frameborder="0" allowfullscreen></iframe>
             </div>
-            <div class="absolute -bottom-16 left-1/2 transform -translate-x-1/2">
-                <button onclick="claimReward()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-black py-3 px-8 rounded-full shadow-lg hover:scale-105 transition animate-bounce border-4 border-white/20"><i class="fa-solid fa-trophy mr-2"></i> PUANIMI AL!</button>
-            </div>
+            <div class="absolute -bottom-16 left-1/2 transform -translate-x-1/2"><button onclick="claimReward()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-black py-3 px-8 rounded-full shadow-lg hover:scale-105 transition animate-bounce border-4 border-white/20"><i class="fa-solid fa-trophy mr-2"></i> PUANIMI AL!</button></div>
         </div>
     </div>
     <div id="profile-modal" class="fixed inset-0 z-50 bg-black/60 hidden flex items-center justify-center backdrop-blur-sm p-4">
@@ -229,23 +193,10 @@
             <button onclick="document.getElementById('profile-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-300 hover:text-red-500 font-bold text-xl transition">X</button>
             <h2 class="text-2xl font-black text-slate-800 mb-6 text-center">PROFİLİNİ DÜZENLE</h2>
             <div class="flex justify-center mb-6 relative group cursor-pointer" onclick="randomAvatar()">
-                <div class="w-28 h-28 rounded-full bg-purple-100 border-4 border-purple-500 overflow-hidden relative">
-                    <img id="edit-avatar" src="" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300"><i class="fa-solid fa-shuffle text-white text-2xl"></i></div>
-                </div>
-                <p class="absolute -bottom-6 text-xs text-purple-500 font-bold animate-pulse">Tıkla ve Değiştir</p>
+                <div class="w-28 h-28 rounded-full bg-purple-100 border-4 border-purple-500 overflow-hidden relative"><img id="edit-avatar" src="" class="w-full h-full object-cover"><div class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300"><i class="fa-solid fa-shuffle text-white text-2xl"></i></div></div><p class="absolute -bottom-6 text-xs text-purple-500 font-bold animate-pulse">Tıkla ve Değiştir</p>
             </div>
-            <div class="mb-4">
-                <p class="text-xs font-bold text-gray-400 mb-2 text-center">ROZETLERİN</p>
-                <div id="my-badges" class="flex justify-center gap-2 flex-wrap min-h-[30px]"></div>
-            </div>
-            <div class="space-y-4 mt-4">
-                <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase ml-2">Kâşif Adı</label>
-                    <input type="text" id="edit-username" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-3 font-bold focus:border-purple-500 focus:bg-white transition outline-none text-slate-700">
-                </div>
-                <button onclick="saveProfile()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition">DEĞİŞİKLİKLERİ KAYDET ✅</button>
-            </div>
+            <div class="mb-4"><p class="text-xs font-bold text-gray-400 mb-2 text-center">ROZETLERİN</p><div id="my-badges" class="flex justify-center gap-2 flex-wrap min-h-[30px]"></div></div>
+            <div class="space-y-4 mt-4"><div><label class="text-xs font-bold text-slate-400 uppercase ml-2">Kâşif Adı</label><input type="text" id="edit-username" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-3 font-bold focus:border-purple-500 focus:bg-white transition outline-none text-slate-700"></div><button onclick="saveProfile()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 rounded-xl shadow-lg transform active:scale-95 transition">DEĞİŞİKLİKLERİ KAYDET ✅</button></div>
         </div>
     </div>
 
@@ -267,61 +218,137 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        // ÖNEMLİ: Veritabanı adını 'kasif' olarak belirttik
         const db = getFirestore(app, "kasif");
         
-        enableIndexedDbPersistence(db).catch(err => console.log(err));
+        enableIndexedDbPersistence(db).catch(err => console.log("Offline mod hatası:", err.code));
 
         let currentUserUid = null;
         let userDataCache = {};
         let gameTimerInterval;
+        let gamesDatabase = []; // Dinamik Oyun Listesi
 
-        // AUTH
+        // AUTH & BAŞLANGIÇ
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUserUid = user.uid;
-                await loadUserData(user); 
+                // Asenkron işlemleri başlat ama birbirini bekletme
+                loadUserData(user); 
                 updateStatus('online', null);
                 initRealtimeUsers();
                 initChatListener(); 
+                fetchGamesFromDB(); // Oyunları veritabanından çek
             } else {
                 window.location.href = "login.html";
             }
         });
 
-        // --- SOHBET SİSTEMİ (RESİM VE İSİM DÜZELTİLDİ) ---
+        // LOADER FAILSAFE (Donmayı Önler)
+        window.forceCloseLoader = () => {
+            document.getElementById('loader').style.display = 'none';
+        }
+        // 5 saniye sonra loader hala varsa zorla kapat
+        setTimeout(() => {
+            const loader = document.getElementById('loader');
+            if(loader && loader.style.display !== 'none') {
+                console.log("Loader zaman aşımı, zorla kapatılıyor.");
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }
+        }, 5000);
+
+        // --- OYUNLARI VERİTABANINDAN ÇEKME (Admin Entegrasyonu) ---
+        async function fetchGamesFromDB() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "games"));
+                gamesDatabase = []; // Listeyi temizle
+                querySnapshot.forEach((doc) => {
+                    const d = doc.data();
+                    gamesDatabase.push({
+                        id: doc.id,
+                        title: d.title,
+                        cat: d.cat,
+                        img: d.img,
+                        url: d.url
+                    });
+                });
+                // Eğer oyun yoksa demo oyunları ekle (Boş görünmesin)
+                if(gamesDatabase.length === 0) {
+                    gamesDatabase = [
+                        { id: 1, title: "Demo: Türkiye Haritası", cat: "Coğrafya", img: "https://placehold.co/400x300", url: "https://wordwall.net/embed/..." }
+                    ];
+                }
+                filterGames('all');
+            } catch (e) {
+                console.error("Oyun çekme hatası:", e);
+                document.getElementById('games-grid').innerHTML = '<div class="col-span-full text-red-400 text-center">Oyunlar yüklenirken hata oluştu.</div>';
+            }
+        }
+
+        window.filterGames = (filter) => {
+            const grid = document.getElementById('games-grid');
+            grid.innerHTML = '';
+            
+            const filtered = filter === 'all' ? gamesDatabase : gamesDatabase.filter(g => g.cat === filter);
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10 font-bold opacity-50">Bu kategoride henüz oyun yok.</div>`;
+                return;
+            }
+
+            filtered.forEach(game => {
+                let badgeColor = "bg-gray-500";
+                if(game.cat === "Tarih") badgeColor = "bg-red-500";
+                if(game.cat === "Coğrafya") badgeColor = "bg-blue-500";
+                if(game.cat === "Bilim") badgeColor = "bg-green-500";
+                if(game.cat === "Vatandaşlık") badgeColor = "bg-orange-500";
+                if(game.cat === "Mantık") badgeColor = "bg-purple-500";
+
+                grid.innerHTML += `
+                <div onclick="playGame('${game.url}', '${game.title}')" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition duration-300 group cursor-pointer border-2 border-transparent hover:border-purple-400 transform hover:-translate-y-2 animate-fade-in">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="${game.img || 'https://placehold.co/400x300'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
+                        <div class="absolute top-3 right-3 ${badgeColor} text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wide shadow-md z-10">${game.cat}</div>
+                        <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
+                             <i class="fa-solid fa-play text-white text-5xl drop-shadow-lg scale-0 group-hover:scale-100 transition duration-300"></i>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h4 class="font-black text-slate-700 text-lg mb-1 leading-tight line-clamp-1">${game.title}</h4>
+                        <p class="text-xs text-slate-400 font-bold flex items-center gap-1"><i class="fa-solid fa-coins text-yellow-500"></i> Oyna ve Kazan!</p>
+                    </div>
+                </div>`;
+            });
+        };
+
+        // --- SOHBET SİSTEMİ ---
         function initChatListener() {
             const chatRef = collection(db, "messages");
             const q = query(chatRef, orderBy("timestamp", "asc"), limit(50));
 
             onSnapshot(q, (snapshot) => {
                 const chatBox = document.getElementById('chat-messages');
-                chatBox.innerHTML = '<div class="text-center text-gray-400 text-xs mt-4"><p>Sohbet geçmişi her 1 dakikada bir temizlenir.</p><p class="mt-1">Güvenli ve nazik konuşalım! 🚀</p></div>';
-                
+                chatBox.innerHTML = '<div class="text-center text-gray-400 text-xs mt-4"><p>Geçmiş 1 dk sonra silinir.</p></div>';
                 let hasNewMessage = false;
 
                 snapshot.forEach((doc) => {
                     const msg = doc.data();
                     const msgTime = msg.timestamp ? msg.timestamp.toDate() : new Date();
                     const now = new Date();
-                    const diffSeconds = (now - msgTime) / 1000;
-
-                    if (diffSeconds < 60) {
+                    if ((now - msgTime) / 1000 < 60) { // 60 saniye kuralı
                         const isMe = msg.senderId === currentUserUid;
                         const bubbleClass = isMe ? 'chat-bubble-me self-end' : 'chat-bubble-other self-start';
                         const alignClass = isMe ? 'justify-end' : 'justify-start';
                         const timeStr = msgTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        // Varsayılan avatar
                         const avatarSrc = msg.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=Unknown";
-                        const senderName = msg.senderName || "Gizli Kâşif";
+                        const senderName = msg.senderName || "Kâşif";
 
                         const html = `
                         <div class="flex w-full ${alignClass} mb-3 animate-fade-in group">
                              ${!isMe ? `<img src="${avatarSrc}" title="${senderName}" class="w-8 h-8 rounded-full bg-white border border-gray-200 mr-2 self-end mb-1 shadow-sm">` : ''}
                             <div class="flex flex-col max-w-[75%]">
                                 ${!isMe ? `<span class="text-[10px] text-gray-500 ml-2 mb-0.5 font-bold">${senderName}</span>` : ''}
-                                <div class="px-4 py-2 text-sm font-medium ${bubbleClass}">
-                                    ${msg.text}
-                                </div>
+                                <div class="px-4 py-2 text-sm font-medium ${bubbleClass}">${msg.text}</div>
                                 <span class="text-[9px] text-gray-400 mt-1 opacity-0 group-hover:opacity-100 transition ${isMe ? 'text-right mr-1' : 'ml-1'}">${timeStr}</span>
                             </div>
                         </div>`;
@@ -329,9 +356,8 @@
                         hasNewMessage = true;
                     }
                 });
-
                 chatBox.scrollTop = chatBox.scrollHeight;
-
+                
                 const chatModal = document.getElementById('chat-modal');
                 if(chatModal.classList.contains('hidden') && hasNewMessage) {
                      document.getElementById('chat-notification').classList.remove('hidden');
@@ -345,19 +371,13 @@
             const input = document.getElementById('chat-input');
             const text = input.value.trim();
             if(!text) return;
-
             try {
-                // Mesaj Gönderirken o anki isim ve avatarı kullan
                 await addDoc(collection(db, "messages"), {
-                    text: text,
-                    senderId: currentUserUid,
-                    senderName: userDataCache.username || "Kâşif",
-                    avatar: userDataCache.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=default",
-                    timestamp: Timestamp.now()
+                    text: text, senderId: currentUserUid, senderName: userDataCache.username, avatar: userDataCache.avatar, timestamp: Timestamp.now()
                 });
                 input.value = '';
                 if(Math.random() < 0.1) deleteOldMessages();
-            } catch(e) { console.error("Mesaj hatası:", e); }
+            } catch(e) { console.error(e); }
         };
 
         async function deleteOldMessages() {
@@ -371,43 +391,11 @@
             document.getElementById('chat-modal').classList.remove('hidden');
             document.getElementById('chat-notification').classList.add('hidden');
             document.getElementById('chat-nav-btn').classList.remove('notification-glow', 'text-green-400', 'bg-gray-800');
-            const chatBox = document.getElementById('chat-messages');
-            chatBox.scrollTop = chatBox.scrollHeight;
+            document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight;
         };
         window.closeChatModal = () => document.getElementById('chat-modal').classList.add('hidden');
 
-        // --- ÇIKIŞ YAPMA (ONARILDI) ---
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            Swal.fire({
-                title: 'Çıkış Yapılıyor...',
-                text: "Maceradan ayrılmak istiyor musun?",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Evet, Çıkış Yap',
-                cancelButtonText: 'Hayır, Kal'
-            }).then(async (result) => {
-                if (result.isConfirmed) {
-                    try { await updateStatus('offline', null); } catch(e) { console.log(e); }
-                    await signOut(auth);
-                    window.location.href = "login.html";
-                }
-            });
-        });
-
-        // --- DİĞER FONKSİYONLAR ---
-        window.updateStatus = async (status, gameName) => {
-            if (!currentUserUid) return;
-            try {
-                await updateDoc(doc(db, "users", currentUserUid), {
-                    onlineStatus: status,
-                    playing: gameName || null,
-                    lastSeen: new Date().toISOString()
-                });
-            } catch (e) {}
-        }
-
+        // --- VERİ & AUTH YÖNETİMİ ---
         window.loadUserData = async (user) => {
             const loader = document.getElementById('loader');
             try {
@@ -422,9 +410,13 @@
                     userDataCache = newProfile;
                     updateUI(newProfile);
                 }
+                // Loader'ı kapat
                 loader.classList.add('hidden-loader');
                 setTimeout(() => loader.style.display = 'none', 500);
-            } catch (error) { console.error(error); }
+            } catch (error) { 
+                console.error(error); 
+                loader.innerHTML += `<p class="text-red-500 mt-2">Hata: ${error.message}</p>`;
+            }
         }
 
         function updateUI(data) {
@@ -437,6 +429,7 @@
             document.getElementById('header-avatar').src = data.avatar;
             document.getElementById('edit-username').value = data.username;
             document.getElementById('edit-avatar').src = data.avatar;
+            
             const badgeContainer = document.getElementById('active-badge-container');
             const myBadgesContainer = document.getElementById('my-badges');
             badgeContainer.innerHTML = ''; myBadgesContainer.innerHTML = '';
@@ -468,6 +461,50 @@
             });
         }
 
+        // --- BUTON FONKSİYONLARI ---
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            Swal.fire({
+                title: 'Çıkış Yapılıyor...', text: "Maceradan ayrılmak istiyor musun?", icon: 'warning',
+                showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Evet, Çıkış Yap'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try { await updateDoc(doc(db, "users", currentUserUid), { onlineStatus: 'offline', playing: null }); } catch(e){}
+                    await signOut(auth);
+                    window.location.href = "login.html";
+                }
+            });
+        });
+
+        window.updateStatus = async (status, gameName) => {
+            if (!currentUserUid) return;
+            try { await updateDoc(doc(db, "users", currentUserUid), { onlineStatus: status, playing: gameName || null, lastSeen: new Date().toISOString() }); } catch(e) {}
+        }
+
+        window.playGame = (url, title) => {
+            document.getElementById('modal-game-title').innerText = title;
+            document.getElementById('game-iframe').src = url || "https://tr.wikipedia.org/wiki/Ana_Sayfa";
+            document.getElementById('game-modal').classList.remove('hidden');
+            updateStatus('online', title);
+            let sec = 0; document.getElementById('game-timer').innerText = "00:00";
+            gameTimerInterval = setInterval(() => { sec++; document.getElementById('game-timer').innerText = `${Math.floor(sec/60).toString().padStart(2,'0')}:${(sec%60).toString().padStart(2,'0')}`; }, 1000);
+        };
+
+        window.closeGameModal = () => {
+            document.getElementById('game-modal').classList.add('hidden');
+            document.getElementById('game-iframe').src = "";
+            clearInterval(gameTimerInterval);
+            updateStatus('online', null);
+        };
+
+        window.claimReward = async () => {
+            try {
+                await updateDoc(doc(db, "users", currentUserUid), { xp: increment(50), coins: increment(20) });
+                userDataCache.xp += 50; userDataCache.coins += 20; updateUI(userDataCache);
+                window.closeGameModal();
+                Swal.fire({ title: 'Tebrikler! 🏆', html: `<b>+50 XP</b> ve <b>+20 Altın</b> kazandın.`, icon: 'success' });
+            } catch(e) { console.error(e); }
+        };
+
         window.buyItem = async (itemId, cost, icon) => {
              if(userDataCache.coins < cost) { Swal.fire({icon:'error', title:'Paran Yetmiyor! 😢'}); return; }
              if(userDataCache.badges && userDataCache.badges.some(b => b.id === itemId)) { Swal.fire({icon:'info', title:'Zaten Var!'}); return; }
@@ -482,6 +519,7 @@
                  }
              });
         }
+
         window.saveProfile = async () => {
             const newName = document.getElementById('edit-username').value;
             const newAvatar = document.getElementById('edit-avatar').src;
@@ -491,7 +529,6 @@
         window.openShopModal = () => document.getElementById('shop-modal').classList.remove('hidden');
         window.openProfileModal = () => document.getElementById('profile-modal').classList.remove('hidden');
         window.randomAvatar = () => { document.getElementById('edit-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${Math.random().toString(36)}`; }
-        
         window.openLeaderboard = async () => {
              document.getElementById('leaderboard-modal').classList.remove('hidden');
              const list = document.getElementById('leaderboard-list'); list.innerHTML='Yükleniyor...';
@@ -501,124 +538,6 @@
                  snap.forEach(doc=>{ const u=doc.data(); let c="bg-gray-100"; if(rank==1)c="bg-yellow-100 border-yellow-300"; list.innerHTML+=`<div class="flex items-center gap-4 p-3 rounded-2xl border ${c}"><div class="font-black">#${rank}</div><img src="${u.avatar}" class="w-8 h-8 rounded-full"><div class="flex-1 font-bold text-sm">${u.username}</div><div class="font-black text-sm">${u.xp} XP</div></div>`; rank++; });
              } catch(e){}
         }
-        
-        const gamesDatabase = [
-            { id: 1, title: "Kurtuluş Savaşı Cepheleri", cat: "Tarih", img: "https://img.freepik.com/free-vector/turkish-flag-background_23-2147959082.jpg", url: "https://learningapps.org/watch?v=pgi85x8n321" },
-            { id: 2, title: "Türkiye Haritası Puzzle", cat: "Coğrafya", img: "https://img.freepik.com/free-vector/turkey-map-flag-concept_23-2148606622.jpg", url: "https://wordwall.net/tr/resource/12345/embed" },
-            { id: 3, title: "Gezegenleri Sırala", cat: "Bilim", img: "https://img.freepik.com/free-vector/solar-system-background_1284-13654.jpg", url: "https://wordwall.net/tr/resource/54321/embed" }, 
-            { id: 4, title: "Osmanlı Padişahları", cat: "Tarih", img: "https://img.freepik.com/free-vector/ottoman-empire-illustration_23-2148003666.jpg", url: "" },
-            { id: 5, title: "Haklarımı Biliyorum", cat: "Vatandaşlık", img: "https://img.freepik.com/free-vector/law-justice-concept_23-2148606622.jpg", url: "" }
-        ];
-        window.filterGames = (filter) => {
-             const grid = document.getElementById('games-grid'); grid.innerHTML='';
-             const filtered = filter==='all'?gamesDatabase:gamesDatabase.filter(g=>g.cat===filter);
-             filtered.forEach(g=>{
-                 let color="bg-gray-500"; if(g.cat=="Tarih")color="bg-red-500"; if(g.cat=="Bilim")color="bg-green-500";
-                 grid.innerHTML+=`<div onclick="playGame('${g.url}','${g.title}')" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition cursor-pointer border-2 hover:border-purple-400 transform hover:-translate-y-2"><div class="relative h-48"><img src="${g.img}" class="w-full h-full object-cover"><div class="absolute top-3 right-3 ${color} text-white text-[10px] font-black px-3 py-1 rounded-full uppercase shadow-md">${g.cat}</div></div><div class="p-5"><h4 class="font-black text-slate-700 text-lg line-clamp-1">${g.title}</h4><p class="text-xs text-slate-400 font-bold">Oyna & Kazan!</p></div></div>`;
-             });
-        }
-        window.playGame = (url,t) => {
-            document.getElementById('modal-game-title').innerText=t; document.getElementById('game-iframe').src=url||""; document.getElementById('game-modal').classList.remove('hidden');
-            updateStatus('online', t); let s=0; document.getElementById('game-timer').innerText="00:00";
-            gameTimerInterval = setInterval(()=>{ s++; document.getElementById('game-timer').innerText = `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; },1000);
-        }
-        window.closeGameModal = () => { document.getElementById('game-modal').classList.add('hidden'); document.getElementById('game-iframe').src=""; clearInterval(gameTimerInterval); updateStatus('online',null); }
-        window.claimReward = async () => {
-             try { await updateDoc(doc(db,"users",currentUserUid),{xp:increment(50),coins:increment(20)}); userDataCache.xp+=50; userDataCache.coins+=20; updateUI(userDataCache); window.closeGameModal(); Swal.fire({icon:'success', title:'Kazandın!', text:'+50 XP, +20 Altın'}); } catch(e){}
-        }
-
-        filterGames('all');
-
-        // ==========================================
-        // OYUNLARI VERİTABANINDAN ÇEKME MODÜLÜ
-        // ==========================================
-        
-        let gamesDatabase = []; // Oyunlar burada tutulacak
-
-        // 1. Veritabanından Oyunları İndir
-        async function fetchGamesFromDB() {
-            const grid = document.getElementById('games-grid');
-            // Yükleniyor ikonu göster
-            grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-10"><i class="fa-solid fa-spinner fa-spin text-3xl mb-2"></i><br>Oyunlar yükleniyor...</div>';
-
-            try {
-                // "games" koleksiyonuna bağlan
-                const querySnapshot = await getDocs(collection(db, "games"));
-                gamesDatabase = [];
-                
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    gamesDatabase.push({
-                        id: doc.id,
-                        title: data.title,
-                        cat: data.cat,     // Kategori (Tarih, Bilim vb.)
-                        img: data.img,     // Kapak Resmi
-                        url: data.url      // Oyun Linki
-                    });
-                });
-
-                // Oyunları ekrana bas
-                filterGames('all');
-
-            } catch (e) {
-                console.error("Oyunlar yüklenirken hata:", e);
-                grid.innerHTML = '<div class="col-span-full text-center text-red-400">Oyunlar yüklenemedi. İnternet bağlantını kontrol et.</div>';
-            }
-        }
-
-        // 2. Oyunları Ekrana Dizme ve Filtreleme
-        window.filterGames = (filter) => {
-            const grid = document.getElementById('games-grid');
-            grid.innerHTML = '';
-            
-            // Eğer "all" seçiliyse hepsini, değilse kategoriye göre filtrele
-            const filtered = filter === 'all' ? gamesDatabase : gamesDatabase.filter(g => g.cat === filter);
-
-            if(filtered.length === 0) {
-                // Eğer hiç oyun yoksa mesaj göster
-                grid.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10 font-bold opacity-50">
-                    <i class="fa-solid fa-box-open text-4xl mb-2"></i><br>
-                    Bu kategoride henüz oyun yok kâşif!
-                </div>`;
-                return;
-            }
-
-            filtered.forEach(game => {
-                // Kategoriye göre etiket rengi belirle
-                let badgeColor = "bg-gray-500";
-                if(game.cat === "Tarih") badgeColor = "bg-red-500";
-                if(game.cat === "Coğrafya") badgeColor = "bg-blue-500";
-                if(game.cat === "Bilim") badgeColor = "bg-green-500";
-                if(game.cat === "Vatandaşlık") badgeColor = "bg-orange-500";
-                if(game.cat === "Mantık") badgeColor = "bg-purple-500";
-
-                // Kart HTML'i
-                const html = `
-                <div onclick="playGame('${game.url}', '${game.title}')" class="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition duration-300 group cursor-pointer border-2 border-transparent hover:border-purple-400 transform hover:-translate-y-2 animate-fade-in">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="${game.img || 'https://placehold.co/400x300?text=Oyun'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
-                        <div class="absolute top-3 right-3 ${badgeColor} text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wide shadow-md z-10">
-                            ${game.cat}
-                        </div>
-                        
-                        <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
-                             <i class="fa-solid fa-play text-white text-5xl drop-shadow-lg scale-0 group-hover:scale-100 transition duration-300"></i>
-                        </div>
-                    </div>
-                    <div class="p-5">
-                        <h4 class="font-black text-slate-700 text-lg mb-1 leading-tight line-clamp-1">${game.title}</h4>
-                        <p class="text-xs text-slate-400 font-bold flex items-center gap-1">
-                            <i class="fa-solid fa-coins text-yellow-500"></i> Puan Kazanmak için Oyna!
-                        </p>
-                    </div>
-                </div>`;
-                
-                grid.innerHTML += html;
-            });
-        };
-
-        // Sayfa açıldığında oyunları çekmeyi başlat
-        fetchGamesFromDB();
     </script>
 </body>
 </html>
