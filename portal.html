@@ -28,18 +28,12 @@
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         
         /* Sohbet Baloncukları */
-        .chat-bubble-me { background: linear-gradient(135deg, #6366f1, #a855f7); color: white; border-radius: 1.5rem 1.5rem 0 1.5rem; }
-        .chat-bubble-other { background: #e5e7eb; color: #1f2937; border-radius: 1.5rem 1.5rem 1.5rem 0; }
+        .chat-bubble-me { background: linear-gradient(135deg, #8b5cf6, #d946ef); color: white; border-radius: 1.5rem 1.5rem 0 1.5rem; box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.3); }
+        .chat-bubble-other { background: white; color: #374151; border-radius: 1.5rem 1.5rem 1.5rem 0; border: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         
         /* Bildirim Parlaması */
-        .notification-glow {
-            animation: glow-red 1.5s infinite;
-        }
-        @keyframes glow-red {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
+        .notification-glow { animation: glow-red 1.5s infinite; }
+        @keyframes glow-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
 </head>
 <body class="bg-panel-bg h-screen flex overflow-hidden text-slate-800">
@@ -66,7 +60,7 @@
                 <a href="#" onclick="openChatModal()" id="chat-nav-btn" class="relative flex items-center p-3 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-green-400 transition">
                     <div class="relative">
                         <i class="fa-solid fa-walkie-talkie text-xl w-8 text-center"></i>
-                        <span id="chat-notification" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-800"></span>
+                        <span id="chat-notification" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-gray-800 animate-pulse"></span>
                     </div>
                     <span class="hidden lg:block font-bold">Kâşif Telsizi</span>
                 </a>
@@ -138,7 +132,7 @@
             <h3 class="font-black text-slate-700 flex items-center gap-2">
                 <i class="fa-solid fa-earth-americas text-green-500 animate-pulse"></i> Canlı Kâşifler
             </h3>
-            <p class="text-xs text-gray-400 font-bold mt-1">Diğer Kâşif Arkadaşların İşte Burada!</p>
+            <p class="text-xs text-gray-400 font-bold mt-1">Sadece gerçek oyuncular</p>
         </div>
         <div id="active-users-list" class="flex-1 overflow-y-auto p-4 space-y-3">
              <div class="text-center text-gray-400 text-xs mt-10 italic">
@@ -148,30 +142,29 @@
     </aside>
 
     <div id="chat-modal" class="fixed inset-0 z-50 bg-black/60 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-white w-full max-w-md h-[600px] rounded-[2rem] shadow-2xl flex flex-col relative overflow-hidden">
-            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-4 flex justify-between items-center text-white">
+        <div class="bg-white w-full max-w-md h-[650px] rounded-[2.5rem] shadow-2xl flex flex-col relative overflow-hidden border-8 border-white">
+            <div class="bg-slate-800 p-4 flex justify-between items-center text-white">
                 <div class="flex items-center gap-3">
-                    <div class="bg-white/20 p-2 rounded-full"><i class="fa-solid fa-walkie-talkie"></i></div>
+                    <div class="bg-green-500 p-2 rounded-full shadow-lg animate-pulse"><i class="fa-solid fa-walkie-talkie text-white"></i></div>
                     <div>
-                        <h3 class="font-black text-lg">Kâşif Telsizi</h3>
-                        <p class="text-xs text-purple-200">Global Frekans • Herkese Açık</p>
+                        <h3 class="font-black text-lg text-white">Kâşif Telsizi</h3>
+                        <p class="text-[10px] text-green-400 font-bold tracking-wider">CANLI FREKANS • AÇIK</p>
                     </div>
                 </div>
-                <button onclick="closeChatModal()" class="text-white/80 hover:text-white hover:bg-white/10 w-8 h-8 rounded-full transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+                <button onclick="closeChatModal()" class="text-slate-400 hover:text-white hover:bg-white/10 w-8 h-8 rounded-full transition"><i class="fa-solid fa-power-off text-lg"></i></button>
             </div>
 
-            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
-                <div class="text-center text-gray-400 text-xs mt-4">
-                    <p>Sohbet geçmişi her 1 dakikada bir temizlenir.</p>
-                    <p class="mt-1">Güvenli ve nazik konuşalım! 🚀</p>
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-100/50">
+                <div class="text-center text-gray-400 text-xs mt-4 opacity-50">
+                    <p>Sohbet geçmişi her 1 dakikada bir silinir.</p>
                 </div>
             </div>
 
-            <div class="p-4 bg-white border-t border-gray-100">
-                <form onsubmit="sendMessage(event)" class="flex gap-2">
-                    <input type="text" id="chat-input" maxlength="100" placeholder="Bir şeyler yaz..." class="flex-1 bg-gray-100 border-0 rounded-full px-4 py-3 font-bold text-slate-700 focus:ring-2 focus:ring-purple-500 focus:bg-white transition outline-none">
-                    <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition">
-                        <i class="fa-solid fa-paper-plane"></i>
+            <div class="p-3 bg-white border-t border-gray-100">
+                <form onsubmit="sendMessage(event)" class="flex gap-2 items-center">
+                    <input type="text" id="chat-input" maxlength="80" placeholder="Mesajın..." class="flex-1 bg-slate-100 border-2 border-transparent focus:border-purple-500 rounded-full px-5 py-3 font-bold text-slate-700 text-sm transition outline-none">
+                    <button type="submit" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition">
+                        <i class="fa-solid fa-paper-plane text-sm"></i>
                     </button>
                 </form>
             </div>
@@ -289,14 +282,13 @@
                 await loadUserData(user); 
                 updateStatus('online', null);
                 initRealtimeUsers();
-                initChatListener(); // Sohbeti başlat
+                initChatListener(); 
             } else {
                 window.location.href = "login.html";
             }
         });
 
-        // --- SOHBET SİSTEMİ (PERFORMANSLI) ---
-        // Sadece son 50 mesajı getir, istemcide eski mesajları gösterme.
+        // --- SOHBET SİSTEMİ (RESİM VE İSİM DÜZELTİLDİ) ---
         function initChatListener() {
             const chatRef = collection(db, "messages");
             const q = query(chatRef, orderBy("timestamp", "asc"), limit(50));
@@ -309,27 +301,28 @@
 
                 snapshot.forEach((doc) => {
                     const msg = doc.data();
-                    
-                    // 1 Dakika Kuralı (Performans için İstemcide Filtrele)
                     const msgTime = msg.timestamp ? msg.timestamp.toDate() : new Date();
                     const now = new Date();
                     const diffSeconds = (now - msgTime) / 1000;
 
-                    if (diffSeconds < 60) { // Sadece 60 saniyeden yeni mesajları göster
+                    if (diffSeconds < 60) {
                         const isMe = msg.senderId === currentUserUid;
                         const bubbleClass = isMe ? 'chat-bubble-me self-end' : 'chat-bubble-other self-start';
                         const alignClass = isMe ? 'justify-end' : 'justify-start';
                         const timeStr = msgTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        // Varsayılan avatar
+                        const avatarSrc = msg.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=Unknown";
+                        const senderName = msg.senderName || "Gizli Kâşif";
 
                         const html = `
-                        <div class="flex w-full ${alignClass} mb-2 animate-fade-in">
-                             ${!isMe ? `<img src="${msg.avatar}" class="w-8 h-8 rounded-full bg-white mr-2 self-end mb-1">` : ''}
-                            <div class="flex flex-col max-w-[80%]">
-                                ${!isMe ? `<span class="text-[10px] text-gray-500 ml-1 mb-0.5">${msg.senderName}</span>` : ''}
-                                <div class="px-4 py-2 text-sm font-medium shadow-sm ${bubbleClass}">
+                        <div class="flex w-full ${alignClass} mb-3 animate-fade-in group">
+                             ${!isMe ? `<img src="${avatarSrc}" title="${senderName}" class="w-8 h-8 rounded-full bg-white border border-gray-200 mr-2 self-end mb-1 shadow-sm">` : ''}
+                            <div class="flex flex-col max-w-[75%]">
+                                ${!isMe ? `<span class="text-[10px] text-gray-500 ml-2 mb-0.5 font-bold">${senderName}</span>` : ''}
+                                <div class="px-4 py-2 text-sm font-medium ${bubbleClass}">
                                     ${msg.text}
                                 </div>
-                                <span class="text-[9px] text-gray-400 mt-0.5 ${isMe ? 'text-right mr-1' : 'ml-1'}">${timeStr}</span>
+                                <span class="text-[9px] text-gray-400 mt-1 opacity-0 group-hover:opacity-100 transition ${isMe ? 'text-right mr-1' : 'ml-1'}">${timeStr}</span>
                             </div>
                         </div>`;
                         chatBox.innerHTML += html;
@@ -337,14 +330,10 @@
                     }
                 });
 
-                // Otomatik aşağı kaydır
                 chatBox.scrollTop = chatBox.scrollHeight;
 
-                // Bildirim Mantığı: Eğer modal kapalıysa ve son mesaj başkasındansa
                 const chatModal = document.getElementById('chat-modal');
                 if(chatModal.classList.contains('hidden') && hasNewMessage) {
-                    // Son mesaj benim değilse bildirim ver
-                    // (Basitlik için her güncellemede yakıyoruz)
                      document.getElementById('chat-notification').classList.remove('hidden');
                      document.getElementById('chat-nav-btn').classList.add('notification-glow', 'text-green-400', 'bg-gray-800');
                 }
@@ -358,24 +347,19 @@
             if(!text) return;
 
             try {
-                // Mesaj Gönder
+                // Mesaj Gönderirken o anki isim ve avatarı kullan
                 await addDoc(collection(db, "messages"), {
                     text: text,
                     senderId: currentUserUid,
-                    senderName: userDataCache.username,
-                    avatar: userDataCache.avatar,
+                    senderName: userDataCache.username || "Kâşif",
+                    avatar: userDataCache.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=default",
                     timestamp: Timestamp.now()
                 });
                 input.value = '';
-
-                // TEMİZLİK GÖREVİ (Her mesaj atıldığında şans eseri eski mesajları sil)
-                // Bu veritabanını temiz tutar. (Sadece %10 ihtimalle çalışsın ki sistemi yormasın)
                 if(Math.random() < 0.1) deleteOldMessages();
-
             } catch(e) { console.error("Mesaj hatası:", e); }
         };
 
-        // Veritabanı Temizliği (1 dakikadan eski mesajları sil)
         async function deleteOldMessages() {
             const oneMinAgo = new Date(Date.now() - 60 * 1000);
             const q = query(collection(db, "messages"), where("timestamp", "<", oneMinAgo));
@@ -385,16 +369,34 @@
 
         window.openChatModal = () => {
             document.getElementById('chat-modal').classList.remove('hidden');
-            // Bildirimi temizle
             document.getElementById('chat-notification').classList.add('hidden');
             document.getElementById('chat-nav-btn').classList.remove('notification-glow', 'text-green-400', 'bg-gray-800');
-            // En alta kaydır
             const chatBox = document.getElementById('chat-messages');
             chatBox.scrollTop = chatBox.scrollHeight;
         };
         window.closeChatModal = () => document.getElementById('chat-modal').classList.add('hidden');
 
-        // --- DİĞER FONKSİYONLAR (Öncekiyle aynı) ---
+        // --- ÇIKIŞ YAPMA (ONARILDI) ---
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            Swal.fire({
+                title: 'Çıkış Yapılıyor...',
+                text: "Maceradan ayrılmak istiyor musun?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Evet, Çıkış Yap',
+                cancelButtonText: 'Hayır, Kal'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try { await updateStatus('offline', null); } catch(e) { console.log(e); }
+                    await signOut(auth);
+                    window.location.href = "login.html";
+                }
+            });
+        });
+
+        // --- DİĞER FONKSİYONLAR ---
         window.updateStatus = async (status, gameName) => {
             if (!currentUserUid) return;
             try {
@@ -466,7 +468,6 @@
             });
         }
 
-        // Satın Alma, Kaydetme vs. (Eski kodlarla aynı)
         window.buyItem = async (itemId, cost, icon) => {
              if(userDataCache.coins < cost) { Swal.fire({icon:'error', title:'Paran Yetmiyor! 😢'}); return; }
              if(userDataCache.badges && userDataCache.badges.some(b => b.id === itemId)) { Swal.fire({icon:'info', title:'Zaten Var!'}); return; }
@@ -491,7 +492,6 @@
         window.openProfileModal = () => document.getElementById('profile-modal').classList.remove('hidden');
         window.randomAvatar = () => { document.getElementById('edit-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${Math.random().toString(36)}`; }
         
-        // Oyun & Sıralama
         window.openLeaderboard = async () => {
              document.getElementById('leaderboard-modal').classList.remove('hidden');
              const list = document.getElementById('leaderboard-list'); list.innerHTML='Yükleniyor...';
@@ -502,7 +502,6 @@
              } catch(e){}
         }
         
-        // Oyun Verileri
         const gamesDatabase = [
             { id: 1, title: "Kurtuluş Savaşı Cepheleri", cat: "Tarih", img: "https://img.freepik.com/free-vector/turkish-flag-background_23-2147959082.jpg", url: "https://learningapps.org/watch?v=pgi85x8n321" },
             { id: 2, title: "Türkiye Haritası Puzzle", cat: "Coğrafya", img: "https://img.freepik.com/free-vector/turkey-map-flag-concept_23-2148606622.jpg", url: "https://wordwall.net/tr/resource/12345/embed" },
