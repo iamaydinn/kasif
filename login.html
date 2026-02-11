@@ -68,7 +68,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const db = getFirestore(app, "kasif");
 
         // Kullanıcı zaten giriş yapmışsa direkt Portala at
         onAuthStateChanged(auth, (user) => {
