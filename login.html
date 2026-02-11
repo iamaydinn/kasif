@@ -3,49 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KÂŞİF - Giriş Yap</title>
+    <title>KÂŞİF - Maceraya Giriş</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        body { font-family: 'Fredoka', sans-serif; }
-        .space-bg { background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%); height: 100vh; width: 100%; position: relative; overflow: hidden; }
-        .glass-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
-        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--duration) ease-in-out infinite; }
-        @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+        body {
+            font-family: 'Fredoka', sans-serif;
+            /* Daha canlı, mor-mavi-turuncu geçişli bir arka plan */
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+            background-image: linear-gradient(to top, #3b008d 0%, #10002b 100%);
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Kart Tasarımı (Daha parlak) */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        /* === ANİMASYONLAR === */
+
+        /* 1. Yanıp Sönen Yıldızlar */
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px white, 0 0 20px rgb(147, 197, 253);
+            animation: twinkle var(--duration) ease-in-out infinite alternate;
+        }
+        @keyframes twinkle { 
+            0% { opacity: 0.3; transform: scale(0.8); } 
+            100% { opacity: 1; transform: scale(1.2); } 
+        }
+
+        /* 2. Yüzen Astronot (Mevcut görsel) */
+        .astronaut-float {
+            animation: floatAstronaut 6s ease-in-out infinite;
+        }
+        @keyframes floatAstronaut {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        /* 3. Uçan Roket */
+        .rocket-ship {
+            position: absolute;
+            width: 150px;
+            left: -200px;
+            top: 20%;
+            z-index: 1;
+            filter: drop-shadow(0 0 20px orange);
+            animation: flyRocket 15s linear infinite;
+        }
+        @keyframes flyRocket {
+            0% { transform: translateX(0) translateY(0) rotate(15deg); }
+            50% { transform: translateX(60vw) translateY(-100px) rotate(15deg); }
+            100% { transform: translateX(120vw) translateY(200px) rotate(15deg); }
+        }
+
+        /* 4. Dönen Gezegen */
+        .planet-spin {
+            position: absolute;
+            bottom: -100px;
+            right: -100px;
+            width: 400px;
+            opacity: 0.6;
+            z-index: 1;
+            animation: spinPlanet 120s linear infinite;
+        }
+        @keyframes spinPlanet {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 5. Kayan Kuyruklu Yıldız */
+        .shooting-star {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.1), 0 0 0 8px rgba(255,255,255,0.1), 0 0 20px rgba(255,255,255,1);
+            animation: shoot 3s linear infinite;
+            opacity: 0;
+        }
+        .shooting-star::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 300px;
+            height: 1px;
+            background: linear-gradient(90deg, #fff, transparent);
+        }
+        @keyframes shoot {
+            0% { transform: rotate(-45deg) translateX(0); opacity: 1; }
+            70% { opacity: 1; }
+            100% { transform: rotate(-45deg) translateX(-1000px); opacity: 0; }
+        }
     </style>
 </head>
-<body class="space-bg flex items-center justify-center">
+<body class="flex items-center justify-center overflow-hidden">
 
     <div id="stars-container"></div>
+    
+    <img src="https://cdn-icons-png.flaticon.com/512/1067/1067357.png" class="rocket-ship" alt="Roket">
+    
+    <img src="https://cdn-icons-png.flaticon.com/512/2590/2590298.png" class="planet-spin" alt="Gezegen">
+    
+    <div class="shooting-star" style="top: 20%; left: 80%; animation-delay: 0s;"></div>
+    <div class="shooting-star" style="top: 60%; left: 10%; animation-delay: 2s;"></div>
 
-    <div class="relative z-10 w-full max-w-md px-6">
-        <div class="text-center mb-8">
-            <h1 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 drop-shadow-lg tracking-wide">KÂŞİF</h1>
-            <p class="text-gray-400 mt-2 font-medium">Eğlenceli Bilgi Evreni</p>
+    <div class="relative z-20 w-full max-w-md px-6 flex flex-col items-center">
+        
+        <div class="astronaut-float mb-6 relative">
+             <div class="absolute inset-0 bg-orange-500 blur-3xl opacity-30 rounded-full animate-pulse"></div>
+             <img src="https://cdn-icons-png.flaticon.com/512/4539/4539561.png" alt="Astronot" class="w-48 h-48 drop-shadow-[0_0_30px_rgba(255,165,0,0.8)] relative z-10">
         </div>
 
-        <div class="glass-card p-8 rounded-[2rem] shadow-2xl relative">
-            <div id="error-msg" class="hidden bg-red-500/80 text-white p-3 rounded-xl mb-4 text-center text-sm font-bold"></div>
+        <div class="text-center mb-8">
+            <h1 class="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-orange-400 to-red-500 drop-shadow-lg tracking-wide transform -rotate-2">KÂŞİF</h1>
+            <p class="text-blue-200 mt-2 font-bold text-lg">Eğlenceli Bilgi Evrenine Hoşgeldin!</p>
+        </div>
 
-            <form id="auth-form" class="space-y-4">
-                <div>
-                    <label class="text-white text-xs font-bold ml-2 uppercase">E-Posta</label>
-                    <input type="email" id="email" class="w-full bg-black/40 border border-gray-600 rounded-xl py-3 px-4 text-white font-bold focus:border-yellow-400 outline-none" placeholder="ornek@kasif.com" required>
+        <div class="glass-card p-8 rounded-[2.5rem] shadow-2xl relative w-full">
+            <div id="error-msg" class="hidden bg-red-500/90 text-white p-3 rounded-xl mb-4 text-center text-sm font-bold animate-bounce"></div>
+
+            <form id="auth-form" class="space-y-5">
+                <div class="relative group">
+                    <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-yellow-400 transition"></i>
+                    <input type="email" id="email" class="w-full bg-blue-950/50 border-2 border-blue-800/50 rounded-2xl py-4 pl-12 text-white font-bold placeholder-blue-300/50 focus:border-yellow-400 focus:bg-blue-950/70 outline-none transition" placeholder="E-Posta Adresin" required>
                 </div>
-                <div>
-                    <label class="text-white text-xs font-bold ml-2 uppercase">Şifre</label>
-                    <input type="password" id="password" class="w-full bg-black/40 border border-gray-600 rounded-xl py-3 px-4 text-white font-bold focus:border-yellow-400 outline-none" placeholder="******" required>
+                <div class="relative group">
+                     <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-blue-300 group-focus-within:text-yellow-400 transition"></i>
+                    <input type="password" id="password" class="w-full bg-blue-950/50 border-2 border-blue-800/50 rounded-2xl py-4 pl-12 text-white font-bold placeholder-blue-300/50 focus:border-yellow-400 focus:bg-blue-950/70 outline-none transition" placeholder="Gizli Şifren" required>
                 </div>
                 
-                <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 text-white font-black py-4 rounded-xl shadow-lg hover:scale-105 transition transform">
-                    GİRİŞ YAP 🚀
+                <button type="submit" id="submit-btn" class="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-black text-xl py-4 rounded-2xl shadow-lg hover:scale-105 transition transform active:scale-95 flex items-center justify-center gap-3">
+                    <span>ROKETİ ATEŞLE</span> <i class="fa-solid fa-rocket"></i>
                 </button>
             </form>
 
-            <div class="mt-6 text-center">
-                <p class="text-gray-400 text-sm" id="toggle-text">Hesabın yok mu?</p>
-                <button id="toggle-btn" class="text-yellow-400 font-bold hover:underline mt-1">Hemen Kayıt Ol</button>
+            <div class="mt-8 text-center bg-blue-950/30 py-3 rounded-xl">
+                <p class="text-blue-200 text-sm font-medium" id="toggle-text">Henüz kâşif değil misin?</p>
+                <button id="toggle-btn" class="text-yellow-300 font-black hover:text-yellow-200 hover:underline mt-1 transition text-lg">Hemen Kayıt Ol ✨</button>
             </div>
         </div>
     </div>
@@ -68,9 +177,9 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        // DÜZELTME: Veritabanı adını belirttik
         const db = getFirestore(app, "kasif");
 
-        // Kullanıcı zaten giriş yapmışsa direkt Portala at
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 window.location.href = "portal.html";
@@ -86,72 +195,74 @@
         const toggleBtn = document.getElementById('toggle-btn');
         const toggleText = document.getElementById('toggle-text');
 
-        // Giriş / Kayıt Modu Değiştirme
         toggleBtn.addEventListener('click', () => {
             isLoginMode = !isLoginMode;
             if (isLoginMode) {
-                submitBtn.innerText = "GİRİŞ YAP 🚀";
-                toggleText.innerText = "Hesabın yok mu?";
-                toggleBtn.innerText = "Hemen Kayıt Ol";
+                submitBtn.innerHTML = '<span>ROKETİ ATEŞLE</span> <i class="fa-solid fa-rocket"></i>';
+                toggleText.innerText = "Henüz kâşif değil misin?";
+                toggleBtn.innerText = "Hemen Kayıt Ol ✨";
             } else {
-                submitBtn.innerText = "KAYIT OL ✨";
-                toggleText.innerText = "Zaten hesabın var mı?";
-                toggleBtn.innerText = "Giriş Yap";
+                submitBtn.innerHTML = '<span>KAYIT OL VE UÇUŞA BAŞLA</span> <i class="fa-solid fa-user-astronaut"></i>';
+                toggleText.innerText = "Zaten bir kâşif misin?";
+                toggleBtn.innerText = "Giriş Yap 🚀";
             }
             errorMsg.classList.add('hidden');
         });
 
-        // Form Gönderimi
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = emailInp.value;
             const password = passInp.value;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> İşleniyor...';
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin fa-2x"></i>';
             errorMsg.classList.add('hidden');
 
             try {
                 if (isLoginMode) {
-                    // GİRİŞ YAPMA
                     await signInWithEmailAndPassword(auth, email, password);
-                    // Başarılıysa onAuthStateChanged zaten yönlendirecek
                 } else {
-                    // KAYIT OLMA
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
-                    
-                    // Yeni kullanıcı için Veritabanında Profil Oluştur
                     await setDoc(doc(db, "users", user.uid), {
-                        username: email.split('@')[0], // E-postanın başını isim yap
+                        username: email.split('@')[0],
                         email: email,
                         xp: 0,
                         level: 1,
                         coins: 100,
                         avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`,
-                        title: "Acemi Kâşif"
+                        title: "Acemi Kâşif",
+                        badges: [],
+                        onlineStatus: 'online'
                     });
-                    
                     window.location.href = "portal.html";
                 }
             } catch (error) {
                 console.error(error);
-                errorMsg.innerText = "Hata: " + error.message.replace('Firebase: ', '');
+                let trMsg = "Bir hata oluştu.";
+                if(error.code === 'auth/invalid-credential') trMsg = "E-posta veya şifre hatalı!";
+                if(error.code === 'auth/email-already-in-use') trMsg = "Bu e-posta zaten kullanılıyor!";
+                if(error.code === 'auth/weak-password') trMsg = "Şifre çok zayıf! En az 6 karakter olmalı.";
+                
+                errorMsg.innerText = trMsg;
                 errorMsg.classList.remove('hidden');
                 submitBtn.disabled = false;
-                submitBtn.innerText = isLoginMode ? "GİRİŞ YAP 🚀" : "KAYIT OL ✨";
+                submitBtn.innerHTML = isLoginMode ? '<span>ROKETİ ATEŞLE</span> <i class="fa-solid fa-rocket"></i>' : '<span>KAYIT OL VE UÇUŞA BAŞLA</span> <i class="fa-solid fa-user-astronaut"></i>';
             }
         });
 
-        // Yıldız Efekti
+        // DAHA FAZLA ve PARLAK YILDIZ EFEKTİ
         const container = document.getElementById('stars-container');
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 150; i++) {
             const star = document.createElement('div');
             star.classList.add('star');
             star.style.left = Math.random() * 100 + '%';
             star.style.top = Math.random() * 100 + '%';
-            star.style.width = Math.random() * 3 + 'px';
-            star.style.height = star.style.width;
-            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+            const size = Math.random() * 4 + 'px';
+            star.style.width = size;
+            star.style.height = size;
+            star.style.setProperty('--duration', (Math.random() * 3 + 1) + 's');
+            // Rastgele renkli yıldızlar (mavi/beyaz)
+            star.style.background = Math.random() > 0.8 ? '#93c5fd' : 'white';
             container.appendChild(star);
         }
     </script>
