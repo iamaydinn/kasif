@@ -261,7 +261,7 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        const db = getFirestore(app, "kasif");
         
         // Offline Persistence (HATAYI ÇÖZEN KISIM)
         enableIndexedDbPersistence(db).catch((err) => console.log("Offline mod hatası:", err.code));
