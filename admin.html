@@ -2,185 +2,95 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KÂŞİF - Görev Kontrol</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { 'kid': ['Fredoka', 'sans-serif'] },
-                    colors: { 'admin-dark': '#0f172a', 'admin-panel': '#1e293b' }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { font-family: 'Fredoka', sans-serif; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .swal2-container { z-index: 99999 !important; }
-    </style>
+    <style>.swal2-container { z-index: 99999 !important; } body { font-family: sans-serif; }</style>
 </head>
-<body class="bg-admin-dark text-slate-200 h-screen flex overflow-hidden">
+<body class="bg-slate-900 text-white flex h-screen">
 
-    <aside class="w-64 bg-admin-panel flex flex-col border-r border-slate-700 flex-shrink-0">
-        <div class="h-20 flex items-center justify-center border-b border-slate-700 bg-slate-900">
-            <h1 class="text-xl font-black text-red-500 tracking-widest flex items-center gap-2">
-                <i class="fa-solid fa-user-secret"></i> ADMİN
-            </h1>
+    <aside class="w-64 bg-slate-800 border-r border-slate-700 flex flex-col flex-shrink-0">
+        <div class="h-20 flex items-center justify-center border-b border-slate-700 text-xl font-bold text-red-500 tracking-wider">
+            <i class="fa-solid fa-user-secret mr-2"></i> ADMIN
         </div>
-        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-            <p class="text-xs text-slate-500 font-bold uppercase ml-2 mb-1">Yönetim</p>
-            <button onclick="switchTab('users')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-700 transition text-left tab-btn bg-slate-700 text-white" data-tab="users">
-                <i class="fa-solid fa-users-gear text-blue-400"></i> Öğrenciler
-            </button>
-            <button onclick="switchTab('games')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-700 transition text-left tab-btn" data-tab="games">
-                <i class="fa-solid fa-gamepad text-green-400"></i> Oyunlar
-            </button>
-            
-            <p class="text-xs text-slate-500 font-bold uppercase ml-2 mb-1 mt-4">Ekonomi & İçerik</p>
-            <button onclick="switchTab('shop')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-700 transition text-left tab-btn" data-tab="shop">
-                <i class="fa-solid fa-store text-yellow-400"></i> Mağaza Ürünleri
-            </button>
-            <button onclick="switchTab('badges')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-slate-700 transition text-left tab-btn" data-tab="badges">
-                <i class="fa-solid fa-medal text-purple-400"></i> Rozet Tanımları
-            </button>
+        <nav class="flex-1 p-4 space-y-2">
+            <button onclick="switchTab('users')" class="w-full text-left p-3 rounded hover:bg-slate-700 bg-slate-700 tab-btn" id="btn-users"><i class="fa-solid fa-users mr-2"></i> Kullanıcılar</button>
+            <button onclick="switchTab('shop')" class="w-full text-left p-3 rounded hover:bg-slate-700 tab-btn" id="btn-shop"><i class="fa-solid fa-store mr-2"></i> Mağaza</button>
+            <button onclick="switchTab('games')" class="w-full text-left p-3 rounded hover:bg-slate-700 tab-btn" id="btn-games"><i class="fa-solid fa-gamepad mr-2"></i> Oyunlar</button>
         </nav>
-        <div class="p-4 border-t border-slate-700">
-            <button onclick="location.href='portal.html'" class="w-full border border-slate-600 p-3 rounded-xl hover:bg-slate-700 transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-arrow-left"></i> Portala Dön
-            </button>
-        </div>
+        <button onclick="location.href='portal.html'" class="m-4 p-3 border border-slate-600 rounded hover:bg-slate-700">Portala Dön</button>
     </aside>
 
-    <main class="flex-1 flex flex-col relative overflow-hidden bg-admin-dark">
+    <main class="flex-1 p-8 overflow-y-auto">
         
-        <header class="h-20 border-b border-slate-700 flex items-center justify-between px-8 bg-admin-panel">
-            <h2 id="page-title" class="text-2xl font-bold text-white">Öğrenci Yönetimi</h2>
-            <div class="flex items-center gap-3 bg-slate-800 px-4 py-2 rounded-full">
-                <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span class="text-xs font-bold text-slate-300">Sistem Çevrimiçi</span>
+        <div id="tab-users" class="content-tab">
+            <div class="flex justify-between mb-4">
+                <h2 class="text-2xl font-bold">Kullanıcı Yönetimi</h2>
+                <button onclick="loadUsers()" class="text-slate-400"><i class="fa-solid fa-rotate"></i></button>
             </div>
-        </header>
-
-        <div id="tab-users" class="flex-1 overflow-y-auto p-8 content-tab">
-            <div class="bg-admin-panel rounded-2xl border border-slate-700 overflow-hidden shadow-xl">
-                <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800">
-                    <h3 class="font-bold">Kayıtlı Kâşifler</h3>
-                    <button onclick="loadUsers()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-rotate"></i> Yenile</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead class="bg-slate-900 text-slate-400 text-xs uppercase">
-                            <tr>
-                                <th class="p-4">Kâşif</th>
-                                <th class="p-4">Level</th>
-                                <th class="p-4">Bakiye</th>
-                                <th class="p-4 text-right">İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-list" class="divide-y divide-slate-700 text-sm"></tbody>
-                    </table>
-                </div>
+            <div class="overflow-x-auto bg-slate-800 rounded-xl border border-slate-700">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-900 text-xs uppercase text-slate-400">
+                        <tr><th class="p-4">Kullanıcı</th><th class="p-4">Rol</th><th class="p-4">Bakiye</th><th class="p-4 text-right">İşlem</th></tr>
+                    </thead>
+                    <tbody id="users-list" class="divide-y divide-slate-700 text-sm"></tbody>
+                </table>
             </div>
         </div>
 
-        <div id="tab-games" class="flex-1 overflow-y-auto p-8 content-tab hidden">
-            <div class="flex justify-end mb-6">
-                <button onclick="openGameModal()" class="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2">
-                    <i class="fa-solid fa-plus"></i> Yeni Oyun Ekle
-                </button>
+        <div id="tab-shop" class="content-tab hidden">
+            <div class="flex justify-between mb-6">
+                <h2 class="text-2xl font-bold">Mağaza Ürünleri</h2>
+                <button onclick="document.getElementById('modal-shop').classList.remove('hidden')" class="bg-yellow-600 hover:bg-yellow-500 px-4 py-2 rounded font-bold">+ Ürün Ekle</button>
             </div>
-            <div id="games-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            <div id="shop-list" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
         </div>
 
-        <div id="tab-shop" class="flex-1 overflow-y-auto p-8 content-tab hidden">
-            <div class="flex justify-between items-center mb-6">
-                <div class="text-sm text-slate-400">Buradan mağazaya yeni rozetler, efektler veya eşyalar ekleyebilirsin.</div>
-                <button onclick="openShopModal()" class="bg-yellow-600 hover:bg-yellow-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2">
-                    <i class="fa-solid fa-tag"></i> Ürün Ekle
-                </button>
+        <div id="tab-games" class="content-tab hidden">
+            <div class="flex justify-between mb-6">
+                <h2 class="text-2xl font-bold">Oyunlar</h2>
+                <button onclick="document.getElementById('modal-game').classList.remove('hidden')" class="bg-green-600 hover:bg-green-500 px-4 py-2 rounded font-bold">+ Oyun Ekle</button>
             </div>
-            <div id="shop-list" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
-        </div>
-
-        <div id="tab-badges" class="flex-1 overflow-y-auto p-8 content-tab hidden">
-            <div class="flex justify-between items-center mb-6">
-                <div class="text-sm text-slate-400">Sistemde tanımlı rozetler. Öğrencilere buradan manuel rozet veremezsin, burası sadece tanım içindir.</div>
-                <button onclick="openBadgeModal()" class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2">
-                    <i class="fa-solid fa-medal"></i> Yeni Rozet Tanımla
-                </button>
-            </div>
-            <div id="badges-list" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+            <div id="games-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"></div>
         </div>
 
     </main>
 
-    <div id="modal-user" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-800 w-full max-w-md rounded-2xl border border-slate-600 p-6 relative">
-            <button onclick="closeModal('modal-user')" class="absolute top-4 right-4 text-slate-400 hover:text-white">X</button>
-            <h3 class="text-xl font-bold text-white mb-4">Öğrenci Düzenle</h3>
-            <input type="hidden" id="user-id">
+    <div id="modal-shop" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 w-full max-w-md p-6 rounded-xl border border-slate-600">
+            <h3 class="text-xl font-bold mb-4">Yeni Ürün Ekle</h3>
             <div class="space-y-3">
-                <div><label class="text-xs text-slate-400">Altın</label><input id="user-coins" type="number" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white"></div>
-                <div><label class="text-xs text-slate-400">XP</label><input id="user-xp" type="number" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white"></div>
-                <div><label class="text-xs text-slate-400">Ünvan</label><input id="user-title" type="text" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white"></div>
-                <button onclick="saveUser()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded font-bold mt-2">Kaydet</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-game" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-800 w-full max-w-lg rounded-2xl border border-slate-600 p-6 relative">
-            <button onclick="closeModal('modal-game')" class="absolute top-4 right-4 text-slate-400 hover:text-white">X</button>
-            <h3 class="text-xl font-bold text-white mb-4">Oyun Yönetimi</h3>
-            <input type="hidden" id="game-id">
-            <div class="space-y-3">
-                <input id="game-title" type="text" placeholder="Oyun Adı" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
-                <select id="game-cat" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
-                    <option value="Tarih">Tarih</option><option value="Coğrafya">Coğrafya</option><option value="Bilim">Bilim</option><option value="Vatandaşlık">Vatandaşlık</option>
-                </select>
-                <input id="game-img" type="text" placeholder="Kapak Resmi URL (https://...)" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
-                <input id="game-url" type="text" placeholder="Embed Linki (Wordwall/LearningApps)" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
-                <button onclick="saveGame()" class="w-full bg-green-600 hover:bg-green-500 text-white py-2 rounded font-bold">Yayınla</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-shop" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-800 w-full max-w-lg rounded-2xl border border-slate-600 p-6 relative">
-            <button onclick="closeModal('modal-shop')" class="absolute top-4 right-4 text-slate-400 hover:text-white">X</button>
-            <h3 class="text-xl font-bold text-white mb-4">Ürün Ekle/Düzenle</h3>
-            <input type="hidden" id="shop-id">
-            <div class="space-y-3">
-                <input id="shop-name" type="text" placeholder="Ürün Adı (Örn: Roket Rozeti)" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
-                <div class="grid grid-cols-2 gap-2">
-                    <input id="shop-price" type="number" placeholder="Fiyat (Altın)" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
-                    <input id="shop-icon" type="text" placeholder="İkon (Emoji veya URL)" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
-                </div>
-                <select id="shop-type" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
+                <input id="prod-name" type="text" placeholder="Ürün Adı (Örn: Korsan Şapkası)" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
+                <input id="prod-price" type="number" placeholder="Fiyat (Altın)" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
+                <input id="prod-icon" type="text" placeholder="İkon (Emoji: 🧢)" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
+                <select id="prod-type" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
                     <option value="badge">Rozet</option>
                     <option value="effect">İsim Efekti (CSS Class)</option>
                 </select>
-                <input id="shop-desc" type="text" placeholder="Açıklama (Kısa)" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
-                <button onclick="saveShopItem()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-white py-2 rounded font-bold">Market'e Koy</button>
+                <input id="prod-effect" type="text" placeholder="Efekt Class (Sadece efektse: effect-fire)" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
+                <div class="flex justify-end gap-2 mt-4">
+                    <button onclick="document.getElementById('modal-shop').classList.add('hidden')" class="text-slate-400">İptal</button>
+                    <button onclick="addShopItem()" class="bg-yellow-600 px-4 py-2 rounded font-bold">Kaydet</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="modal-badge" class="fixed inset-0 z-50 bg-black/80 hidden flex items-center justify-center p-4">
-        <div class="bg-slate-800 w-full max-w-sm rounded-2xl border border-slate-600 p-6 relative">
-            <button onclick="closeModal('modal-badge')" class="absolute top-4 right-4 text-slate-400 hover:text-white">X</button>
-            <h3 class="text-xl font-bold text-white mb-4">Yeni Rozet Tanımı</h3>
+    <div id="modal-game" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 w-full max-w-md p-6 rounded-xl border border-slate-600">
+            <h3 class="text-xl font-bold mb-4">Yeni Oyun Ekle</h3>
             <div class="space-y-3">
-                <input id="badge-name" type="text" placeholder="Rozet Adı" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
-                <input id="badge-icon" type="text" placeholder="İkon (Emoji)" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white text-center text-2xl">
-                <input id="badge-desc" type="text" placeholder="Açıklama" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
-                <button onclick="saveBadgeDef()" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 rounded font-bold">Tanımla</button>
+                <input id="game-title" type="text" placeholder="Oyun Adı" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
+                <select id="game-cat" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
+                    <option value="Tarih">Tarih</option><option value="Coğrafya">Coğrafya</option><option value="Bilim">Bilim</option>
+                </select>
+                <input id="game-img" type="text" placeholder="Resim URL" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
+                <input id="game-url" type="text" placeholder="Embed URL" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
+                <div class="flex justify-end gap-2 mt-4">
+                    <button onclick="document.getElementById('modal-game').classList.add('hidden')" class="text-slate-400">İptal</button>
+                    <button onclick="addGame()" class="bg-green-600 px-4 py-2 rounded font-bold">Kaydet</button>
+                </div>
             </div>
         </div>
     </div>
@@ -188,42 +98,25 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // FIREBASE AYARLARI
-        const firebaseConfig = {
-            apiKey: "AIzaSyD5SFoL8-4idNlbixCw81pjWMn6M6-yv1A",
-            authDomain: "kasif-cd133.firebaseapp.com",
-            projectId: "kasif-cd133",
-            storageBucket: "kasif-cd133.firebasestorage.app",
-            messagingSenderId: "734052460302",
-            appId: "1:734052460302:web:9c8b1747e3dcbdff6c195f",
-            measurementId: "G-VZ04P8EQ69"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyD5SFoL8-4idNlbixCw81pjWMn6M6-yv1A", authDomain: "kasif-cd133.firebaseapp.com", projectId: "kasif-cd133", storageBucket: "kasif-cd133.firebasestorage.app", messagingSenderId: "734052460302", appId: "1:734052460302:web:9c8b1747e3dcbdff6c195f", measurementId: "G-VZ04P8EQ69" };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app, "kasif");
 
-        let badgeLibrary = [];
-
-        // --- GLOBAL FONKSİYONLAR ---
+        // TABLARI DEĞİŞTİR
         window.switchTab = (tab) => {
             document.querySelectorAll('.content-tab').forEach(el => el.classList.add('hidden'));
             document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('bg-slate-700', 'text-white'));
-            document.querySelector(`[data-tab="${tab}"]`).classList.add('bg-slate-700', 'text-white');
-            
-            if(tab==='users') loadUsers();
-            if(tab==='games') loadGames();
-            if(tab==='shop') loadShop();
-            if(tab==='badges') loadBadges();
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('bg-slate-700'));
+            document.getElementById(`btn-${tab}`).classList.add('bg-slate-700');
+            if(tab === 'users') loadUsers();
+            if(tab === 'shop') loadShop();
+            if(tab === 'games') loadGames();
         };
 
-        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
-
-        // --- 1. KULLANICI YÖNETİMİ ---
+        // 1. KULLANICILARI YÜKLE
         window.loadUsers = async () => {
             const list = document.getElementById('users-list');
             list.innerHTML = '<tr><td colspan="4" class="p-4 text-center">Yükleniyor...</td></tr>';
@@ -232,205 +125,96 @@
                 list.innerHTML = '';
                 snap.forEach(d => {
                     const u = d.data();
+                    const isTeacher = u.role === 'teacher';
+                    const roleColor = isTeacher ? 'text-orange-400 font-bold' : 'text-slate-400';
+                    const btnText = isTeacher ? 'Öğrenci Yap' : 'Öğretmen Yap';
+                    const btnClass = isTeacher ? 'bg-slate-600' : 'bg-orange-600 hover:bg-orange-500';
+                    
                     list.innerHTML += `
                     <tr class="hover:bg-slate-800 border-b border-slate-700">
                         <td class="p-4 flex items-center gap-3">
                             <img src="${u.avatar}" class="w-8 h-8 rounded-full">
                             <div><div class="font-bold">${u.username}</div><div class="text-xs text-slate-500">${u.email}</div></div>
                         </td>
-                        <td class="p-4"><span class="bg-blue-900 text-blue-200 px-2 py-1 rounded text-xs">Lvl ${u.level||1}</span></td>
-                        <td class="p-4 text-yellow-400 font-mono">${u.coins||0} 💰</td>
-                        <td class="p-4 text-right flex justify-end gap-2">
-                            <button onclick="editUser('${d.id}', '${u.username}', ${u.coins}, ${u.xp}, '${u.title}')" class="bg-slate-600 hover:bg-slate-500 px-3 py-1 rounded text-xs text-white">Düzenle</button>
-                            <button onclick="giveBadge('${d.id}')" class="bg-purple-600 hover:bg-purple-500 px-3 py-1 rounded text-xs text-white">Rozet Ver</button>
+                        <td class="p-4 ${roleColor}">${isTeacher ? '🎓 ÖĞRETMEN' : 'Öğrenci'}</td>
+                        <td class="p-4 text-yellow-400">${u.coins}</td>
+                        <td class="p-4 text-right">
+                            <button onclick="toggleRole('${d.id}', '${u.role}')" class="${btnClass} text-white px-3 py-1 rounded text-xs transition">${btnText}</button>
                         </td>
                     </tr>`;
                 });
             } catch(e) { console.error(e); }
         };
 
-        window.editUser = (id, name, coins, xp, title) => {
-            document.getElementById('user-id').value = id;
-            document.getElementById('user-coins').value = coins;
-            document.getElementById('user-xp').value = xp;
-            document.getElementById('user-title').value = title;
-            document.getElementById('modal-user').classList.remove('hidden');
+        // ROL DEĞİŞTİRME (ÖĞRETMEN/ÖĞRENCİ)
+        window.toggleRole = async (uid, currentRole) => {
+            const newRole = currentRole === 'teacher' ? 'student' : 'teacher';
+            await updateDoc(doc(db, "users", uid), { role: newRole });
+            Swal.fire({icon: 'success', title: 'Rol Güncellendi', text: `Kullanıcı artık ${newRole === 'teacher' ? 'Öğretmen' : 'Öğrenci'}`});
+            loadUsers();
         };
 
-        window.saveUser = async () => {
-            const id = document.getElementById('user-id').value;
-            const coins = parseInt(document.getElementById('user-coins').value);
-            const xp = parseInt(document.getElementById('user-xp').value);
-            const title = document.getElementById('user-title').value;
-            const level = Math.floor(xp / 1000) + 1;
-
-            try {
-                await updateDoc(doc(db, "users", id), { coins, xp, title, level });
-                window.closeModal('modal-user');
-                loadUsers();
-                Swal.fire('Başarılı', 'Kullanıcı güncellendi.', 'success');
-            } catch(e) { Swal.fire('Hata', e.message, 'error'); }
-        };
-
-        window.giveBadge = async (uid) => {
-            // Önce tanımlı rozetleri çekelim
-            if(badgeLibrary.length === 0) await loadBadgesInternal();
-            
-            const options = {};
-            badgeLibrary.forEach(b => options[b.id] = `${b.icon} ${b.name}`);
-            
-            const { value: badgeId } = await Swal.fire({
-                title: 'Rozet Seç',
-                input: 'select',
-                inputOptions: options,
-                showCancelButton: true
-            });
-
-            if (badgeId) {
-                const selected = badgeLibrary.find(b => b.id === badgeId);
-                const badge = { id: selected.id, name: selected.name, icon: selected.icon, date: new Date().toISOString(), type: 'reward' };
-                try {
-                    await updateDoc(doc(db, "users", uid), { badges: arrayUnion(badge) });
-                    Swal.fire('Gönderildi', 'Öğrenci rozeti aldı!', 'success');
-                } catch(e) { Swal.fire('Hata', e.message, 'error'); }
-            }
-        };
-
-        // --- 2. OYUN YÖNETİMİ ---
-        window.loadGames = async () => {
-            const list = document.getElementById('games-list');
-            list.innerHTML = 'Yükleniyor...';
-            const snap = await getDocs(collection(db, "games"));
-            list.innerHTML = '';
-            snap.forEach(d => {
-                const g = d.data();
-                list.innerHTML += `
-                <div class="bg-slate-800 rounded-xl overflow-hidden border border-slate-700 relative group">
-                    <img src="${g.img}" class="w-full h-32 object-cover opacity-60 group-hover:opacity-100 transition">
-                    <div class="p-3">
-                        <div class="text-xs text-slate-400 uppercase">${g.cat}</div>
-                        <div class="font-bold truncate">${g.title}</div>
-                        <button onclick="deleteGame('${d.id}')" class="mt-2 w-full bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white text-xs py-1 rounded transition">Sil</button>
-                    </div>
-                </div>`;
-            });
-        };
-
-        window.openGameModal = () => document.getElementById('modal-game').classList.remove('hidden');
-        
-        window.saveGame = async () => {
-            const title = document.getElementById('game-title').value;
-            const cat = document.getElementById('game-cat').value;
-            const img = document.getElementById('game-img').value;
-            const url = document.getElementById('game-url').value;
-            try {
-                await addDoc(collection(db, "games"), { title, cat, img, url });
-                window.closeModal('modal-game');
-                loadGames();
-                Swal.fire('Eklendi', 'Oyun yayında!', 'success');
-            } catch(e) { console.error(e); }
-        };
-
-        window.deleteGame = async (id) => {
-            if(confirm("Silmek istiyor musun?")) {
-                await deleteDoc(doc(db, "games", id));
-                loadGames();
-            }
-        };
-
-        // --- 3. MAĞAZA YÖNETİMİ ---
+        // 2. MAĞAZA YÖNETİMİ (MARKETE EKLEME)
         window.loadShop = async () => {
             const list = document.getElementById('shop-list');
+            list.innerHTML = 'Yükleniyor...';
             const snap = await getDocs(collection(db, "shop_items"));
             list.innerHTML = '';
             snap.forEach(d => {
                 const item = d.data();
                 list.innerHTML += `
-                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center relative">
-                    <button onclick="deleteShopItem('${d.id}')" class="absolute top-2 right-2 text-red-500 hover:text-white"><i class="fa-solid fa-trash"></i></button>
-                    <div class="text-4xl mb-2">${item.icon}</div>
-                    <div class="font-bold">${item.name}</div>
-                    <div class="text-yellow-400 font-mono text-sm">${item.price} 💰</div>
-                    <div class="text-xs text-slate-500 mt-1">${item.type}</div>
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 relative">
+                    <button onclick="deleteItem('shop_items', '${d.id}')" class="absolute top-2 right-2 text-red-500 hover:text-white">x</button>
+                    <div class="text-4xl text-center mb-2">${item.icon}</div>
+                    <div class="font-bold text-center">${item.name}</div>
+                    <div class="text-center text-yellow-400 text-sm">${item.price} 💰</div>
+                    <div class="text-center text-xs text-slate-500 uppercase mt-1">${item.type}</div>
                 </div>`;
             });
         };
 
-        window.openShopModal = () => document.getElementById('modal-shop').classList.remove('hidden');
-
-        window.saveShopItem = async () => {
-            const name = document.getElementById('shop-name').value;
-            const price = parseInt(document.getElementById('shop-price').value);
-            const icon = document.getElementById('shop-icon').value;
-            const type = document.getElementById('shop-type').value;
-            const desc = document.getElementById('shop-desc').value;
+        window.addShopItem = async () => {
+            const name = document.getElementById('prod-name').value;
+            const price = Number(document.getElementById('prod-price').value);
+            const icon = document.getElementById('prod-icon').value;
+            const type = document.getElementById('prod-type').value;
+            const effect = document.getElementById('prod-effect').value; // Opsiyonel
             
-            try {
-                await addDoc(collection(db, "shop_items"), { name, price, icon, type, desc });
-                window.closeModal('modal-shop');
-                loadShop();
-                Swal.fire('Eklendi', 'Ürün markete kondu.', 'success');
-            } catch(e) { console.error(e); }
+            await addDoc(collection(db, "shop_items"), { name, price, icon, type, effectClass: effect || '' });
+            document.getElementById('modal-shop').classList.add('hidden');
+            loadShop();
+            Swal.fire('Başarılı', 'Ürün markete eklendi!', 'success');
         };
 
-        window.deleteShopItem = async (id) => {
-            if(confirm("Bu ürünü marketten kaldır?")) {
-                await deleteDoc(doc(db, "shop_items", id));
-                loadShop();
-            }
-        };
-
-        // --- 4. ROZET TANIMLARI ---
-        async function loadBadgesInternal() {
-            const snap = await getDocs(collection(db, "badges_library"));
-            badgeLibrary = [];
-            snap.forEach(d => badgeLibrary.push({ ...d.data(), id: d.id }));
-        }
-
-        window.loadBadges = async () => {
-            const list = document.getElementById('badges-list');
-            await loadBadgesInternal();
+        // 3. OYUN YÖNETİMİ
+        window.loadGames = async () => {
+            const list = document.getElementById('games-list');
+            const snap = await getDocs(collection(db, "games"));
             list.innerHTML = '';
-            badgeLibrary.forEach(b => {
-                list.innerHTML += `
-                <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 text-center relative">
-                    <button onclick="deleteBadgeDef('${b.id}')" class="absolute top-1 right-1 text-red-500 text-xs hover:text-white">x</button>
-                    <div class="text-3xl">${b.icon}</div>
-                    <div class="font-bold text-sm mt-1">${b.name}</div>
-                </div>`;
+            snap.forEach(d => {
+                const g = d.data();
+                list.innerHTML += `<div class="bg-slate-800 p-2 rounded relative"><img src="${g.img}" class="w-full h-24 object-cover opacity-50"><div class="absolute bottom-2 left-2 font-bold">${g.title}</div><button onclick="deleteItem('games','${d.id}')" class="absolute top-1 right-1 text-red-500 bg-black/50 px-2 rounded">x</button></div>`;
             });
         };
 
-        window.openBadgeModal = () => document.getElementById('modal-badge').classList.remove('hidden');
-
-        window.saveBadgeDef = async () => {
-            const name = document.getElementById('badge-name').value;
-            const icon = document.getElementById('badge-icon').value;
-            const desc = document.getElementById('badge-desc').value;
-            try {
-                await addDoc(collection(db, "badges_library"), { name, icon, desc });
-                window.closeModal('modal-badge');
-                loadBadges();
-            } catch(e) { console.error(e); }
+        window.addGame = async () => {
+            const title = document.getElementById('game-title').value;
+            const cat = document.getElementById('game-cat').value;
+            const img = document.getElementById('game-img').value;
+            const url = document.getElementById('game-url').value;
+            await addDoc(collection(db, "games"), { title, cat, img, url });
+            document.getElementById('modal-game').classList.add('hidden');
+            loadGames();
         };
 
-        window.deleteBadgeDef = async (id) => {
-            if(confirm("Tanımı sil?")) {
-                await deleteDoc(doc(db, "badges_library", id));
-                loadBadges();
+        window.deleteItem = async (col, id) => {
+            if(confirm('Silmek istediğine emin misin?')) {
+                await deleteDoc(doc(db, col, id));
+                if(col==='games') loadGames(); else loadShop();
             }
         };
 
-        // AUTH
-        onAuthStateChanged(auth, u => {
-            if(u) {
-                console.log("Admin Logged In");
-                loadUsers();
-            } else {
-                window.location.href="login.html";
-            }
-        });
-
+        onAuthStateChanged(auth, u => { if(u) loadUsers(); else location.href="login.html"; });
     </script>
 </body>
 </html>
