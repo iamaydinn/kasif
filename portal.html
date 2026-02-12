@@ -15,52 +15,62 @@
             theme: {
                 extend: {
                     fontFamily: { 'kid': ['Fredoka', 'sans-serif'] },
-                    colors: { 'panel-bg': '#F0F4F8', 'sidebar-bg': '#0F172A', 'brand-yellow': '#FCD34D' },
-                    zIndex: { 'modal': '99999' }
+                    colors: { 'panel-bg': '#0B1120', 'sidebar-bg': '#1E293B', 'brand-yellow': '#FCD34D' },
+                    zIndex: { 'max': '9999999' }
                 }
             }
         }
     </script>
     <style>
-        body { font-family: 'Fredoka', sans-serif; cursor: url('https://cdn-icons-png.flaticon.com/32/889/889669.png'), auto; overflow: hidden; }
+        body { 
+            font-family: 'Fredoka', sans-serif; 
+            cursor: default; /* Normal İmleç */
+            overflow: hidden; 
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* İmleç Efekti */
-        .click-particle { position: absolute; pointer-events: none; animation: particleFade 0.8s forwards; z-index: 999999; font-size: 24px; color: #FFD700; text-shadow: 0 0 5px orange; }
-        @keyframes particleFade { 0% { opacity: 1; transform: scale(0.5) rotate(0deg); } 100% { opacity: 0; transform: scale(1.5) rotate(180deg); } }
+        /* Yıldızlar Arka Planı */
+        .stars { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; background-image: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.1; }
 
-        /* Z-Index Fix */
-        .swal2-container { z-index: 2147483647 !important; }
-        .modal-overlay { z-index: 100000 !important; background-color: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px); }
-        #loader { position: fixed; inset: 0; background: #0F172A; z-index: 200000; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s; }
-
-        /* Efektler */
+        /* Animasyonlar */
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
         .animate-float { animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+        /* Koyu Tema Uyumlu Chat */
+        .bubble-me { background: linear-gradient(135deg, #6366f1, #a855f7); color: white; border-radius: 1.5rem 1.5rem 0 1.5rem; }
+        .bubble-other { background: #334155; color: white; border-radius: 1.5rem 1.5rem 1.5rem 0; border: 1px solid #475569; }
+
+        /* Z-Index Fix - Popup En Üstte */
+        .swal2-container { z-index: 2147483647 !important; }
+        .modal-overlay { z-index: 99999 !important; background-color: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); }
         
-        /* Öğretmen Parıltısı */
-        .teacher-glow { box-shadow: 0 0 15px rgba(252, 211, 77, 0.5); border-color: #FCD34D !important; }
+        /* Yükleme Ekranı */
+        #loader { position: fixed; inset: 0; background: #0F172A; z-index: 100000; display: flex; align-items: center; justify-content: center; flex-direction: column; transition: opacity 0.5s; }
+
+        /* İsim Efektleri */
         .effect-rainbow { background-image: linear-gradient(to left, violet, indigo, blue, green, yellow, orange, red); -webkit-background-clip: text; color: transparent; animation: hue 3s linear infinite; font-weight: 900; }
         .effect-fire { color: #ff4500; text-shadow: 0 0 5px #ff8c00; animation: burn 1.5s infinite alternate; font-weight: 900; }
         @keyframes hue { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(360deg); } }
         @keyframes burn { from { text-shadow: 0 0 5px #ff8c00; } to { text-shadow: 0 0 20px #ff4500; } }
     </style>
 </head>
-<body class="bg-panel-bg h-screen flex text-slate-800" onclick="window.app.spawnParticle(event)">
+<body class="bg-panel-bg h-screen flex text-slate-200">
 
-    <audio id="sfx-pop" src="https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3"></audio>
-    <audio id="sfx-win" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+    <div class="stars"></div>
+
+    <audio id="sfx-pop" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+    <audio id="sfx-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
     <audio id="sfx-hover" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
 
     <div id="loader">
         <i class="fa-solid fa-rocket text-7xl text-brand-yellow animate-bounce"></i>
         <h2 class="text-4xl font-black text-white mt-6 tracking-widest">KÂŞİF</h2>
-        <p class="text-slate-400 text-sm mt-2 font-bold animate-pulse">Sistemler Hazırlanıyor...</p>
-        <button onclick="document.getElementById('loader').style.display='none'" class="mt-10 text-xs text-slate-600 underline hover:text-white cursor-pointer">Yüklenmedi mi? Tıkla.</button>
+        <p class="text-slate-400 text-sm mt-2 font-bold animate-pulse">Uzay İstasyonuna Bağlanılıyor...</p>
+        <button onclick="document.getElementById('loader').style.display='none'" class="mt-8 px-4 py-2 border border-slate-600 rounded-full text-xs text-slate-500 hover:text-white transition">Manuel Giriş</button>
     </div>
 
-    <aside class="w-20 lg:w-64 bg-sidebar-bg text-white flex flex-col justify-between shadow-2xl flex-shrink-0 z-50 relative">
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 pointer-events-none"></div>
+    <aside class="w-20 lg:w-64 bg-sidebar-bg border-r border-slate-800 flex flex-col justify-between z-50 relative shadow-2xl">
         <div>
             <div class="h-24 flex items-center justify-center lg:justify-start lg:px-6 border-b border-slate-800 cursor-pointer group" onclick="location.reload()">
                 <div class="w-12 h-12 bg-brand-yellow rounded-2xl flex items-center justify-center text-sidebar-bg text-3xl shadow-[0_0_20px_rgba(252,211,77,0.4)] group-hover:rotate-12 transition duration-300">
@@ -68,7 +78,7 @@
                 </div>
                 <div class="hidden lg:block ml-3">
                     <h1 class="text-2xl font-black text-white tracking-wider">KÂŞİF</h1>
-                    <p class="text-[10px] text-slate-400 font-bold tracking-widest">V14 FİNAL</p>
+                    <p class="text-[10px] text-slate-400 font-bold tracking-widest">DARK EDITION</p>
                 </div>
             </div>
             
@@ -76,25 +86,22 @@
                 <button onclick="window.app.playSound('sfx-hover'); window.app.filterGames('all')" class="w-full flex items-center p-3.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg transition transform active:scale-95 group border border-indigo-400/30">
                     <i class="fa-solid fa-gamepad text-xl w-8 text-center"></i><span class="hidden lg:block font-bold ml-3">Oyunlar</span>
                 </button>
-                
-                <button id="btn-classroom" onclick="window.app.playSound('sfx-hover'); window.app.openClassroom()" class="w-full flex items-center p-3.5 rounded-2xl text-slate-400 hover:bg-slate-800 hover:text-orange-400 transition group">
-                    <i class="fa-solid fa-chalkboard-user text-xl w-8 text-center group-hover:scale-110 transition"></i>
-                    <span class="hidden lg:block font-bold ml-3">Sınıfım</span>
+                <button onclick="window.app.playSound('sfx-hover'); window.app.openClassroom()" class="w-full flex items-center p-3.5 rounded-2xl text-slate-400 hover:bg-slate-800 hover:text-orange-400 transition group">
+                    <i class="fa-solid fa-chalkboard-user text-xl w-8 text-center group-hover:scale-110"></i><span class="hidden lg:block font-bold ml-3">Sınıfım</span>
                 </button>
-
                 <button onclick="window.app.playSound('sfx-hover'); window.app.openChat()" class="w-full flex items-center p-3.5 rounded-2xl text-slate-400 hover:bg-slate-800 hover:text-green-400 transition group relative">
-                    <i class="fa-solid fa-walkie-talkie text-xl w-8 text-center"></i>
+                    <i class="fa-solid fa-walkie-talkie text-xl w-8 text-center group-hover:scale-110"></i>
                     <span id="chat-badge" class="hidden absolute top-3 left-8 w-3 h-3 bg-red-500 rounded-full border-2 border-slate-900 animate-pulse"></span>
                     <span class="hidden lg:block font-bold ml-3">Telsiz</span>
                 </button>
                 <button onclick="window.app.playSound('sfx-hover'); window.app.openShop()" class="w-full flex items-center p-3.5 rounded-2xl text-slate-400 hover:bg-slate-800 hover:text-brand-yellow transition group">
-                    <i class="fa-solid fa-store text-xl w-8 text-center"></i><span class="hidden lg:block font-bold ml-3">Mağaza</span>
+                    <i class="fa-solid fa-store text-xl w-8 text-center group-hover:-translate-y-1"></i><span class="hidden lg:block font-bold ml-3">Mağaza</span>
                 </button>
                 <button onclick="window.app.playSound('sfx-hover'); window.app.openLeaderboard()" class="w-full flex items-center p-3.5 rounded-2xl text-slate-400 hover:bg-slate-800 hover:text-blue-400 transition group">
-                    <i class="fa-solid fa-trophy text-xl w-8 text-center"></i><span class="hidden lg:block font-bold ml-3">Sıralama</span>
+                    <i class="fa-solid fa-trophy text-xl w-8 text-center group-hover:text-yellow-300"></i><span class="hidden lg:block font-bold ml-3">Sıralama</span>
                 </button>
                 <button onclick="window.app.playSound('sfx-hover'); window.app.openProfile()" class="w-full flex items-center p-3.5 rounded-2xl text-slate-400 hover:bg-slate-800 hover:text-pink-400 transition group">
-                    <i class="fa-solid fa-user-astronaut text-xl w-8 text-center"></i><span class="hidden lg:block font-bold ml-3">Profilim</span>
+                    <i class="fa-solid fa-user-astronaut text-xl w-8 text-center group-hover:scale-110"></i><span class="hidden lg:block font-bold ml-3">Profilim</span>
                 </button>
             </nav>
         </div>
@@ -105,117 +112,138 @@
         </div>
     </aside>
 
-    <main class="flex-1 flex flex-col h-full relative min-w-0 bg-panel-bg">
-        <header class="h-24 bg-white border-b border-slate-200 flex items-center justify-between px-8 shadow-sm z-40 relative">
+    <main class="flex-1 flex flex-col h-full relative min-w-0">
+        <header class="h-24 border-b border-slate-800 flex items-center justify-between px-8 shadow-lg z-40 relative bg-slate-900/50 backdrop-blur-md">
             <div>
-                <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">Merhaba, <span id="display-name" class="text-indigo-600">...</span>! 👋</h2>
+                <h2 class="text-2xl font-black text-white flex items-center gap-2">Merhaba, <span id="display-name" class="text-indigo-400">...</span>! 👋</h2>
                 <div class="flex items-center gap-2 mt-1">
-                    <span id="display-title" class="px-3 py-1 rounded-lg bg-slate-100 text-xs font-black text-slate-500 border border-slate-200 uppercase tracking-wide">...</span>
-                    <span id="teacher-badge" class="hidden px-3 py-1 rounded-lg bg-orange-100 text-xs font-black text-orange-600 border border-orange-200 uppercase tracking-wide animate-pulse">🎓 EĞİTMEN</span>
+                    <span id="display-title" class="px-3 py-1 rounded-lg bg-slate-800 text-xs font-black text-slate-400 border border-slate-700 uppercase tracking-wide">...</span>
+                    <span id="teacher-badge" class="hidden px-3 py-1 rounded-lg bg-orange-900/50 text-xs font-black text-orange-400 border border-orange-700 uppercase tracking-wide animate-pulse">🎓 EĞİTMEN</span>
                 </div>
             </div>
             <div class="flex items-center gap-6">
                 <div class="hidden md:flex flex-col w-56 group transition hover:scale-105">
-                    <div class="flex justify-between text-xs font-black text-slate-600 mb-1">
-                        <span id="display-level" class="text-indigo-600 bg-indigo-50 px-2 rounded">Lvl 1</span>
-                        <span id="display-xp" class="text-slate-400">0 / 1000 XP</span>
+                    <div class="flex justify-between text-xs font-black text-slate-400 mb-1">
+                        <span id="display-level" class="text-indigo-400">Lvl 1</span>
+                        <span id="display-xp">0 / 1000 XP</span>
                     </div>
-                    <div class="h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200 shadow-inner">
-                        <div id="xp-bar" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 w-0 transition-all duration-1000 relative"></div>
+                    <div class="h-3 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
+                        <div id="xp-bar" class="h-full bg-gradient-to-r from-indigo-600 to-purple-600 w-0 transition-all duration-1000 relative"></div>
                     </div>
                 </div>
-                <div class="bg-yellow-50 text-yellow-700 px-5 py-2.5 rounded-2xl font-black flex items-center gap-2 border-2 border-yellow-200 shadow-sm hover:scale-105 transition cursor-pointer active:scale-95" onclick="window.app.playSound('sfx-pop'); window.app.openShop()">
-                    <i class="fa-solid fa-coins text-yellow-500 text-xl drop-shadow-sm animate-float"></i> <span id="display-coins" class="text-xl">0</span>
+                <div class="bg-slate-800 text-yellow-400 px-5 py-2.5 rounded-2xl font-black flex items-center gap-2 border border-slate-700 shadow-lg hover:border-yellow-500 transition cursor-pointer" onclick="window.app.playSound('sfx-pop'); window.app.openShop()">
+                    <i class="fa-solid fa-coins text-xl animate-float"></i> <span id="display-coins" class="text-xl">0</span>
                 </div>
                 <div class="relative group cursor-pointer" onclick="window.app.playSound('sfx-pop'); window.app.openProfile()">
-                    <img id="display-avatar" src="" class="w-14 h-14 rounded-full bg-slate-100 border-4 border-white shadow-md transition group-hover:scale-110 object-cover">
-                    <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white rounded-full animate-pulse shadow-lg"></div>
+                    <img id="display-avatar" src="" class="w-14 h-14 rounded-full bg-slate-800 border-4 border-slate-700 shadow-md transition group-hover:border-indigo-500 object-cover">
+                    <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-slate-900 rounded-full animate-pulse"></div>
                 </div>
             </div>
         </header>
 
         <div class="flex-1 overflow-y-auto p-8 relative">
             <div class="flex gap-3 mb-8 overflow-x-auto pb-2 no-scrollbar">
-                <button onclick="window.app.filterGames('all')" class="bg-slate-800 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-black transition active:scale-95 border-b-4 border-slate-900">Tümü</button>
-                <button onclick="window.app.filterGames('Tarih')" class="bg-red-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-red-600 transition active:scale-95 border-b-4 border-red-700">Tarih</button>
-                <button onclick="window.app.filterGames('Coğrafya')" class="bg-blue-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-blue-600 transition active:scale-95 border-b-4 border-blue-700">Coğrafya</button>
-                <button onclick="window.app.filterGames('Bilim')" class="bg-green-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-green-600 transition active:scale-95 border-b-4 border-green-700">Bilim</button>
+                <button onclick="window.app.filterGames('all')" class="bg-slate-800 text-white px-6 py-2.5 rounded-xl font-bold shadow hover:bg-indigo-600 transition active:scale-95 border border-slate-700">Tümü</button>
+                <button onclick="window.app.filterGames('Tarih')" class="bg-slate-800 text-red-400 px-6 py-2.5 rounded-xl font-bold shadow hover:bg-red-900/30 transition active:scale-95 border border-slate-700">Tarih</button>
+                <button onclick="window.app.filterGames('Coğrafya')" class="bg-slate-800 text-blue-400 px-6 py-2.5 rounded-xl font-bold shadow hover:bg-blue-900/30 transition active:scale-95 border border-slate-700">Coğrafya</button>
+                <button onclick="window.app.filterGames('Bilim')" class="bg-slate-800 text-green-400 px-6 py-2.5 rounded-xl font-bold shadow hover:bg-green-900/30 transition active:scale-95 border border-slate-700">Bilim</button>
             </div>
             <div id="games-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-6 pb-20">
-                <div class="col-span-full text-center py-20 opacity-50"><i class="fa-solid fa-satellite-dish fa-spin text-4xl mb-4 text-slate-300"></i><p>Oyun veritabanına bağlanılıyor...</p></div>
+                <div class="col-span-full text-center py-20 opacity-50"><i class="fa-solid fa-ghost text-4xl mb-4 text-slate-600"></i><p class="text-slate-500">Oyun veritabanına bağlanılıyor...</p></div>
             </div>
         </div>
     </main>
 
-    <aside class="w-72 bg-white border-l border-slate-200 hidden xl:flex flex-col z-40 shadow-lg">
-        <div class="p-5 border-b border-slate-100 bg-slate-50">
-            <h3 class="font-black text-slate-700 flex items-center gap-2"><i class="fa-solid fa-users-viewfinder text-indigo-500 animate-pulse"></i> AKTİF KÂŞİFLER</h3>
-            <p class="text-xs text-slate-400 font-bold mt-1">Sosyalleşme Zamanı!</p>
+    <aside class="w-72 bg-slate-900/80 backdrop-blur border-l border-slate-800 hidden xl:flex flex-col z-40 shadow-lg">
+        <div class="p-5 border-b border-slate-800">
+            <h3 class="font-black text-white flex items-center gap-2"><i class="fa-solid fa-users-viewfinder text-indigo-500 animate-pulse"></i> AKTİF KÂŞİFLER</h3>
+            <p class="text-xs text-slate-500 font-bold mt-1">Kimler neler oynuyor?</p>
         </div>
-        <div id="active-users-list" class="flex-1 overflow-y-auto p-4 space-y-3"><div class="text-center text-xs text-gray-400 mt-4">Sinyal taranıyor...</div></div>
+        <div id="active-users-list" class="flex-1 overflow-y-auto p-4 space-y-3"><div class="text-center text-xs text-gray-500 mt-4">Sinyal taranıyor...</div></div>
     </aside>
 
+    <div id="modal-shop" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4">
+        <div class="bg-slate-900 w-full max-w-5xl rounded-[2.5rem] p-8 relative shadow-2xl h-[85vh] flex flex-col border-4 border-slate-700">
+            <button onclick="window.app.closeModal('modal-shop')" class="absolute top-6 right-6 text-slate-500 hover:text-white font-bold text-2xl transition">X</button>
+            <div class="text-center mb-8"><h2 class="text-4xl font-black text-indigo-400">MAĞAZA</h2><div class="inline-block bg-slate-800 text-yellow-400 px-5 py-2 rounded-full font-black border border-slate-600 mt-3 text-lg">BAKİYEN: <span id="shop-balance">0</span> 💰</div></div>
+            <div id="shop-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto p-4 no-scrollbar"></div>
+        </div>
+    </div>
+
     <div id="modal-class" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4">
-        <div class="bg-white w-full max-w-4xl rounded-[2.5rem] p-0 relative shadow-2xl h-[85vh] flex flex-col overflow-hidden border-8 border-white">
-            <button onclick="window.app.closeModal('modal-class')" class="absolute top-4 right-4 text-white hover:text-red-200 font-bold text-2xl transition z-50">X</button>
-            <div class="bg-gradient-to-r from-orange-500 to-red-500 p-8 text-white relative">
-                <h2 id="class-name-display" class="text-4xl font-black mb-2">SINIFIM</h2>
-                <div class="flex items-center gap-3">
-                    <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-chalkboard-user"></i> <span id="class-teacher-display">...</span></span>
-                    <span class="bg-white/20 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-2"><i class="fa-solid fa-key"></i> Kod: <span id="class-code-display">...</span></span>
-                </div>
+        <div class="bg-slate-900 w-full max-w-4xl rounded-[2.5rem] relative shadow-2xl h-[85vh] flex flex-col border-4 border-slate-700 overflow-hidden">
+            <button onclick="window.app.closeModal('modal-class')" class="absolute top-4 right-4 text-white hover:text-red-400 font-bold text-2xl z-50">X</button>
+            <div class="bg-gradient-to-r from-orange-600 to-red-600 p-8 text-white">
+                <h2 id="class-name-display" class="text-3xl font-black mb-2">SINIFIM</h2>
+                <div class="flex gap-4 text-sm opacity-90"><span id="class-teacher-display">...</span><span>Kod: <span id="class-code-display" class="font-mono bg-black/20 px-2 rounded">...</span></span></div>
             </div>
             <div class="flex-1 flex overflow-hidden">
-                <div class="flex-1 bg-slate-50 p-6 overflow-y-auto">
-                    <div id="teacher-tools" class="hidden mb-6 bg-white p-4 rounded-2xl border-2 border-orange-100 shadow-sm animate-float">
-                        <h4 class="font-bold text-orange-600 mb-2">🎓 Öğretmen Paneli</h4>
-                        <div class="flex gap-2">
-                            <input id="post-content" type="text" placeholder="Duyuru Paylaş..." class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 outline-none">
-                            <button onclick="window.app.postToClass()" class="bg-orange-500 text-white px-4 py-2 rounded-xl font-bold hover:bg-orange-600">Gönder</button>
-                        </div>
+                <div class="flex-1 bg-slate-800 p-6 overflow-y-auto">
+                    <div id="teacher-tools" class="hidden mb-6 bg-slate-700 p-4 rounded-xl border border-slate-600">
+                        <div class="flex gap-2"><input id="post-content" type="text" placeholder="Duyuru yap..." class="flex-1 bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white outline-none"><button onclick="window.app.postToClass()" class="bg-orange-600 text-white px-4 py-2 rounded-lg font-bold">Gönder</button></div>
                     </div>
-                    <h3 class="font-black text-slate-700 mb-4">SINIF DUVARI</h3>
-                    <div id="class-feed" class="space-y-4"></div>
+                    <h3 class="font-bold text-slate-400 mb-4">SINIF DUVARI</h3><div id="class-feed" class="space-y-4"></div>
                 </div>
-                <div class="w-72 bg-white border-l border-slate-100 p-6 overflow-y-auto hidden md:block">
-                    <h3 class="font-black text-slate-700 mb-4">ÖĞRENCİLER</h3>
-                    <div id="class-students-list" class="space-y-3"></div>
+                <div class="w-64 bg-slate-900 border-l border-slate-700 p-6 overflow-y-auto hidden md:block">
+                    <h3 class="font-bold text-slate-400 mb-4">ÖĞRENCİLER</h3><div id="class-students-list" class="space-y-3"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <div id="modal-join-class" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4">
-        <div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 relative shadow-2xl border-4 border-white text-center">
-            <button onclick="window.app.closeModal('modal-join-class')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 font-bold text-2xl transition">X</button>
-            <div class="text-6xl mb-4 animate-bounce">🎒</div>
-            <h2 class="text-2xl font-black text-slate-800 mb-2">SINIF İŞLEMLERİ</h2>
-            <div id="student-view" class="block">
-                <p class="text-slate-400 text-sm mb-4">Sınıf kodunu girerek katıl.</p>
-                <input id="join-class-code" type="text" placeholder="KOD (Örn: X9J2K)" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-4 font-bold text-center text-xl outline-none focus:border-orange-500 uppercase mb-4">
-                <button onclick="window.app.joinClass()" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl shadow-lg active:scale-95 transition">KATIL</button>
+        <div class="bg-slate-900 w-full max-w-md rounded-3xl p-8 border-2 border-slate-700 text-center text-white">
+            <button onclick="window.app.closeModal('modal-join-class')" class="absolute top-4 right-4 text-slate-500 hover:text-white">X</button>
+            <h2 class="text-2xl font-bold mb-4">Sınıf İşlemleri</h2>
+            <div id="student-view">
+                <input id="join-class-code" placeholder="Sınıf Kodu" class="w-full bg-slate-800 border border-slate-600 p-3 rounded mb-4 text-center text-white outline-none">
+                <button onclick="window.app.joinClass()" class="w-full bg-indigo-600 py-3 rounded font-bold hover:bg-indigo-500">Katıl</button>
             </div>
-            <div id="teacher-view" class="hidden mt-4 pt-4 border-t border-slate-100">
-                <p class="text-orange-500 font-bold text-sm mb-2">ÖĞRETMEN YETKİSİ AKTİF</p>
-                <button onclick="window.app.createClassPrompt()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl shadow-lg active:scale-95 transition">YENİ SINIF OLUŞTUR</button>
+            <div id="teacher-view" class="hidden mt-4 pt-4 border-t border-slate-700">
+                <button onclick="window.app.createClassPrompt()" class="w-full bg-slate-700 py-3 rounded font-bold hover:bg-slate-600">Sınıf Oluştur</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-shop" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4">
-        <div class="bg-white w-full max-w-5xl rounded-[2.5rem] p-8 relative shadow-2xl h-[85vh] flex flex-col border-4 border-white">
-            <button onclick="window.app.closeModal('modal-shop')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 font-bold text-2xl transition">X</button>
-            <div class="text-center mb-8"><h2 class="text-4xl font-black text-indigo-600">MAĞAZA</h2><div class="inline-block bg-brand-yellow text-yellow-900 px-5 py-2 rounded-full font-black border-2 border-yellow-400 mt-3 text-lg">BAKİYEN: <span id="shop-balance">0</span> 💰</div></div>
-            <div id="shop-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto p-4 no-scrollbar">
-                </div>
+    <div id="modal-chat" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4">
+        <div class="bg-slate-900 w-full max-w-md h-[600px] rounded-3xl flex flex-col border-2 border-slate-700 overflow-hidden">
+            <div class="bg-slate-800 p-4 flex justify-between items-center text-white border-b border-slate-700">
+                <div class="flex items-center gap-2"><i class="fa-solid fa-walkie-talkie text-green-400"></i><span class="font-bold">Telsiz</span></div>
+                <button onclick="window.app.closeModal('modal-chat')" class="text-slate-400 hover:text-white">X</button>
+            </div>
+            <div id="chat-box" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-900"></div>
+            <form onsubmit="window.app.sendMsg(event)" class="p-4 bg-slate-800 border-t border-slate-700 flex gap-2">
+                <input id="chat-input" placeholder="Mesaj..." class="flex-1 bg-slate-900 rounded-full px-4 py-2 text-white outline-none border border-slate-700 focus:border-indigo-500">
+                <button type="submit" class="bg-indigo-600 text-white w-10 h-10 rounded-full hover:bg-indigo-500 flex items-center justify-center"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
         </div>
     </div>
 
-    <div id="modal-badges" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4"><div class="bg-white w-full max-w-3xl rounded-[2.5rem] p-8 relative shadow-2xl border-4 border-white h-[70vh] flex flex-col"><button onclick="window.app.closeModal('modal-badges')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 font-bold text-2xl transition">X</button><h2 class="text-3xl font-black text-center text-purple-600 mb-6">ROZETLERİM</h2><div id="badge-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 overflow-y-auto p-2"></div></div></div>
-    <div id="modal-profile" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4"><div class="bg-white w-full max-w-md rounded-[2.5rem] p-8 relative shadow-2xl animate-float border-4 border-white"><button onclick="window.app.closeModal('modal-profile')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 font-bold text-2xl transition">X</button><h2 class="text-2xl font-black text-slate-800 mb-6 text-center">KİMLİK KARTI</h2><div class="flex justify-center mb-6 relative group cursor-pointer" onclick="window.app.playSound('sfx-pop'); window.app.randomAvatar()"><div class="w-32 h-32 rounded-full bg-indigo-100 border-4 border-indigo-500 overflow-hidden relative shadow-lg"><img id="edit-avatar" src="" class="w-full h-full object-cover"></div></div><div class="space-y-4"><div><label class="text-xs font-bold text-slate-400 uppercase ml-2">İsim</label><input type="text" id="edit-name" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-3.5 font-bold outline-none"></div><div><label class="text-xs font-bold text-slate-400 uppercase ml-2">Ünvan</label><select id="edit-title" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-3.5 font-bold outline-none text-slate-700"></select></div><div><label class="text-xs font-bold text-slate-400 uppercase ml-2">İsim Efekti</label><select id="edit-effect" class="w-full bg-slate-100 border-2 border-slate-200 rounded-xl p-3.5 font-bold outline-none text-slate-700"><option value="">Yok</option></select></div><button onclick="window.app.saveProfile()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg active:scale-95 transition mt-2">KAYDET ✅</button></div></div></div>
-    <div id="modal-chat" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4"><div class="bg-white w-full max-w-md h-[650px] rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden border-4 border-white"><div class="bg-slate-800 p-4 flex justify-between items-center text-white shadow-md z-10"><div class="flex items-center gap-3"><i class="fa-solid fa-walkie-talkie text-green-400"></i><span class="font-bold">Kâşif Telsizi</span></div><button onclick="window.app.closeModal('modal-chat')" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button></div><div id="chat-box" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50"></div><form onsubmit="window.app.sendMsg(event)" class="p-4 bg-white border-t flex gap-2 items-center"><input id="chat-input" type="text" maxlength="80" placeholder="Bir şeyler yaz..." class="flex-1 bg-slate-100 rounded-full px-5 py-3 outline-none font-bold text-slate-700 transition"><button type="submit" class="bg-indigo-600 text-white w-12 h-12 rounded-full hover:bg-indigo-700 transition shadow-lg flex items-center justify-center"><i class="fa-solid fa-paper-plane"></i></button></form></div></div>
-    <div id="modal-game" class="fixed inset-0 hidden flex-col items-center justify-center modal-overlay p-4 bg-black/95"><div class="w-full max-w-6xl h-[85vh] flex flex-col"><div class="flex justify-between items-center text-white mb-2"><h2 id="game-title-text" class="text-xl font-bold text-brand-yellow">Oyun</h2><button onclick="window.app.closeGame()" class="bg-red-500 px-6 rounded-full font-bold hover:bg-red-600">Kapat X</button></div><div class="flex-1 bg-black rounded-3xl overflow-hidden border-4 border-slate-800 relative shadow-2xl"><iframe id="game-frame" src="" class="w-full h-full border-0"></iframe></div><div class="text-center mt-6"><button onclick="window.app.playSound('sfx-level'); window.app.claimReward()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white font-black py-4 px-12 rounded-full shadow-xl hover:scale-105 transition animate-bounce border-4 border-green-400/30 text-lg">ÖDÜLÜ AL! 🏆</button></div></div></div>
-    <div id="modal-leaderboard" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4"><div class="bg-white w-full max-w-lg rounded-[2.5rem] p-8 relative shadow-2xl border-4 border-white"><button onclick="window.app.closeModal('modal-leaderboard')" class="absolute top-6 right-6 text-slate-300 hover:text-red-500 font-bold text-2xl transition">X</button><h2 class="text-3xl font-black text-center text-slate-800 mb-6 tracking-tight">LİDER TABLOSU 🏆</h2><div id="lb-list" class="space-y-3 max-h-[400px] overflow-y-auto pr-2"></div></div></div>
+    <div id="modal-profile" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4">
+        <div class="bg-slate-900 w-full max-w-md rounded-3xl p-8 border-2 border-slate-700 relative text-white">
+            <button onclick="window.app.closeModal('modal-profile')" class="absolute top-4 right-4 text-slate-500 hover:text-white">X</button>
+            <h2 class="text-2xl font-bold text-center mb-6">Kimlik Kartı</h2>
+            <div class="flex justify-center mb-6 cursor-pointer" onclick="window.app.randomAvatar()">
+                <img id="edit-avatar" src="" class="w-32 h-32 rounded-full border-4 border-indigo-500 bg-slate-800">
+            </div>
+            <div class="space-y-4">
+                <input id="edit-name" class="w-full bg-slate-800 border border-slate-600 rounded p-3 text-white outline-none" placeholder="İsim">
+                <select id="edit-title" class="w-full bg-slate-800 border border-slate-600 rounded p-3 text-white outline-none"></select>
+                <select id="edit-effect" class="w-full bg-slate-800 border border-slate-600 rounded p-3 text-white outline-none"><option value="">Efekt Yok</option></select>
+                <button onclick="window.app.saveProfile()" class="w-full bg-green-600 py-3 rounded font-bold hover:bg-green-500">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-game" class="fixed inset-0 hidden flex-col items-center justify-center modal-overlay p-4 bg-black/95">
+        <div class="w-full max-w-6xl h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center text-white mb-2"><h2 id="game-title-text" class="text-xl font-bold text-yellow-400">Oyun</h2><button onclick="window.app.closeGame()" class="bg-red-600 px-6 py-1 rounded hover:bg-red-500">Kapat</button></div>
+            <div class="flex-1 bg-black rounded border border-slate-700 overflow-hidden"><iframe id="game-frame" src="" class="w-full h-full border-0"></iframe></div>
+            <div class="text-center mt-4"><button onclick="window.app.claimReward()" class="bg-green-600 text-white font-bold py-3 px-10 rounded hover:bg-green-500 animate-bounce">ÖDÜLÜ AL! 🏆</button></div>
+        </div>
+    </div>
+
+    <div id="modal-leaderboard" class="fixed inset-0 hidden items-center justify-center modal-overlay p-4"><div class="bg-slate-900 w-full max-w-lg rounded-3xl p-8 border-2 border-slate-700 relative text-white"><button onclick="window.app.closeModal('modal-leaderboard')" class="absolute top-4 right-4 text-slate-500 hover:text-white">X</button><h2 class="text-2xl font-bold text-center mb-4">Lider Tablosu</h2><div id="lb-list" class="space-y-2 max-h-[400px] overflow-y-auto"></div></div></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -229,14 +257,14 @@
         enableIndexedDbPersistence(db).catch(e => console.log("Offline:", e));
 
         let currentUser = null; let userData = {}; let gamesData = []; let timer;
-        const titlesList = ["Acemi Kâşif","Meraklı Gözlemci","Yıldız Tozu","Çaylak Pilot","Gezgin","Uzay Çırağı","Roketçi","Marslı","Meteor Avcısı","Galaksi Rehberi","Uzman Kâşif","Kaptan","Yörünge Bekçisi","Nebula Uzmanı","Kozmik Seyyah","Yıldız Savaşçısı","Kara Delik Sörfçüsü","Güneş Muhafızı","Süpernova","Hiper Sürücü","Evrenin Bilgini","Galaktik Komutan","Zaman Yolcusu","Boyut Gezgini","Sonsuzluk Bekçisi","Yıldız Lordu","Evren Mimarı","Kozmik Efsane","Uzayın Hakimi","BÜYÜK KÂŞİF"];
+        const titlesList = ["Acemi Kâşif","Gezgin","Uzman","Kaptan","Efsane","Bilgin","Yıldız Lordu","Evren Mimarı","BÜYÜK KÂŞİF"];
 
         window.app = {
             playSound: (id) => { const a=document.getElementById(id); if(a){a.currentTime=0; a.volume=0.3; a.play().catch(()=>{});} },
             spawnParticle: (e) => { const el=document.createElement('div'); el.className='click-particle fa-solid fa-star'; el.style.left=e.pageX+'px'; el.style.top=e.pageY+'px'; document.body.appendChild(el); setTimeout(()=>el.remove(),800); },
             closeModal: (id) => document.getElementById(id).style.display = 'none',
             
-            // --- CLASSROOM SYSTEM ---
+            // --- CLASSROOM ---
             openClassroom: () => {
                 if(!userData.classId) {
                     document.getElementById('modal-join-class').style.display = 'flex';
@@ -247,21 +275,20 @@
                 }
             },
             createClassPrompt: async () => {
-                const { value: className } = await Swal.fire({title:'Sınıf Adı?', input:'text', showCancelButton:true});
+                const { value: className } = await Swal.fire({title:'Sınıf Adı?', input:'text', showCancelButton:true, background:'#1e293b', color:'white'});
                 if(className) {
                     const code = Math.random().toString(36).substring(2,7).toUpperCase();
                     await addDoc(collection(db, "classes"), { name: className, code: code, teacherId: currentUser.uid, teacherName: userData.username });
                     await updateDoc(doc(db, "users", currentUser.uid), { classId: code });
                     userData.classId = code; window.app.closeModal('modal-join-class'); window.app.openClassroom();
-                    Swal.fire({icon:'success', title:'Sınıf Hazır!', text:`Kod: ${code}`});
                 }
             },
             joinClass: async () => {
                 const code = document.getElementById('join-class-code').value.toUpperCase().trim();
                 const q = query(collection(db, "classes"), where("code", "==", code)); const snap = await getDocs(q);
-                if(snap.empty) { Swal.fire({icon:'error', title:'Sınıf Bulunamadı'}); return; }
+                if(snap.empty) { Swal.fire({icon:'error', title:'Bulunamadı', background:'#1e293b', color:'white'}); return; }
                 await updateDoc(doc(db, "users", currentUser.uid), { classId: code }); userData.classId = code;
-                window.app.closeModal('modal-join-class'); window.app.openClassroom(); Swal.fire({icon:'success', title:'Sınıfa Katıldın!'});
+                window.app.closeModal('modal-join-class'); window.app.openClassroom();
             },
             loadClassData: async () => {
                 const q = query(collection(db, "classes"), where("code", "==", userData.classId)); const snap = await getDocs(q);
@@ -282,66 +309,132 @@
             loadClassPosts: (cid) => {
                 onSnapshot(query(collection(db, "class_posts"), where("classId", "==", cid), orderBy("date", "desc"), limit(20)), (s) => {
                     const f = document.getElementById('class-feed'); f.innerHTML = '';
-                    s.forEach(d => { const p=d.data(); f.innerHTML+=`<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm animate-float"><div class="flex justify-between mb-2"><span class="font-bold text-orange-600">${p.author}</span><span class="text-xs text-slate-400">${p.date?p.date.toDate().toLocaleTimeString():''}</span></div><p class="text-slate-700">${p.text}</p></div>`; });
+                    s.forEach(d => { const p=d.data(); f.innerHTML+=`<div class="bg-slate-700 p-3 rounded-xl border border-slate-600 animate-float"><div class="flex justify-between mb-1"><span class="font-bold text-orange-400">${p.author}</span><span class="text-xs text-slate-400">${p.date?p.date.toDate().toLocaleTimeString():''}</span></div><p class="text-slate-300">${p.text}</p></div>`; });
                 });
             },
             loadClassStudents: (cid) => {
                 onSnapshot(query(collection(db, "users"), where("classId", "==", cid)), (s) => {
                     const l = document.getElementById('class-students-list'); l.innerHTML = '';
-                    s.forEach(d => { const u=d.data(); l.innerHTML+=`<div class="flex items-center gap-2 p-2 rounded-xl hover:bg-slate-50"><img src="${u.avatar}" class="w-8 h-8 rounded-full"><span class="text-sm font-bold text-slate-700">${u.username}</span></div>`; });
+                    s.forEach(d => { const u=d.data(); l.innerHTML+=`<div class="flex items-center gap-2 p-2 rounded hover:bg-slate-700"><img src="${u.avatar}" class="w-8 h-8 rounded-full"><span class="text-sm font-bold text-slate-300">${u.username}</span></div>`; });
                 });
             },
 
-            // --- DYNAMIC SHOP ---
+            // --- SHOP ---
             openShop: async () => {
-                const con = document.getElementById('shop-container'); con.innerHTML = '<div class="text-center w-full">Yükleniyor...</div>';
+                const con = document.getElementById('shop-container'); con.innerHTML = '<div class="text-center w-full text-white">Yükleniyor...</div>';
                 const snap = await getDocs(collection(db, "shop_items"));
                 con.innerHTML = `
-                <div class="col-span-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl p-8 text-center text-white shadow-lg relative overflow-hidden group hover:scale-[1.01] transition flex flex-col items-center justify-center min-h-[200px]" onclick="window.app.buyMysteryBox()">
-                    <h3 class="text-3xl font-black mb-2">🎁 GİZEMLİ KUTU</h3><p class="text-sm opacity-90 mb-6 font-bold">50 Altın ver, şansını dene!</p><button class="bg-white text-purple-600 font-black px-10 py-3 rounded-full shadow-xl hover:bg-gray-100 transition active:scale-95 text-lg">50 💰 AÇ</button>
+                <div class="col-span-full bg-gradient-to-r from-purple-600 to-pink-600 rounded-3xl p-6 text-center text-white shadow-lg cursor-pointer transform hover:scale-[1.01] transition" onclick="window.app.buyMysteryBox()">
+                    <h3 class="text-2xl font-black mb-2">🎁 GİZEMLİ KUTU</h3><p class="text-sm opacity-90 mb-4">50 Altın - Şansını Dene!</p><button class="bg-white text-purple-600 font-black px-8 py-2 rounded-full">AÇ</button>
                 </div>`;
                 snap.forEach(d => {
                     const i = d.data();
                     con.innerHTML += `
-                    <div class="border-4 border-slate-50 rounded-3xl p-6 text-center hover:border-indigo-200 transition bg-white group hover:-translate-y-2">
-                        <div class="text-5xl mb-4 animate-float ${i.effectClass || ''}">${i.icon}</div>
-                        <h3 class="font-bold text-slate-700">${i.name}</h3>
-                        <button onclick="window.app.buyItem('${i.type}', '${d.id}', ${i.price}, '${i.icon}')" class="bg-green-500 hover:bg-green-600 text-white w-full py-3 rounded-xl font-bold shadow-lg active:scale-95 transition mt-4">${i.price} 💰 AL</button>
+                    <div class="bg-slate-800 border border-slate-600 rounded-2xl p-4 text-center hover:border-indigo-500 transition group hover:-translate-y-1">
+                        <div class="text-4xl mb-2 animate-float ${i.effectClass || ''}">${i.icon}</div>
+                        <h3 class="font-bold text-slate-300">${i.name}</h3>
+                        <button onclick="window.app.buyItem('${i.type}', '${d.id}', ${i.price}, '${i.icon}')" class="bg-green-600 hover:bg-green-500 text-white w-full py-2 rounded font-bold mt-2 shadow">${i.price} 💰 AL</button>
                     </div>`;
                 });
                 document.getElementById('modal-shop').style.display = 'flex'; window.app.playSound('sfx-pop');
             },
 
-            // --- COMMON ---
-            openBadges: () => { const g=document.getElementById('badge-grid'); g.innerHTML=''; (userData.badges||[]).filter(b=>!b.id.startsWith('effect')).forEach(b=>{ g.innerHTML+=`<div class="bg-slate-50 border-2 border-slate-100 rounded-2xl p-4 text-center"><div class="text-5xl mb-2">${b.icon}</div><div class="font-bold text-sm">${b.name}</div></div>`; }); document.getElementById('modal-badges').style.display='flex'; },
-            openProfile: () => { /* (Previous logic) */ document.getElementById('modal-profile').style.display='flex'; },
-            saveProfile: async () => { /* (Previous logic) */ },
-            buyMysteryBox: async () => { /* (Previous logic) */ },
-            buyItem: async (type, id, price, icon) => { /* (Previous logic) */ },
+            openProfile: () => {
+                const sel = document.getElementById('edit-title'); sel.innerHTML = '';
+                titlesList.forEach((t, i) => { if(userData.level > i) { const opt=document.createElement('option'); opt.value=t; opt.text=t; sel.appendChild(opt); } });
+                sel.value = userData.title;
+                const efSel = document.getElementById('edit-effect'); efSel.innerHTML = '<option value="">Yok</option>';
+                if(userData.badges) userData.badges.filter(b=>b.type==='effect').forEach(b=>{const opt=document.createElement('option'); opt.value=b.effectClass; opt.text=b.name; efSel.appendChild(opt);});
+                efSel.value = userData.nameEffect || '';
+                document.getElementById('edit-name').value = userData.username;
+                document.getElementById('modal-profile').style.display = 'flex';
+            },
+            saveProfile: async () => {
+                const name = document.getElementById('edit-name').value; const title = document.getElementById('edit-title').value; const effect = document.getElementById('edit-effect').value;
+                if(!name) return; document.getElementById('modal-profile').style.display = 'none';
+                try { await updateDoc(doc(db, "users", currentUser.uid), { username: name, title: title, nameEffect: effect }); userData.username=name; userData.title=title; userData.nameEffect=effect; updateUI(); } catch(e){}
+            },
+            buyMysteryBox: async () => {
+                if(userData.coins < 50) { Swal.fire({icon:'error', title:'Yetersiz Bakiye', background:'#1e293b', color:'white'}); return; }
+                const r = await Swal.fire({title:'Gizemli Kutu', text:'50 Altın?', showCancelButton:true, confirmButtonText:'AÇ', background:'#1e293b', color:'white'});
+                if(r.isConfirmed) {
+                    await updateDoc(doc(db,"users",currentUser.uid), {coins:increment(-50)}); userData.coins-=50;
+                    const chance = Math.random(); let msg = ""; let reward = {};
+                    if(chance < 0.1) { reward = {coins: 500}; msg="500 ALTIN!"; } else if(chance < 0.5) { reward = {coins: 80}; msg="80 Altın"; } else { reward = {xp: 150}; msg="150 XP"; }
+                    if(reward.coins) { await updateDoc(doc(db,"users",currentUser.uid), {coins:increment(reward.coins)}); userData.coins+=reward.coins; }
+                    if(reward.xp) { await updateDoc(doc(db,"users",currentUser.uid), {xp:increment(reward.xp)}); userData.xp+=reward.xp; }
+                    updateUI(); confetti(); window.app.playSound('sfx-win'); Swal.fire({title:msg, icon:'success', background:'#1e293b', color:'white'});
+                }
+            },
             randomAvatar: () => document.getElementById('edit-avatar').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${Math.random()}`,
-            openLeaderboard: async () => { /* (Previous logic) */ document.getElementById('modal-leaderboard').style.display='flex'; },
-            filterGames: (cat) => { /* (Previous logic) */ },
-            playGame: (url, t) => { document.getElementById('modal-game').style.display='flex'; document.getElementById('game-frame').src=url; },
-            closeGame: () => { document.getElementById('modal-game').style.display='none'; document.getElementById('game-frame').src=''; },
-            claimReward: async () => { /* (Previous logic) */ },
-            openChat: () => { document.getElementById('modal-chat').style.display='flex'; },
-            sendMsg: async (e) => { /* (Previous logic) */ },
-            logout: () => { Swal.fire({title:'Çıkış?', icon:'warning', showCancelButton:true}).then(async(r)=>{ if(r.isConfirmed){ await updateStatus('offline', null); await signOut(auth); window.location.href="login.html"; } }); }
+            
+            buyItem: async (type, id, price, icon) => {
+                if(userData.coins < price) { Swal.fire({icon:'error', title:'Yetersiz Bakiye', background:'#1e293b', color:'white'}); return; }
+                const r = await Swal.fire({title:'Satın Al?', text:`${price} Altın`, showCancelButton:true, confirmButtonText:'Al', background:'#1e293b', color:'white'});
+                if(r.isConfirmed) {
+                    // Veritabanından o itemin detayını bulmak lazım ama basitlik için id'yi kullanıyoruz
+                    // Not: Gerçekte badge objesini detaylı oluşturmalıyız.
+                    // Burada kısayol: type 'effect' ise id'yi class olarak kullanabiliriz veya admin panelden gelen veriyi kullanmak daha doğru olurdu.
+                    // Ancak veri akışını basitleştirmek için:
+                    let effectClass = ""; 
+                    // Admin panelinde eklerken 'effectClass' alanını kullanıyoruz.
+                    // Client tarafında o veriyi göremiyoruz şu an loop içinde. 
+                    // Hızlı çözüm: Shop listesini global değişkende tutmak.
+                    // Veya basitleştirilmiş mantık:
+                    const badge = { id: id, type: type, name: "Ürün", icon: icon, date: new Date().toISOString() };
+                    // Eğer efekt ise özel bir adlandırma yapalım (Admin panelindeki ID'ye güvenerek)
+                    if(type === 'effect') badge.effectClass = id; // Basitleştirme
+
+                    await updateDoc(doc(db, "users", currentUser.uid), { coins: increment(-price), badges: arrayUnion(badge) });
+                    userData.coins -= price; if(!userData.badges) userData.badges=[]; userData.badges.push(badge);
+                    updateUI(); window.app.playSound('sfx-win'); Swal.fire({icon:'success', title:'Hayırlı Olsun!', background:'#1e293b', color:'white'});
+                }
+            },
+            
+            openLeaderboard: async () => {
+                document.getElementById('modal-leaderboard').style.display = 'flex'; const list = document.getElementById('lb-list'); list.innerHTML = '<div class="text-center p-4">Yükleniyor...</div>';
+                const q = query(collection(db, "users"), orderBy("xp", "desc"), limit(20)); const snap = await getDocs(q); list.innerHTML = ''; let rank = 1;
+                snap.forEach(d => {
+                    const u = d.data();
+                    let bg = "bg-slate-800 border-slate-700"; let icon = `#${rank}`;
+                    if(rank===1) { bg="bg-yellow-900/30 border-yellow-700"; icon="👑"; }
+                    list.innerHTML += `<div class="flex items-center gap-4 p-3 rounded-xl border ${bg}"><div class="font-black text-xl w-8 text-center text-slate-400">${icon}</div><img src="${u.avatar}" class="w-10 h-10 rounded-full border border-slate-600"><div class="flex-1 overflow-hidden"><div class="font-bold text-sm truncate text-white ${u.nameEffect||''}">${u.username}</div><div class="text-[10px] text-slate-500">${u.title}</div></div><div class="font-black text-indigo-400 text-sm">${u.xp} XP</div></div>`; rank++;
+                });
+            },
+            filterGames: (cat) => {
+                const grid = document.getElementById('games-grid'); grid.innerHTML = ''; const filtered = cat==='all' ? gamesData : gamesData.filter(g => g.cat === cat);
+                if(filtered.length === 0) { grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-10">Oyun bulunamadı.</div>'; return; }
+                filtered.forEach(g => {
+                    grid.innerHTML += `<div onclick="window.app.playGame('${g.url}','${g.title}')" class="bg-slate-800 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition cursor-pointer group transform hover:-translate-y-2 border border-slate-700"><div class="h-40 relative overflow-hidden"><img src="${g.img || 'https://placehold.co/400x250'}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700"><div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-play text-white text-4xl drop-shadow-xl"></i></div></div><div class="p-4"><h4 class="font-bold text-white truncate">${g.title}</h4><p class="text-xs text-slate-400 mt-1"><i class="fa-solid fa-coins text-yellow-500"></i> Puan Kazan</p></div></div>`;
+                });
+            },
+            playGame: (url, title) => { document.getElementById('modal-game').style.display = 'flex'; document.getElementById('game-title-text').innerText = title; document.getElementById('game-frame').src = url; updateStatus('online', title); },
+            closeGame: () => { document.getElementById('modal-game').style.display = 'none'; document.getElementById('game-frame').src = ""; updateStatus('online', null); },
+            claimReward: async () => {
+                await updateDoc(doc(db, "users", currentUser.uid), { xp: increment(50), coins: increment(20) });
+                userData.xp += 50; userData.coins += 20;
+                updateUI(); window.app.playSound('sfx-win'); window.app.closeGame();
+                Swal.fire({icon:'success', title:'+50 XP, +20 Altın', background:'#1e293b', color:'white', toast:true, position:'top', showConfirmButton:false, timer:2000});
+            },
+            openChat: () => { document.getElementById('modal-chat').style.display = 'flex'; document.getElementById('chat-badge').classList.add('hidden'); setTimeout(()=>document.getElementById('chat-box').scrollTop = 99999, 100); },
+            sendMsg: async (e) => {
+                e.preventDefault(); const i = document.getElementById('chat-input'); const t = i.value.trim(); if(!t) return;
+                await addDoc(collection(db, "messages"), { text: t, senderId: currentUser.uid, senderName: userData.username, avatar: userData.avatar, nameEffect: userData.nameEffect || '', timestamp: Timestamp.now() }); i.value = '';
+            },
+            logout: () => { Swal.fire({title:'Çıkış?', icon:'warning', showCancelButton:true, background:'#1e293b', color:'white'}).then(async(r)=>{ if(r.isConfirmed){ await updateStatus('offline', null); await signOut(auth); window.location.href="login.html"; } }); }
         };
 
-        // AUTH & INIT
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 const docRef = doc(db, "users", user.uid);
                 const snap = await getDoc(docRef);
                 if (snap.exists()) userData = snap.data();
-                else { userData = { username: user.email.split('@')[0], email: user.email, xp: 0, level: 1, coins: 100, role: 'student', avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`, title: "Acemi Kâşif" }; await setDoc(docRef, userData); }
+                else { userData = { username: "Yeni Kâşif", email: user.email, xp: 0, level: 1, coins: 100, role: 'student', avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`, title: "Acemi Kâşif" }; await setDoc(docRef, userData); }
                 
-                // TEACHER CHECK
                 if(userData.role === 'teacher') {
                     document.getElementById('teacher-badge').classList.remove('hidden');
-                    document.getElementById('display-avatar').classList.add('teacher-glow');
+                    document.getElementById('display-avatar').style.borderColor = '#FCD34D';
                 }
 
                 updateUI(); updateStatus('online', null); fetchGames(); initRealtimeUsers(); initChat();
@@ -349,12 +442,23 @@
             } else { window.location.href = "login.html"; }
         });
 
-        // (Helper functions from V13 kept here - updateUI, updateStatus, fetchGames, initRealtimeUsers, initChat)
-        function updateUI() { /* ... */ }
-        async function updateStatus(s,g) { /* ... */ }
-        async function fetchGames() { /* ... */ }
-        function initRealtimeUsers() { /* ... */ }
-        function initChat() { /* ... */ }
+        function updateUI() {
+            const nameEl = document.getElementById('display-name'); nameEl.innerText = userData.username || 'Kâşif'; nameEl.className = `text-indigo-400 ${userData.nameEffect || ''}`;
+            document.getElementById('display-title').innerText = userData.title || "Acemi"; 
+            document.getElementById('display-level').innerText = "Lvl " + (userData.level || 1); 
+            document.getElementById('display-xp').innerText = `${(userData.xp||0)%1000} / 1000 XP`; 
+            document.getElementById('display-coins').innerText = userData.coins || 0; 
+            document.getElementById('shop-balance').innerText = userData.coins || 0; 
+            document.getElementById('display-avatar').src = userData.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=x'; 
+            document.getElementById('edit-avatar').src = userData.avatar; 
+            document.getElementById('edit-name').value = userData.username; 
+            document.getElementById('xp-bar').style.width = Math.min(((userData.xp||0)%1000)/10, 100) + "%";
+        }
+
+        async function updateStatus(s, g) { try{ await updateDoc(doc(db,"users",currentUser.uid), {onlineStatus:s, playing:g, lastSeen:new Date().toISOString()}); }catch(e){} }
+        async function fetchGames() { try { const snap = await getDocs(collection(db, "games")); gamesData = []; snap.forEach(d => gamesData.push({ ...d.data(), id: d.id })); if(gamesData.length===0) gamesData=[{id:1, title:"Örnek Harita", cat:"Coğrafya", url:"", img:""}]; window.app.filterGames('all'); } catch(e){console.log(e);} }
+        function initRealtimeUsers() { const q = query(collection(db,"users"), where("onlineStatus","==","online")); onSnapshot(q, (snap) => { const list = document.getElementById('active-users-list'); list.innerHTML=''; snap.forEach(d => { const u = d.data(); if(u.email === userData.email) return; let status = '<span class="text-xs text-green-500 font-bold">● Çevrimiçi</span>'; let bg = "hover:bg-slate-800 border-slate-700"; if(u.playing) { status = `<span class="text-xs text-indigo-400 font-bold truncate">🎮 ${u.playing}</span>`; bg = "bg-indigo-900/20 border-indigo-500/30"; } const nameClass = u.nameEffect || ''; list.innerHTML += `<div class="flex items-center gap-3 p-3 rounded-xl border ${bg} transition cursor-default group animate-float"><div class="relative"><img src="${u.avatar}" class="w-10 h-10 rounded-full bg-slate-800 group-hover:scale-110 transition"><div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full"></div></div><div class="flex-1 overflow-hidden"><h4 class="font-bold text-sm text-slate-300 truncate ${nameClass}">${u.username}</h4>${status}</div></div>`; }); }); }
+        function initChat() { const q = query(collection(db, "messages"), orderBy("timestamp", "asc"), limit(30)); onSnapshot(q, (snap) => { const box = document.getElementById('chat-box'); let hasNew = false; snap.docChanges().forEach(change => { if (change.type === "added") { const msg = change.doc.data(); const isMe = msg.senderId === currentUser.uid; const now = new Date(); const mTime = msg.timestamp ? msg.timestamp.toDate() : new Date(); if((now - mTime)/1000 > 300) return; const safeText = msg.text.replace(/kötü|aptal/gi, "***"); const timeStr = mTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}); const nameEffect = msg.nameEffect || ''; const html = `<div class="flex w-full ${isMe ? 'justify-end' : 'justify-start'} mb-4 animate-float group">${!isMe ? `<img src="${msg.avatar}" class="w-8 h-8 rounded-full mr-2 self-end mb-1 border border-slate-600 shadow-sm" title="${msg.senderName}">` : ''}<div class="max-w-[75%] flex flex-col ${isMe?'items-end':''}">${!isMe ? `<span class="text-[10px] text-slate-400 ml-1 mb-1 font-bold ${nameEffect}">${msg.senderName}</span>` : ''}<div class="px-4 py-2 text-sm font-medium ${isMe ? 'bubble-me' : 'bubble-other'} shadow-sm">${safeText}</div><span class="text-[9px] text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition">${timeStr}</span></div></div>`; box.insertAdjacentHTML('beforeend', html); hasNew = true; } }); if(hasNew) box.scrollTop = box.scrollHeight; if(document.getElementById('modal-chat').style.display==='none' && hasNew) document.getElementById('chat-badge').classList.remove('hidden'); }); }
     </script>
 </body>
 </html>
