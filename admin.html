@@ -2,49 +2,43 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>KÂŞİF - YÖNETİM MERKEZİ</title>
+    <title>KÂŞİF - Görev Kontrol Merkezi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body { font-family: sans-serif; background-color: #0f172a; color: #e2e8f0; }
-        .swal2-container { z-index: 99999 !important; }
+        .swal2-container { z-index: 999999 !important; }
         .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .action-btn { transition: all 0.2s; }
-        .action-btn:hover { transform: translateY(-2px); }
+        /* Modal Overlay */
+        .modal-overlay { z-index: 50; background-color: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
     <aside class="w-72 bg-slate-900 border-r border-slate-700 flex flex-col shadow-2xl z-20">
-        <div class="h-24 flex items-center justify-center border-b border-slate-700">
+        <div class="h-24 flex items-center justify-center border-b border-slate-700 bg-slate-950">
             <div class="text-center">
                 <h1 class="text-2xl font-black text-red-500 tracking-widest"><i class="fa-solid fa-shield-halved mr-2"></i>ADMIN</h1>
-                <p class="text-[10px] text-slate-500 font-mono">SYSTEM V2.0 - ROOT ACCESS</p>
+                <p class="text-[10px] text-slate-500 font-mono">SYSTEM V16 - ROOT ACCESS</p>
             </div>
         </div>
         
         <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
             <div class="text-xs font-bold text-slate-500 uppercase ml-2 mb-2 mt-2">Kullanıcı & Sınıf</div>
-            <button onclick="switchTab('users')" class="w-full text-left p-3 rounded-xl hover:bg-slate-800 transition flex items-center gap-3 bg-slate-800 text-white shadow-lg tab-btn" id="btn-users">
+            <button onclick="window.admin.switchTab('users')" class="w-full text-left p-3 rounded-xl hover:bg-slate-800 transition flex items-center gap-3 bg-slate-800 text-white shadow-lg tab-btn" id="btn-users">
                 <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center"><i class="fa-solid fa-users"></i></div>
                 <span>Öğrenci Yönetimi</span>
             </button>
             
             <div class="text-xs font-bold text-slate-500 uppercase ml-2 mb-2 mt-4">İçerik & Ekonomi</div>
-            <button onclick="switchTab('shop')" class="w-full text-left p-3 rounded-xl hover:bg-slate-800 transition flex items-center gap-3 tab-btn" id="btn-shop">
+            <button onclick="window.admin.switchTab('shop')" class="w-full text-left p-3 rounded-xl hover:bg-slate-800 transition flex items-center gap-3 tab-btn" id="btn-shop">
                 <div class="w-8 h-8 rounded bg-yellow-600 flex items-center justify-center"><i class="fa-solid fa-store"></i></div>
                 <span>Mağaza & Ürünler</span>
             </button>
-            <button onclick="switchTab('games')" class="w-full text-left p-3 rounded-xl hover:bg-slate-800 transition flex items-center gap-3 tab-btn" id="btn-games">
+            <button onclick="window.admin.switchTab('games')" class="w-full text-left p-3 rounded-xl hover:bg-slate-800 transition flex items-center gap-3 tab-btn" id="btn-games">
                 <div class="w-8 h-8 rounded bg-green-600 flex items-center justify-center"><i class="fa-solid fa-gamepad"></i></div>
                 <span>Oyun Kütüphanesi</span>
-            </button>
-
-            <div class="text-xs font-bold text-slate-500 uppercase ml-2 mb-2 mt-4">Sistem Kontrolü</div>
-            <button onclick="switchTab('system')" class="w-full text-left p-3 rounded-xl hover:bg-slate-800 transition flex items-center gap-3 tab-btn" id="btn-system">
-                <div class="w-8 h-8 rounded bg-red-600 flex items-center justify-center"><i class="fa-solid fa-server"></i></div>
-                <span>Sistem Ayarları</span>
             </button>
         </nav>
 
@@ -59,13 +53,10 @@
         <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 pointer-events-none"></div>
 
         <header class="h-20 border-b border-slate-800 flex items-center justify-between px-8 bg-slate-900/80 backdrop-blur z-10">
-            <h2 id="page-title" class="text-2xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-users-gear text-blue-500"></i> Öğrenci Kontrol Paneli</h2>
+            <h2 class="text-2xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-users-gear text-blue-500"></i> Yönetim Paneli</h2>
             <div class="flex gap-4">
                 <div class="bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 text-xs">
-                    <span class="text-slate-400">Toplam Kullanıcı:</span> <span id="stat-users" class="font-bold text-white text-lg ml-1">0</span>
-                </div>
-                <div class="bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 text-xs">
-                    <span class="text-slate-400">Ekonomi Hacmi:</span> <span id="stat-economy" class="font-bold text-yellow-400 text-lg ml-1">0</span> 💰
+                    <span class="text-slate-400">Öğrenci Sayısı:</span> <span id="stat-users" class="font-bold text-white text-lg ml-1">0</span>
                 </div>
             </div>
         </header>
@@ -73,13 +64,13 @@
         <div class="flex-1 overflow-y-auto p-8 relative z-10">
             
             <div id="tab-users" class="content-tab space-y-6">
-                <div class="flex gap-4">
-                    <input type="text" id="user-search" placeholder="Öğrenci ara (İsim, E-posta)..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-4 text-white outline-none focus:border-blue-500 transition">
-                    <button onclick="loadUsers()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 rounded-xl font-bold transition shadow-lg"><i class="fa-solid fa-rotate mr-2"></i> Yenile</button>
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-white">Kayıtlı Kâşifler</h3>
+                    <button onclick="window.admin.loadUsers()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-bold shadow-lg flex items-center gap-2"><i class="fa-solid fa-rotate"></i> Yenile</button>
                 </div>
-
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-4" id="users-grid">
-                    </div>
+                    <div class="text-slate-500">Kullanıcılar yükleniyor...</div>
+                </div>
             </div>
 
             <div id="tab-shop" class="content-tab hidden space-y-6">
@@ -88,7 +79,7 @@
                         <h3 class="text-xl font-bold text-white">Mağaza Kataloğu</h3>
                         <p class="text-slate-400 text-sm">Öğrencilerin alabileceği ürünleri yönet.</p>
                     </div>
-                    <button onclick="openShopModal()" class="bg-yellow-600 hover:bg-yellow-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition flex items-center gap-2"><i class="fa-solid fa-plus"></i> Ürün Ekle</button>
+                    <button onclick="window.admin.openModal('modal-add-shop')" class="bg-yellow-600 hover:bg-yellow-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2"><i class="fa-solid fa-plus"></i> Ürün Ekle</button>
                 </div>
                 <div id="shop-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
             </div>
@@ -99,56 +90,24 @@
                         <h3 class="text-xl font-bold text-white">Oyun Kütüphanesi</h3>
                         <p class="text-slate-400 text-sm">LearningApps, Wordwall vb. embed kodlarını ekle.</p>
                     </div>
-                    <button onclick="openGameModal()" class="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition flex items-center gap-2"><i class="fa-solid fa-plus"></i> Oyun Ekle</button>
+                    <button onclick="window.admin.openModal('modal-add-game')" class="bg-green-600 hover:bg-green-500 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center gap-2"><i class="fa-solid fa-plus"></i> Oyun Ekle</button>
                 </div>
                 <div id="games-grid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
-            </div>
-
-            <div id="tab-system" class="content-tab hidden">
-                <h3 class="text-2xl font-bold text-white mb-6">Acil Durum ve Sistem Yönetimi</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-700">
-                        <div class="text-purple-500 text-4xl mb-4"><i class="fa-solid fa-comments"></i></div>
-                        <h4 class="font-bold text-lg mb-2">Sohbet Kontrolü</h4>
-                        <p class="text-slate-400 text-sm mb-4">Tüm sohbet geçmişini siler veya duyuru yapar.</p>
-                        <div class="space-y-2">
-                            <button onclick="clearChat()" class="w-full bg-slate-800 hover:bg-red-900/50 text-red-400 py-2 rounded-lg font-bold border border-red-900/30 transition">Temizle</button>
-                            <button onclick="sendGlobalAnnouncement()" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 rounded-lg font-bold transition">Duyuru Yap</button>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-700">
-                        <div class="text-yellow-500 text-4xl mb-4"><i class="fa-solid fa-coins"></i></div>
-                        <h4 class="font-bold text-lg mb-2">Global Ekonomi</h4>
-                        <p class="text-slate-400 text-sm mb-4">Herkese hediye dağıt veya ekonomiyi sıfırla.</p>
-                        <div class="space-y-2">
-                            <button onclick="giftAllUsers()" class="w-full bg-yellow-600 hover:bg-yellow-500 text-white py-2 rounded-lg font-bold transition">🎁 Herkese Altın Dağıt</button>
-                            <button onclick="resetEconomy()" class="w-full bg-slate-800 hover:bg-red-900/50 text-red-400 py-2 rounded-lg font-bold border border-red-900/30 transition">Sıfırla (Tehlikeli)</button>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-900 p-6 rounded-2xl border border-slate-700">
-                        <div class="text-blue-500 text-4xl mb-4"><i class="fa-solid fa-trophy"></i></div>
-                        <h4 class="font-bold text-lg mb-2">Sezon Yönetimi</h4>
-                        <p class="text-slate-400 text-sm mb-4">XP'leri sıfırla ve yeni sezonu başlat.</p>
-                        <button onclick="resetLeaderboard()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg font-bold transition">Sezonu Bitir (XP Reset)</button>
-                    </div>
-                </div>
             </div>
 
         </div>
     </main>
 
-    <div id="modal-manage-user" class="fixed inset-0 bg-black/90 hidden flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+    <div id="modal-manage-user" class="fixed inset-0 hidden flex items-center justify-center p-4 modal-overlay">
         <div class="bg-slate-900 w-full max-w-2xl rounded-3xl border border-slate-600 overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
             <div class="bg-slate-800 p-6 flex items-center gap-4 border-b border-slate-700">
-                <img id="m-avatar" src="" class="w-20 h-20 rounded-full border-4 border-slate-600">
+                <img id="m-avatar" src="" class="w-20 h-20 rounded-full border-4 border-slate-600 bg-slate-950">
                 <div class="flex-1">
                     <h3 id="m-username" class="text-2xl font-black text-white">Kullanıcı Adı</h3>
                     <p id="m-email" class="text-slate-400 font-mono text-sm">email@email.com</p>
-                    <div id="m-badges" class="flex gap-1 mt-2 text-xl"></div>
+                    <div id="m-badges" class="flex gap-1 mt-2 text-xl overflow-x-auto"></div>
                 </div>
-                <button onclick="closeModal('modal-manage-user')" class="bg-slate-700 hover:bg-slate-600 text-white w-10 h-10 rounded-full font-bold">X</button>
+                <button onclick="window.admin.closeModal('modal-manage-user')" class="bg-slate-700 hover:bg-slate-600 text-white w-10 h-10 rounded-full font-bold">X</button>
             </div>
             
             <div class="p-6 overflow-y-auto grid grid-cols-2 gap-6">
@@ -166,21 +125,21 @@
                         <span class="w-20 text-sm text-slate-300">Ünvan:</span>
                         <input id="m-title" type="text" class="flex-1 bg-slate-950 border border-slate-700 rounded p-2 text-white">
                     </div>
-                    <button onclick="saveUserChanges()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded font-bold mt-2">Değişiklikleri Kaydet</button>
+                    <button onclick="window.admin.saveUserChanges()" class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded font-bold mt-2">Değişiklikleri Kaydet</button>
                 </div>
 
                 <div class="space-y-2">
                     <h4 class="font-bold text-slate-400 uppercase text-xs border-b border-slate-700 pb-1">Hızlı İşlemler</h4>
-                    <button onclick="toggleTeacherRole()" id="btn-role" class="w-full bg-orange-900/50 hover:bg-orange-600 text-orange-200 border border-orange-700/50 py-2 rounded font-bold text-sm transition">🎓 Öğretmen Yap</button>
-                    <button onclick="giveBadgePrompt()" class="w-full bg-purple-900/50 hover:bg-purple-600 text-purple-200 border border-purple-700/50 py-2 rounded font-bold text-sm transition">🏅 Rozet Ver</button>
-                    <button onclick="sendWarningPrompt()" class="w-full bg-yellow-900/50 hover:bg-yellow-600 text-yellow-200 border border-yellow-700/50 py-2 rounded font-bold text-sm transition">⚠️ Uyarı Gönder</button>
+                    <button onclick="window.admin.toggleTeacherRole()" id="btn-role" class="w-full bg-orange-900/50 hover:bg-orange-600 text-orange-200 border border-orange-700/50 py-2 rounded font-bold text-sm transition">🎓 Öğretmen Yap</button>
+                    <button onclick="window.admin.giveBadgePrompt()" class="w-full bg-purple-900/50 hover:bg-purple-600 text-purple-200 border border-purple-700/50 py-2 rounded font-bold text-sm transition">🏅 Rozet Ver</button>
+                    <button onclick="window.admin.sendWarningPrompt()" class="w-full bg-yellow-900/50 hover:bg-yellow-600 text-yellow-200 border border-yellow-700/50 py-2 rounded font-bold text-sm transition">⚠️ Uyarı Gönder</button>
                 </div>
 
                 <div class="col-span-2 border-t border-red-900/30 pt-4 mt-2">
                     <h4 class="font-bold text-red-500 uppercase text-xs mb-2">Tehlikeli Bölge</h4>
                     <div class="flex gap-3">
-                        <button onclick="banUser()" id="btn-ban" class="flex-1 bg-red-950 hover:bg-red-700 text-red-400 border border-red-900 py-2 rounded font-bold text-sm transition">🚫 Yasakla (Ban)</button>
-                        <button onclick="deleteUser()" class="flex-1 bg-black hover:bg-red-900 text-slate-400 border border-slate-700 py-2 rounded font-bold text-sm transition">🗑️ Hesabı Sil</button>
+                        <button onclick="window.admin.banUser()" id="btn-ban" class="flex-1 bg-red-950 hover:bg-red-700 text-red-400 border border-red-900 py-2 rounded font-bold text-sm transition">🚫 Yasakla (Ban)</button>
+                        <button onclick="window.admin.deleteUser()" class="flex-1 bg-black hover:bg-red-900 text-slate-400 border border-slate-700 py-2 rounded font-bold text-sm transition">🗑️ Hesabı Sil</button>
                     </div>
                 </div>
             </div>
@@ -201,8 +160,8 @@
                 </select>
                 <input id="s-effect" placeholder="Efekt Class (Opsiyonel)" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
                 <div class="flex gap-2 mt-2">
-                    <button onclick="closeModal('modal-add-shop')" class="flex-1 bg-slate-700 text-white py-2 rounded">İptal</button>
-                    <button onclick="addShopItem()" class="flex-1 bg-yellow-600 hover:bg-yellow-500 text-white py-2 rounded font-bold">Ekle</button>
+                    <button onclick="window.admin.closeModal('modal-add-shop')" class="flex-1 bg-slate-700 text-white py-2 rounded">İptal</button>
+                    <button onclick="window.admin.addShopItem()" class="flex-1 bg-yellow-600 hover:bg-yellow-500 text-white py-2 rounded font-bold">Ekle</button>
                 </div>
             </div>
         </div>
@@ -219,8 +178,8 @@
                 <input id="g-img" placeholder="Kapak Resmi URL" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
                 <input id="g-url" placeholder="Oyun Embed Linki" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-white">
                 <div class="flex gap-2 mt-2">
-                    <button onclick="closeModal('modal-add-game')" class="flex-1 bg-slate-700 text-white py-2 rounded">İptal</button>
-                    <button onclick="addGame()" class="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded font-bold">Ekle</button>
+                    <button onclick="window.admin.closeModal('modal-add-game')" class="flex-1 bg-slate-700 text-white py-2 rounded">İptal</button>
+                    <button onclick="window.admin.addGame()" class="flex-1 bg-green-600 hover:bg-green-500 text-white py-2 rounded font-bold">Ekle</button>
                 </div>
             </div>
         </div>
@@ -229,293 +188,203 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, arrayUnion, arrayRemove, increment, writeBatch } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, addDoc, deleteDoc, getDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyD5SFoL8-4idNlbixCw81pjWMn6M6-yv1A", authDomain: "kasif-cd133.firebaseapp.com", projectId: "kasif-cd133", storageBucket: "kasif-cd133.firebasestorage.app", messagingSenderId: "734052460302", appId: "1:734052460302:web:9c8b1747e3dcbdff6c195f", measurementId: "G-VZ04P8EQ69" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app, "kasif");
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app, "kasif");
 
         let currentUserId = null;
         let currentUserData = null;
 
-        window.switchTab = (tab) => {
-            document.querySelectorAll('.content-tab').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-${tab}`).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('bg-blue-600', 'text-white')); // Reset style
-            // Basit stil yönetimi
-            if(tab==='users') loadUsers(); if(tab==='shop') loadShop(); if(tab==='games') loadGames();
-        };
+        // GLOBAL ADMIN OBJESİ
+        window.admin = {
+            switchTab: (tab) => {
+                document.querySelectorAll('.content-tab').forEach(el => el.classList.add('hidden'));
+                document.getElementById(`tab-${tab}`).classList.remove('hidden');
+                if(tab==='users') window.admin.loadUsers();
+                if(tab==='shop') window.admin.loadShop();
+                if(tab==='games') window.admin.loadGames();
+            },
 
-        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+            openModal: (id) => document.getElementById(id).classList.remove('hidden'),
+            closeModal: (id) => document.getElementById(id).classList.add('hidden'),
 
-        // --- 1. KULLANICI YÖNETİMİ ---
-        window.loadUsers = async () => {
-            const grid = document.getElementById('users-grid'); grid.innerHTML = '<div class="text-white">Yükleniyor...</div>';
-            const snap = await getDocs(collection(db, "users"));
-            grid.innerHTML = '';
-            let totalCoins = 0; let totalUsers = 0;
-            snap.forEach(d => {
-                const u = d.data();
-                totalCoins += (u.coins || 0); totalUsers++;
-                let roleBadge = u.role === 'teacher' ? '<span class="bg-orange-500 text-white px-2 py-0.5 rounded text-[10px] font-bold">ÖĞRETMEN</span>' : '<span class="bg-slate-700 text-slate-300 px-2 py-0.5 rounded text-[10px]">ÖĞRENCİ</span>';
-                let statusDot = u.onlineStatus === 'online' ? 'bg-green-500' : 'bg-slate-500';
-                
-                grid.innerHTML += `
-                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex items-center justify-between group hover:border-blue-500 transition">
-                    <div class="flex items-center gap-4">
-                        <div class="relative">
-                            <img src="${u.avatar}" class="w-12 h-12 rounded-full bg-slate-700">
-                            <div class="absolute bottom-0 right-0 w-3 h-3 ${statusDot} border-2 border-slate-800 rounded-full"></div>
-                        </div>
-                        <div>
-                            <div class="font-bold text-white flex items-center gap-2">${u.username} ${roleBadge}</div>
-                            <div class="text-xs text-slate-400 font-mono">${u.email}</div>
-                            <div class="text-xs text-yellow-500 font-bold mt-1">${u.coins} 💰 | ${u.xp} XP</div>
-                        </div>
-                    </div>
-                    <button onclick="manageUser('${d.id}')" class="bg-slate-700 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition">Yönet</button>
-                </div>`;
-            });
-            document.getElementById('stat-users').innerText = totalUsers;
-            document.getElementById('stat-economy').innerText = totalCoins;
-        };
+            // --- KULLANICILAR ---
+            loadUsers: async () => {
+                const grid = document.getElementById('users-grid'); grid.innerHTML = '<div class="text-white">Yükleniyor...</div>';
+                try {
+                    const snap = await getDocs(collection(db, "users"));
+                    grid.innerHTML = '';
+                    let count = 0;
+                    snap.forEach(d => {
+                        count++;
+                        const u = d.data();
+                        let roleBadge = u.role === 'teacher' ? '<span class="bg-orange-500 text-white px-2 py-0.5 rounded text-[10px] font-bold">ÖĞRETMEN</span>' : '<span class="bg-slate-700 text-slate-300 px-2 py-0.5 rounded text-[10px]">ÖĞRENCİ</span>';
+                        let statusDot = u.onlineStatus === 'online' ? 'bg-green-500' : 'bg-slate-500';
+                        if(u.onlineStatus === 'banned') statusDot = 'bg-red-600';
 
-        window.manageUser = async (id) => {
-            currentUserId = id;
-            // Güncel veriyi çek
-            /* Not: Gerçek uygulamada getDoc ile taze veri çekilir, hızlı olsun diye listeden almadık */
-            /* Burada basitlik için arrayden bulmuyoruz, direkt firestore'dan taze çekiyoruz */
-            /* Ancak admin panelinde "ManageUser" a tıkladığımızda o anki veriyi parametre olarak da alabilirdik. */
-            /* En doğrusu bir getDoc yapmaktır. */
-            // Şimdilik görseldeki parametreleri değil, yeni bir getDoc yapalım:
-            // (Kod karmaşasını önlemek için basitleştiriyorum, parametre göndermedim)
-            // Aslında yukarıdaki loop içinde data attribute'lara gömebilirdik.
-            // Neyse, hızlı bir getDoc yapalım:
-            // ... (Firebase import zaten var) ...
-            // const { getDoc, doc } = ... 
-            // Burada importlar module scope'da. Fonksiyonlar window'da.
-            // Module scope'daki db'ye erişmek için hile yapmıyoruz, zaten erişebiliyoruz.
-            // Sadece importları tekrar yazamayız.
-            
-            // Hızlı çözüm: loadUsers'da veriyi global bir objeye atabilirdik. 
-            // Ama en temizi:
-            // Butona tıkladığında fetch yapalım.
-            /* NOT: Aşağıdaki import satırı module içinde, window.manageUser dışarıda.
-               Bu yüzden module içindeki db'ye erişmek için window.db = db; gibi bir atama yapmamız lazım
-               veya kodun tamamını module içine alıp window'a fonksiyonları mount etmeliyiz.
-               Aşağıdaki kod yapısında bu zaten yapılmış durumda.
-            */
-        };
+                        grid.innerHTML += `
+                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex items-center justify-between group hover:border-blue-500 transition">
+                            <div class="flex items-center gap-4">
+                                <div class="relative">
+                                    <img src="${u.avatar}" class="w-12 h-12 rounded-full bg-slate-700 object-cover">
+                                    <div class="absolute bottom-0 right-0 w-3 h-3 ${statusDot} border-2 border-slate-800 rounded-full"></div>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-white flex items-center gap-2">${u.username} ${roleBadge}</div>
+                                    <div class="text-xs text-slate-400 font-mono">${u.email}</div>
+                                    <div class="text-xs text-yellow-500 font-bold mt-1">${u.coins||0} 💰 | ${u.xp||0} XP</div>
+                                </div>
+                            </div>
+                            <button onclick="window.admin.manageUser('${d.id}')" class="bg-slate-700 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition">Yönet</button>
+                        </div>`;
+                    });
+                    document.getElementById('stat-users').innerText = count;
+                } catch(e) { console.error(e); }
+            },
 
-        // --- 2. FONKSİYONLARI BAĞLAMA (MODÜL KAPSAMI DIŞINA ÇIKARMA) ---
-        // Bu kısım çok kritik.
-        
-        // Yardımcı Fonksiyon: Kullanıcı Detayını Getir ve Modalı Doldur
-        const fetchAndShowUser = async (uid) => {
-            const docSnap = await getDoc(doc(db, "users", uid));
-            if(docSnap.exists()) {
-                currentUserData = docSnap.data();
-                document.getElementById('m-avatar').src = currentUserData.avatar;
-                document.getElementById('m-username').innerText = currentUserData.username;
-                document.getElementById('m-email').innerText = currentUserData.email;
-                document.getElementById('m-coins').value = currentUserData.coins;
-                document.getElementById('m-xp').value = currentUserData.xp;
-                document.getElementById('m-title').value = currentUserData.title;
-                
-                // Rol Butonu Durumu
-                const btnRole = document.getElementById('btn-role');
-                if(currentUserData.role === 'teacher') {
-                    btnRole.innerHTML = "🎓 Öğretmenliği Al (Öğrenci Yap)";
-                    btnRole.className = "w-full bg-slate-700 hover:bg-slate-600 text-slate-300 py-2 rounded font-bold text-sm transition";
-                } else {
-                    btnRole.innerHTML = "🎓 Öğretmen Yap";
-                    btnRole.className = "w-full bg-orange-900/50 hover:bg-orange-600 text-orange-200 border border-orange-700/50 py-2 rounded font-bold text-sm transition";
+            manageUser: async (uid) => {
+                currentUserId = uid;
+                const docSnap = await getDoc(doc(db, "users", uid));
+                if(docSnap.exists()) {
+                    currentUserData = docSnap.data();
+                    document.getElementById('m-avatar').src = currentUserData.avatar;
+                    document.getElementById('m-username').innerText = currentUserData.username;
+                    document.getElementById('m-email').innerText = currentUserData.email;
+                    document.getElementById('m-coins').value = currentUserData.coins || 0;
+                    document.getElementById('m-xp').value = currentUserData.xp || 0;
+                    document.getElementById('m-title').value = currentUserData.title || '';
+                    
+                    const btnRole = document.getElementById('btn-role');
+                    if(currentUserData.role === 'teacher') {
+                        btnRole.innerHTML = "🎓 Öğretmenliği Al"; btnRole.className = "w-full bg-slate-700 text-slate-300 py-2 rounded font-bold text-sm";
+                    } else {
+                        btnRole.innerHTML = "🎓 Öğretmen Yap"; btnRole.className = "w-full bg-orange-900/50 hover:bg-orange-600 text-orange-200 border border-orange-700/50 py-2 rounded font-bold text-sm transition";
+                    }
+
+                    const btnBan = document.getElementById('btn-ban');
+                    if(currentUserData.onlineStatus === 'banned') {
+                        btnBan.innerHTML = "✅ Yasağı Kaldır"; btnBan.className = "flex-1 bg-green-900 hover:bg-green-700 text-green-400 border border-green-900 py-2 rounded font-bold text-sm transition";
+                    } else {
+                        btnBan.innerHTML = "🚫 Yasakla"; btnBan.className = "flex-1 bg-red-950 hover:bg-red-700 text-red-400 border border-red-900 py-2 rounded font-bold text-sm transition";
+                    }
+
+                    const bDiv = document.getElementById('m-badges'); bDiv.innerHTML = '';
+                    if(currentUserData.badges) currentUserData.badges.forEach(b => bDiv.innerHTML += `<span title="${b.name}">${b.icon}</span>`);
+
+                    document.getElementById('modal-manage-user').classList.remove('hidden');
                 }
+            },
 
-                // Ban Butonu Durumu
-                const btnBan = document.getElementById('btn-ban');
-                if(currentUserData.onlineStatus === 'banned') {
-                    btnBan.innerHTML = "✅ Yasağı Kaldır";
-                    btnBan.className = "flex-1 bg-green-900 hover:bg-green-700 text-green-400 border border-green-900 py-2 rounded font-bold text-sm transition";
-                } else {
-                    btnBan.innerHTML = "🚫 Yasakla (Ban)";
-                    btnBan.className = "flex-1 bg-red-950 hover:bg-red-700 text-red-400 border border-red-900 py-2 rounded font-bold text-sm transition";
+            saveUserChanges: async () => {
+                const coins = parseInt(document.getElementById('m-coins').value);
+                const xp = parseInt(document.getElementById('m-xp').value);
+                const title = document.getElementById('m-title').value;
+                await updateDoc(doc(db, "users", currentUserId), { coins, xp, title });
+                Swal.fire('Başarılı', 'Kaydedildi.', 'success');
+                window.admin.loadUsers();
+            },
+
+            toggleTeacherRole: async () => {
+                const newRole = currentUserData.role === 'teacher' ? 'student' : 'teacher';
+                await updateDoc(doc(db, "users", currentUserId), { role: newRole });
+                window.admin.manageUser(currentUserId); window.admin.loadUsers();
+                Swal.fire('Rol Değişti', `Yeni Rol: ${newRole}`, 'success');
+            },
+
+            banUser: async () => {
+                const newStatus = currentUserData.onlineStatus === 'banned' ? 'offline' : 'banned';
+                await updateDoc(doc(db, "users", currentUserId), { onlineStatus: newStatus });
+                window.admin.manageUser(currentUserId); window.admin.loadUsers();
+                Swal.fire('İşlem Tamam', `Durum: ${newStatus}`, 'warning');
+            },
+
+            deleteUser: async () => {
+                if(confirm("Kullanıcı silinecek. Emin misin?")) {
+                    await deleteDoc(doc(db, "users", currentUserId));
+                    document.getElementById('modal-manage-user').classList.add('hidden');
+                    window.admin.loadUsers();
+                    Swal.fire('Silindi', 'Kullanıcı uçuruldu.', 'success');
                 }
+            },
 
-                // Rozetleri göster
-                const bDiv = document.getElementById('m-badges'); bDiv.innerHTML = '';
-                if(currentUserData.badges) currentUserData.badges.forEach(b => bDiv.innerHTML += `<span>${b.icon}</span>`);
+            giveBadgePrompt: async () => {
+                const badges = {
+                    'b1': '🚀 Uzay Çırağı', 'b2': '⭐ Parlayan Yıldız', 'b3': '🧠 Bilgi Küpü',
+                    'b4': '🎨 Sanatçı', 'b5': '🌍 Dünya Dostu', 'b6': '👑 Lider', 'b7': '🏆 Şampiyon'
+                };
+                const { value: badgeId } = await Swal.fire({ title: 'Rozet Seç', input: 'select', inputOptions: badges, showCancelButton: true });
+                if (badgeId) {
+                    const icon = badges[badgeId].split(' ')[0];
+                    const name = badges[badgeId].split(' ').slice(1).join(' ');
+                    const badgeObj = { id: badgeId, name: name, icon: icon, date: new Date().toISOString(), type: 'reward' };
+                    await updateDoc(doc(db, "users", currentUserId), { badges: arrayUnion(badgeObj) });
+                    Swal.fire('Gönderildi', 'Rozet verildi.', 'success');
+                    window.admin.manageUser(currentUserId);
+                }
+            },
 
-                document.getElementById('modal-manage-user').classList.remove('hidden');
-            }
-        };
+            sendWarningPrompt: async () => {
+                const { value: text } = await Swal.fire({title: 'Uyarı Mesajı', input: 'text', showCancelButton: true});
+                if(text) {
+                    await addDoc(collection(db, "messages"), {
+                        text: `⚠️ YÖNETİCİ UYARISI: ${text}`, senderId: 'ADMIN', senderName: 'YÖNETİM', avatar: 'https://cdn-icons-png.flaticon.com/512/10308/10308979.png', timestamp: new Date()
+                    });
+                    Swal.fire('Gönderildi', 'Uyarı sohbete düştü.', 'success');
+                }
+            },
 
-        window.manageUser = (uid) => { currentUserId = uid; fetchAndShowUser(uid); };
-
-        window.saveUserChanges = async () => {
-            const coins = parseInt(document.getElementById('m-coins').value);
-            const xp = parseInt(document.getElementById('m-xp').value);
-            const title = document.getElementById('m-title').value;
-            await updateDoc(doc(db, "users", currentUserId), { coins, xp, title });
-            Swal.fire('Başarılı', 'Bilgiler güncellendi.', 'success');
-            loadUsers();
-        };
-
-        window.toggleTeacherRole = async () => {
-            const newRole = currentUserData.role === 'teacher' ? 'student' : 'teacher';
-            await updateDoc(doc(db, "users", currentUserId), { role: newRole });
-            fetchAndShowUser(currentUserId); loadUsers();
-            Swal.fire('Rol Değişti', `Kullanıcı artık ${newRole}`, 'success');
-        };
-
-        window.banUser = async () => {
-            const newStatus = currentUserData.onlineStatus === 'banned' ? 'offline' : 'banned';
-            await updateDoc(doc(db, "users", currentUserId), { onlineStatus: newStatus });
-            fetchAndShowUser(currentUserId);
-            Swal.fire('İşlem Tamam', `Kullanıcı durumu: ${newStatus}`, 'warning');
-        };
-
-        window.deleteUser = async () => {
-            if(confirm("BU HESAP KALICI OLARAK SİLİNECEK! Emin misin?")) {
-                await deleteDoc(doc(db, "users", currentUserId));
-                document.getElementById('modal-manage-user').classList.add('hidden');
-                loadUsers();
-                Swal.fire('Silindi', 'Kullanıcı veritabanından uçuruldu.', 'success');
-            }
-        };
-
-        window.giveBadgePrompt = async () => {
-            const badges = [
-                {id:'b1', name:'Uzay Çırağı', icon:'🚀'}, {id:'b2', name:'Parlayan Yıldız', icon:'⭐'},
-                {id:'b3', name:'Bilgi Küpü', icon:'🧠'}, {id:'b6', name:'Lider', icon:'👑'},
-                {id:'b_custom', name:'Özel Rozet', icon:'🏆'}
-            ];
-            
-            const { value: badgeIdx } = await Swal.fire({
-                title: 'Rozet Seç',
-                input: 'select',
-                inputOptions: badges.reduce((acc, curr, idx) => ({...acc, [idx]: `${curr.icon} ${curr.name}`}), {}),
-                showCancelButton: true
-            });
-
-            if (badgeIdx) {
-                const b = badges[badgeIdx];
-                const badgeObj = { id: b.id, name: b.name, icon: b.icon, date: new Date().toISOString(), type: 'reward' };
-                await updateDoc(doc(db, "users", currentUserId), { badges: arrayUnion(badgeObj) });
-                Swal.fire('Gönderildi', 'Rozet öğrenciye eklendi.', 'success');
-                fetchAndShowUser(currentUserId);
-            }
-        };
-
-        window.sendWarningPrompt = async () => {
-            const { value: text } = await Swal.fire({title: 'Uyarı Mesajı', input: 'text', showCancelButton: true});
-            if(text) {
-                // Uyarıyı kullanıcıya "mesaj" olarak atalım ama tipi "warning" olsun
-                // Portal tarafında bunu dinleyip popup açabiliriz veya sohbete kırmızı yazdırabiliriz.
-                // Şimdilik sohbete kırmızı yazı olarak atalım (System Message).
-                // Veya users dokümanına "lastWarning" alanı ekleyelim.
-                // En garantisi: Sohbetten DM atmak.
-                // Ama admin panelinden mesaj koleksiyonuna yazıyoruz:
-                await addDoc(collection(db, "messages"), {
-                    text: `⚠️ YÖNETİCİ UYARISI: ${text}`,
-                    senderId: 'SYSTEM',
-                    senderName: 'SİSTEM',
-                    avatar: 'https://cdn-icons-png.flaticon.com/512/10308/10308979.png',
-                    timestamp: new Date(),
-                    toUserId: currentUserId // Özel mesaj mantığı (Portal'da filtrelemek lazım ama şimdilik genele atar, isimden anlar)
-                });
-                Swal.fire('Gönderildi', 'Uyarı sohbete düştü.', 'success');
-            }
-        };
-
-        // --- MAĞAZA VE OYUNLAR (CRUD) ---
-        window.openShopModal = () => document.getElementById('modal-add-shop').classList.remove('hidden');
-        window.openGameModal = () => document.getElementById('modal-add-game').classList.remove('hidden');
-
-        window.loadShop = async () => {
-            const grid = document.getElementById('shop-grid'); grid.innerHTML = 'Yükleniyor...';
-            const s = await getDocs(collection(db, "shop_items")); grid.innerHTML = '';
-            s.forEach(d => {
-                const i = d.data();
-                grid.innerHTML += `
-                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 relative text-center">
-                    <button onclick="delItem('shop_items','${d.id}')" class="absolute top-2 right-2 text-red-500 hover:text-white"><i class="fa-solid fa-trash"></i></button>
-                    <div class="text-4xl mb-2">${i.icon}</div>
-                    <div class="font-bold">${i.name}</div>
-                    <div class="text-yellow-400 font-mono">${i.price} 💰</div>
-                </div>`;
-            });
-        };
-
-        window.addShopItem = async () => {
-            await addDoc(collection(db,"shop_items"), {
-                name: document.getElementById('s-name').value,
-                price: Number(document.getElementById('s-price').value),
-                icon: document.getElementById('s-icon').value,
-                type: document.getElementById('s-type').value,
-                effectClass: document.getElementById('s-effect').value
-            });
-            document.getElementById('modal-add-shop').classList.add('hidden'); loadShop();
-        };
-
-        window.loadGames = async () => {
-            const grid = document.getElementById('games-grid'); grid.innerHTML = 'Yükleniyor...';
-            const s = await getDocs(collection(db, "games")); grid.innerHTML = '';
-            s.forEach(d => {
-                const g = d.data();
-                grid.innerHTML += `
-                <div class="bg-slate-800 p-2 rounded-xl border border-slate-700 relative group">
-                    <img src="${g.img}" class="w-full h-32 object-cover rounded-lg opacity-50 group-hover:opacity-100 transition">
-                    <div class="p-2 font-bold text-center">${g.title}</div>
-                    <button onclick="delItem('games','${d.id}')" class="absolute top-2 right-2 bg-red-600 text-white px-2 rounded">Sil</button>
-                </div>`;
-            });
-        };
-
-        window.addGame = async () => {
-            await addDoc(collection(db,"games"), {
-                title: document.getElementById('g-title').value,
-                cat: document.getElementById('g-cat').value,
-                img: document.getElementById('g-img').value,
-                url: document.getElementById('g-url').value
-            });
-            document.getElementById('modal-add-game').classList.add('hidden'); loadGames();
-        };
-
-        window.delItem = async (col, id) => { if(confirm('Sil?')) { await deleteDoc(doc(db,col,id)); col==='games'?loadGames():loadShop(); } };
-
-        // --- SİSTEM (GLOBAL) ---
-        window.clearChat = async () => {
-            if(!confirm('Tüm sohbet silinecek?')) return;
-            const q = await getDocs(collection(db, "messages"));
-            const batch = writeBatch(db);
-            q.forEach(d => batch.delete(d.ref));
-            await batch.commit();
-            Swal.fire('Temizlendi', 'Sohbet tertemiz.', 'success');
-        };
-
-        window.sendGlobalAnnouncement = async () => {
-            const { value: txt } = await Swal.fire({title:'Duyuru', input:'text'});
-            if(txt) {
-                await addDoc(collection(db, "messages"), {
-                    text: `📢 DUYURU: ${txt}`, senderId:'ADMIN', senderName:'YÖNETİM', avatar:'https://cdn-icons-png.flaticon.com/512/1995/1995515.png', timestamp: new Date()
-                });
-            }
-        };
-
-        window.giftAllUsers = async () => {
-            const { value: amt } = await Swal.fire({title:'Kaç Altın?', input:'number'});
-            if(amt) {
-                const s = await getDocs(collection(db, "users"));
-                const batch = writeBatch(db); // Batch kullanımı (Performans için)
+            // --- MAĞAZA ---
+            loadShop: async () => {
+                const grid = document.getElementById('shop-grid'); grid.innerHTML = 'Yükleniyor...';
+                const s = await getDocs(collection(db, "shop_items")); grid.innerHTML = '';
                 s.forEach(d => {
-                    batch.update(d.ref, { coins: increment(Number(amt)) });
+                    const i = d.data();
+                    grid.innerHTML += `
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 relative text-center">
+                        <button onclick="window.admin.delItem('shop_items','${d.id}')" class="absolute top-2 right-2 text-red-500 hover:text-white"><i class="fa-solid fa-trash"></i></button>
+                        <div class="text-4xl mb-2">${i.icon}</div>
+                        <div class="font-bold">${i.name}</div>
+                        <div class="text-yellow-400 font-mono">${i.price} 💰</div>
+                    </div>`;
                 });
-                await batch.commit();
-                Swal.fire('Dağıtıldı', 'Herkes zengin oldu!', 'success');
-            }
+            },
+            addShopItem: async () => {
+                await addDoc(collection(db,"shop_items"), {
+                    name: document.getElementById('s-name').value, price: Number(document.getElementById('s-price').value),
+                    icon: document.getElementById('s-icon').value, type: document.getElementById('s-type').value, effectClass: document.getElementById('s-effect').value
+                });
+                document.getElementById('modal-add-shop').classList.add('hidden'); window.admin.loadShop();
+            },
+
+            // --- OYUNLAR ---
+            loadGames: async () => {
+                const grid = document.getElementById('games-grid'); grid.innerHTML = 'Yükleniyor...';
+                const s = await getDocs(collection(db, "games")); grid.innerHTML = '';
+                s.forEach(d => {
+                    const g = d.data();
+                    grid.innerHTML += `
+                    <div class="bg-slate-800 p-2 rounded-xl border border-slate-700 relative">
+                        <img src="${g.img}" class="w-full h-24 object-cover rounded opacity-50">
+                        <div class="font-bold text-center mt-2">${g.title}</div>
+                        <button onclick="window.admin.delItem('games','${d.id}')" class="absolute top-2 right-2 bg-red-600 px-2 rounded text-white text-xs">Sil</button>
+                    </div>`;
+                });
+            },
+            addGame: async () => {
+                await addDoc(collection(db,"games"), {
+                    title: document.getElementById('g-title').value, cat: document.getElementById('g-cat').value,
+                    img: document.getElementById('g-img').value, url: document.getElementById('g-url').value
+                });
+                document.getElementById('modal-add-game').classList.add('hidden'); window.admin.loadGames();
+            },
+
+            delItem: async (col, id) => { if(confirm('Sil?')) { await deleteDoc(doc(db,col,id)); col==='games'?window.admin.loadGames():window.admin.loadShop(); } }
         };
 
-        onAuthStateChanged(auth, u => { if(u) loadUsers(); else location.href="login.html"; });
+        onAuthStateChanged(auth, u => { if(u) window.admin.loadUsers(); else location.href="login.html"; });
     </script>
 </body>
 </html>
