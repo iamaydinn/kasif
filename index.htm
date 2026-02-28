@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İklim Zinciri - Muhammet Hoca v5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+    <div id="login-screen" class="flex items-center justify-center min-h-screen p-4 bg-indigo-900">
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-md animate__animated animate__fadeIn">
+            <h1 class="text-3xl font-black text-center mb-6 text-slate-800 italic">🌍 İklim Zinciri</h1>
+            <input id="user-name" type="text" placeholder="Ad Soyad" class="w-full p-4 border-2 rounded-2xl mb-4 outline-none focus:border-indigo-500">
+            <select id="user-group" class="w-full p-4 border-2 rounded-2xl mb-6 bg-white outline-none">
+                <option value="">Grubunu Seç...</option>
+                <option value="neden">🔵 Neden Grubu</option>
+                <option value="sonuc">🔴 Sonuç Grubu</option>
+                <option value="cozum">🟢 Çözüm Grubu</option>
+                <option value="dashboard">🖥️ Akıllı Tahta</option>
+            </select>
+            <button id="btn-login" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 transition">Sistemi Başlat 🚀</button>
+        </div>
+    </div>
+
+    <div id="app-screen" class="hidden min-h-screen flex flex-col">
+        <header class="bg-white shadow p-4 flex justify-between items-center px-8 border-b-4 border-indigo-500">
+            <h2 id="display-info" class="font-bold text-slate-700"></h2>
+            <button onclick="location.reload()" class="text-red-500 font-bold hover:bg-red-50 px-4 py-2 rounded-lg transition">Çıkış</button>
+        </header>
+        <main class="p-6 max-w-6xl mx-auto w-full">
+            <div id="content-area"></div>
+            <div id="dashboard-area" class="hidden">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    <div id="chain-feed" class="flex-grow space-y-6"></div>
+                    <div class="w-full lg:w-80">
+                        <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-yellow-400">
+                            <h3 class="text-xl font-bold mb-4">🏆 Liderlik Tablosu</h3>
+                            <div id="leaderboard-list" class="space-y-3 text-sm text-gray-400 italic">Yükleniyor...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, updateDoc, doc, onSnapshot, query, where, orderBy, serverTimestamp, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5SFoL8-4idNlbixCw81pjWMn6M6-yv1A",
+            authDomain: "kasif-cd133.firebaseapp.com",
+            projectId: "kasif-cd133",
+            storageBucket: "kasif-cd133.firebasestorage.app",
+            messagingSenderId: "734052460302",
+            appId: "1:734052460302:web:9c8b1747e3dcbdff6c195f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        let user = {};
+
+        // GİRİŞ İŞLEMİ
+        document.getElementById('btn-login').addEventListener('click', () => {
+            const name = document.getElementById('user-name').value.trim();
+            const group = document.getElementById('user-group').value;
+
+            if (!name || !group) return Swal.fire('Dikkat', 'Bilgilerini eksiksiz girmelisin!', 'warning');
+
+            user = { name, group };
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            document.getElementById('display-info').innerText = `${name.toUpperCase()} | ${group.toUpperCase()} EKİBİ`;
+
+            if (group === 'dashboard') startDashboard();
+            else if (group === 'neden') showNedenForm();
+            else showRelayList();
+        });
+
+        // 🔵 NEDEN EKLEME
+        function showNedenForm() {
+            const area = document.getElementById('content-area');
+            area.innerHTML = `
+                <div class="bg-white p-8 rounded-[2rem] shadow-xl border-l-8 border-blue-500 animate__animated animate__fadeInUp">
+                    <h3 class="text-2xl font-bold mb-4 text-blue-800">1. Adım: Neden Bul</h3>
+                    <textarea id="txt-input" class="w-full p-5 border-2 rounded-2xl mb-6 h-40 outline-none focus:border-blue-400 text-lg" placeholder="Örn: Fabrika bacalarından çıkan dumanlar..."></textarea>
+                    <button id="btn-send-neden" class="w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-xl shadow-lg hover:bg-blue-700 active:scale-95 transition">GÖNDER ➡️</button>
+                </div>`;
+            
+            document.getElementById('btn-send-neden').addEventListener('click', async () => {
+                const val = document.getElementById('txt-input').value.trim();
+                if(!val) return Swal.fire('Hata', 'Lütfen bir neden yazın!', 'error');
+                
+                try {
+                    await addDoc(collection(db, "iklimZinciri"), {
+                        neden: val, nedenYazan: user.name, status: 1, timestamp: serverTimestamp()
+                    });
+                    document.getElementById('txt-input').value = "";
+                    Swal.fire({ title: 'Gitti!', text: 'Veri Sonuç ekibine iletildi!', icon: 'success', timer: 2000 });
+                } catch(e) { 
+                    Swal.fire('Hata', 'Veritabanı reddetti! Lütfen Rules ayarını yapın.', 'error');
+                    console.error(e);
+                }
+            });
+        }
+
+        // 🔴 SONUÇ & 🟢 ÇÖZÜM LİSTESİ
+        function showRelayList() {
+            const target = user.group === 'sonuc' ? 1 : 2;
+            const q = query(collection(db, "iklimZinciri"), where("status", "==", target), orderBy("timestamp", "desc"));
+            
+            onSnapshot(q, (snap) => {
+                const area = document.getElementById('content-area');
+                area.innerHTML = `<h3 class="text-2xl font-black mb-6 text-slate-800">⚡ Bekleyen Görevlerin</h3>`;
+                
+                if (snap.empty) {
+                    area.innerHTML += `<div class="bg-white/50 p-12 rounded-3xl text-center border-2 border-dashed border-slate-300 text-slate-400 italic">Şu an bekleyen görev yok...</div>`;
+                    return;
+                }
+
+                snap.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const cardId = docSnap.id;
+                    const card = document.createElement('div');
+                    card.className = "bg-white p-8 rounded-[2rem] shadow-lg mb-6 border-l-[12px] animate__animated animate__fadeInLeft " + (target === 1 ? "border-red-500" : "border-green-600");
+                    card.innerHTML = `
+                        <p class="text-xs font-black text-slate-300 mb-2 uppercase">${data.nedenYazan} yazdı:</p>
+                        <p class="text-xl font-bold text-slate-700 mb-6 italic">"${data.neden}"</p>
+                        ${data.sonuc ? `<div class="bg-red-50 p-4 rounded-xl mb-6 text-red-700 font-bold">🔴 Sonuç: ${data.sonuc}</div>` : ""}
+                        <input type="text" id="in-${cardId}" class="w-full p-4 border-2 rounded-2xl mb-4 outline-none focus:border-slate-300" placeholder="${user.group === 'sonuc' ? 'Bunun sonucu ne olur?' : 'Bu soruna çözümün nedir?'}">
+                        <button id="btn-${cardId}" class="w-full py-4 rounded-2xl font-black text-white ${target === 1 ? "bg-red-500" : "bg-green-600"} shadow-lg active:scale-95 transition">BAYRAĞI DEVRET 🏁</button>
+                    `;
+                    area.appendChild(card);
+
+                    document.getElementById(`btn-${cardId}`).addEventListener('click', async () => {
+                        const val = document.getElementById(`in-${cardId}`).value.trim();
+                        if(!val) return Swal.fire('Dur!', 'Lütfen kutuyu doldur.', 'warning');
+                        
+                        const ref = doc(db, "iklimZinciri", cardId);
+                        if(user.group === 'sonuc') await updateDoc(ref, { sonuc: val, sonucYazan: user.name, status: 2 });
+                        else await updateDoc(ref, { cozum: val, cozumYazan: user.name, status: 3 });
+                        Swal.fire({ title: 'Başarılı!', text: 'Bir sonraki ekibe geçti.', icon: 'success', timer: 1500 });
+                    });
+                });
+            });
+        }
+
+        // 🖥️ AKILLI TAHTA
+        function startDashboard() {
+            document.getElementById('dashboard-area').classList.remove('hidden');
+            const q = query(collection(db, "iklimZinciri"), where("status", "==", 3), orderBy("timestamp", "desc"));
+            
+            onSnapshot(q, (snap) => {
+                const feed = document.getElementById('chain-feed');
+                feed.innerHTML = "<h1 class='text-3xl font-black mb-6 text-slate-800'>Canlı İklim Akışı 🚀</h1>";
+                snap.forEach((docSnap) => {
+                    const d = docSnap.data();
+                    feed.innerHTML += `
+                        <div class="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row animate__animated animate__zoomIn">
+                            <div class="p-8 bg-blue-50/50 flex-1 border-r border-slate-100">
+                                <span class="text-[10px] font-black text-blue-400 uppercase">NEDEN (${d.nedenYazan})</span>
+                                <p class="text-xl font-bold mt-1 text-slate-800">${d.neden}</p>
+                            </div>
+                            <div class="p-8 bg-red-50/50 flex-1 border-r border-slate-100">
+                                <span class="text-[10px] font-black text-red-400 uppercase">SONUÇ (${d.sonucYazan})</span>
+                                <p class="text-xl font-bold mt-1 text-red-900">${d.sonuc}</p>
+                            </div>
+                            <div class="p-8 bg-green-600 flex-1 text-white shadow-inner">
+                                <span class="text-[10px] font-black opacity-60 uppercase font-black">ÇÖZÜM (${d.cozumYazan})</span>
+                                <p class="text-2xl font-black mt-1 leading-tight">${d.cozum}</p>
+                            </div>
+                        </div>`;
+                });
+                updateLeaderboard();
+            });
+        }
+
+        async function updateLeaderboard() {
+            const q = query(collection(db, "iklimZinciri"));
+            const snap = await getDocs(q);
+            const scores = {};
+            
+            snap.forEach((doc) => {
+                const d = doc.data();
+                if(d.nedenYazan) scores[d.nedenYazan] = (scores[d.nedenYazan] || 0) + 1;
+                if(d.sonucYazan) scores[d.sonucYazan] = (scores[d.sonucYazan] || 0) + 1;
+                if(d.cozumYazan) scores[d.cozumYazan] = (scores[d.cozumYazan] || 0) + 1;
+            });
+
+            const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const list = document.getElementById('leaderboard-list');
+            
+            if(sorted.length === 0) { list.innerHTML = "Puanlar bekleniyor..."; return; }
+            list.innerHTML = sorted.map(([n, p], i) => `
+                <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl animate__animated animate__fadeInRight">
+                    <span class="font-bold text-slate-700 truncate w-32">${i+1}. ${n}</span>
+                    <span class="bg-indigo-600 text-white text-[10px] px-3 py-1 rounded-full font-black">${p} PUAN</span>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
